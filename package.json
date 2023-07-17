@@ -1,0 +1,42 @@
+{
+  "name": "react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "@axa-fr/react-toolkit-all": "^2.0.1-alpha.0",
+    "plotty": "^0.4.9",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-webcam": "^7.1.1",
+    "sass": "^1.63.6"
+  },
+  "devDependencies": {
+    "@storybook/addon-essentials": "^7.0.26",
+    "@storybook/addon-interactions": "^7.0.26",
+    "@storybook/addon-links": "^7.0.26",
+    "@storybook/blocks": "^7.0.26",
+    "@storybook/react": "^7.0.26",
+    "@storybook/react-vite": "^7.0.26",
+    "@storybook/testing-library": "^0.0.14-next.2",
+    "@types/react": "^18.0.37",
+    "@types/react-dom": "^18.0.11",
+    "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^8.38.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "eslint-plugin-storybook": "^0.6.12",
+    "prop-types": "^15.8.1",
+    "storybook": "^7.0.26",
+    "vite": "^4.3.9"
+  }
+}
