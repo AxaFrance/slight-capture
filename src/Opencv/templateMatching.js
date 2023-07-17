@@ -14,34 +14,67 @@ export const findMatch = (cv) => (template, image) => {
     cv.rectangle(image, maxPoint, point, color, 2, cv.LINE_8, 0);
     
     */
-    let color = new cv.Scalar(255, 0, 0, 255);
+    let colorRed = new cv.Scalar(255, 0, 0, 255);
+    let colorBlue = new cv.Scalar(0, 255, 0, 255);
 
-    var newDst = [];
-    var start = 0;
-    var end = destination.cols;
-
-    for (var i = 0; i < destination.rows; i++) {
+    const newDst = [];
+    let start = 0;
+    let end = destination.cols;
+    let numberPoint = 0;
+    
+    const minPointMemory = {
+        "x": 999999999,
+        "y": 999999999
+    }
+    const maxPointMemory = {
+        "x": 0,
+        "y": 0
+    }
+    for (let i = 0; i < destination.rows; i++) {
 
         newDst[i] = [];
-        for (var k = 0; k < destination.cols; k++) {
+        for (let k = 0; k < destination.cols; k++) {
 
             newDst[i][k] = destination.data32F[start];
 
-            if (newDst[i][k] > 0.5) {
-                console.log(newDst[i][k])
+            if (newDst[i][k] > 0.35) {
+                //console.log(newDst[i][k])
                 let maxPoint = {
                     "x": k,
                     "y": i
                 }
+                if(maxPoint.x < minPointMemory.x) {
+                    minPointMemory.x = maxPoint.x;
+                }
+                if(maxPoint.y < minPointMemory.y) {
+                    minPointMemory.y = maxPoint.y;
+                }
+                
+                console.log(maxPoint);
+                numberPoint++;
                 let point = new cv.Point(k + template.cols, i + template.rows);
-                cv.rectangle(image, maxPoint, point, color, 1, cv.LINE_8, 0);
+                console.log(point);
+                if(point.x > maxPointMemory.x) {
+                    maxPointMemory.x = maxPoint.x;
+                }
+                if(point.y > maxPointMemory.y) {
+                    maxPointMemory.y = maxPoint.y;
+                }
+                cv.rectangle(image, maxPoint, point, colorRed, 1, cv.LINE_8, 0);
             }
             start++;
         }
         start = end;
         end = end + destination.cols;
     }
+    console.log(numberPoint)
 
+    if(maxPointMemory.x !== 0 && maxPointMemory.y !== 0 && minPointMemory.x !== 999999999 && minPointMemory.y !== 999999999) {
+        let marginX = 0;// maxPointMemory.x - minPointMemory.x ;
+        let marginY = maxPointMemory.y - minPointMemory.y;
+        cv.rectangle(image, minPointMemory, new cv.Point(maxPointMemory.x + template.cols + marginX, maxPointMemory.y + template.rows + marginY), colorBlue, parseInt(numberPoint / 10, 10), cv.LINE_8, 0);
+    }
     mask.delete();
+    destination.delete();
     return image;
 }

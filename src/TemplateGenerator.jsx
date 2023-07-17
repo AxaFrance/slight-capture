@@ -118,9 +118,11 @@ export const TemplateGenerator = () => {
         const imgCvTemplateResized = imageResize(cv)(imgCv, 1000).image;
         console.log("imgCvTemplateResized", imgCvTemplateResized)
         const outputCv = findMatch(cv)(state.imgCvTemplateResized, imgCvTemplateResized);
-
+  
         const output  =  await toImageBase64(cv)(outputCv);
         setState({...state, output: output});
+        imgCv.delete();
+        imgCvTemplateResized.delete();
         //playAlgoWithCurrentTemplateAsync(template, setState, state, file);
     }
 
