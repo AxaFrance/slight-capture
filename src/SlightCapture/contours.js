@@ -19,7 +19,7 @@ export const findContours = (cv) => (imgCv, dilate = 6) => {
     return contours;
 }
 
-export const _findContours = (cv) => (src, thresholdMinArea = 0.04, contourMode = null) => {
+const _findContours = (cv) => (src, thresholdMinArea = 0.04, contourMode = null) => {
     const height = src.cols;
     const width = src.rows;
 
@@ -52,26 +52,26 @@ export const cropContours = (cv) => (img, filteredContours) => {
         let rotatedRect = cv.minAreaRect(contour);
         let vertices = cv.RotatedRect.points(rotatedRect);
 
-        //Find the corners
+        // Find the corners
         let corner1 = new cv.Point(vertices[0].x - 10, vertices[0].y - 10);
         let corner2 = new cv.Point(vertices[1].x - 10, vertices[1].y - 10);
         let corner3 = new cv.Point(vertices[2].x - 10, vertices[2].y - 10);
         let corner4 = new cv.Point(vertices[3].x - 10, vertices[3].y - 10);
 
-        //Order the corners
+        // Order the corners
         let cornerArray = [{corner: corner1}, {corner: corner2}, {corner: corner3}, {corner: corner4}];
-        //Sort by Y position (to get top-down)
+        // Sort by Y position (to get top-down)
         cornerArray.sort((item1, item2) => {
             return (item1.corner.y < item2.corner.y) ? -1 : (item1.corner.y > item2.corner.y) ? 1 : 0;
         }).slice(0, 5);
 
-        //Determine left/right based on x position of top and bottom 2
+        // Determine left/right based on x position of top and bottom 2
         const tl = cornerArray[0].corner.x < cornerArray[1].corner.x ? cornerArray[0] : cornerArray[1];
         const tr = cornerArray[0].corner.x > cornerArray[1].corner.x ? cornerArray[0] : cornerArray[1];
         const bl = cornerArray[2].corner.x < cornerArray[3].corner.x ? cornerArray[2] : cornerArray[3];
         const br = cornerArray[2].corner.x > cornerArray[3].corner.x ? cornerArray[2] : cornerArray[3];
 
-        //Calculate the max width/height
+        // Calculate the max width/height
         const widthBottom = Math.hypot(br.corner.x - bl.corner.x, br.corner.y - bl.corner.y);
         const widthTop = Math.hypot(tr.corner.x - tl.corner.x, tr.corner.y - tl.corner.y);
         const theWidth = (widthBottom > widthTop) ? widthBottom : widthTop;
@@ -79,7 +79,7 @@ export const cropContours = (cv) => (img, filteredContours) => {
         const heightLeft = Math.hypot(tl.corner.x - bl.corner.x, tr.corner.y - bl.corner.y);
         const theHeight = (heightRight > heightLeft) ? heightRight : heightLeft;
 
-        //Transform!
+        // Transform!
         const to = [0, 0, theWidth - 1, 0, theWidth - 1, theHeight - 1, 0, theHeight - 1];
         const finalDestCoords = cv.matFromArray(4, 1, cv.CV_32FC2, to); //
         const from = [tl.corner.x, tl.corner.y, tr.corner.x, tr.corner.y, br.corner.x, br.corner.y, bl.corner.x, bl.corner.y];

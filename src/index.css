@@ -40,6 +40,7 @@ button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
+  margin: 0.5em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
@@ -66,4 +67,84 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+
+/* CSS custom for SlightCapture */
+.sc-modal-video {
+  position: fixed;
+  z-index: 10000000;
+  padding-top: 0;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  background-color: white;
+  text-align:center;
+}
+
+.sc-modal-video__title {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.sc-modal-video__invert-camera {
+  padding: 0.5em;
+  font-size: 1em;
+  margin: 1em;
+  position:absolute;
+  background-color:#a8a8a88f;
+}
+
+.sc-modal-video__quit {
+  padding: 0.3em;
+  font-size: 1em;
+  margin: 1em;
+  position:absolute; 
+  top: 0; 
+  right: 0;
+}
+
+.sc-modal-video__video {
+  display: inline;
+  width: 100%;
+}
+
+.sc-modal-confirm {
+  position: fixed;
+  z-index: 100000000;
+  padding-top: 0;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  background-color: white;
+  text-align:center;
+}
+
+.sc-modal-confirm__loading {
+  
+}
+
+.sc-modal-confirm__title .sc-modal-confirm__title--error {
+  
+}
+
+.sc-modal-confirm__image {
+  max-width: 800px;
+  width: 100%;
+}
+
+.sc-modal-confirm__button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sc-modal-confirm__button .sc-modal-confirm__button--error .sc-modal-confirm__button--cancel .sc-modal-confirm__button--ok {
+  padding: 0.5em;
+  font-size: 2em;
+  margin: 1em;
 }
