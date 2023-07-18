@@ -33,6 +33,7 @@ function useInterval(callback, delay) {
 
 function WebcamImage({captureCallBack, templateJson}) {
     const [img, setImg] = useState(null);
+    const [isWorking, setIsWorking] = useState(false);
     const webcamRef = useRef(null);
 
     const videoConstraints = {
@@ -41,16 +42,19 @@ function WebcamImage({captureCallBack, templateJson}) {
         facingMode: "user",
     };
 
-    const capture = useCallback(() => {
+    const capture = async () => {
+        if (isWorking) return;
+        setIsWorking(true);
         const imageSrc = webcamRef.current.getScreenshot();
         setImg(imageSrc);
-        captureCallBack(imageSrc, templateJson);
-    }, [webcamRef, templateJson]);
+        await captureCallBack(imageSrc, templateJson);
+        setIsWorking(false);
+    };
 
 
     useInterval(() => {
         capture();
-    }, 200);
+    }, 100);
 
 
     return (
@@ -60,11 +64,13 @@ function WebcamImage({captureCallBack, templateJson}) {
                     <Webcam
                         audio={false}
                         mirrored={false}
-                        height={400}    
-                        width={400}
+                        screenshotQuality={1}
+                        width={1000}
+                        height={800}
                         ref={webcamRef}
-                        screenshotFormat="image/jpeg"
+                        screenshotFormat="image/bmp"
                         videoConstraints={videoConstraints}
+                        imageSmoothing={false}
                     />
                 </>
 
@@ -83,7 +89,11 @@ export const TemplateGenerator = () => {
         templateImage: "",
         jsonContent: "",
         croppedContoursBase64: [null],
-        errorMessage: ""
+        errorMessage: "",   
+        numberPoint:0,
+        output:null,
+        bestOutput:null,
+        bestNumberPoint:0,
     });
 
     if (!loaded) {
@@ -97,33 +107,36 @@ export const TemplateGenerator = () => {
         const cv = window.cv;
         const convertedFile = await toBase64Async(file);
         const imgCvTemplate = await loadImageAsync(cv)(convertedFile);
-        const imgCvTemplateResized = imageResize(cv)(imgCvTemplate, 200).image;
+        const imgCvTemplateResized = imageResize(cv)(imgCvTemplate, 600).image;
         const resizedImg = detectAndComputeSerializable(cv)(imgCvTemplateResized);
         const jsonValue = JSON.stringify(resizedImg);
         const templateImage = await toImageBase64(cv)(imgCvTemplateResized);
         setState({...state, jsonContent: jsonValue, templateImage:templateImage, imgCvTemplateResized});
     }
 
-    const capture = async (value, templateJson) => {
-        const file = {fileBase64: value, name: "screen.base64"};
-        //const template = {imgDescription: JSON.parse(templateJson), goodMatchSizeThreshold: 5};
-        //setState({...state, loaderMode: LoaderModes.get, croppedContoursBase64: [null]});
-
+    const capture = async (value) => {
         const cv = window.cv;
-
-       // const imageBase64 = await loadImageAsync(cv)(value)
-        console.log("imgCv before")
+        if(value === null) return;
         const imgCv= await loadImageAsync(cv)(value);
-     //   console.log("imgCv", imgCv)
-        const imgCvTemplateResized = imageResize(cv)(imgCv, 1000).image;
-        console.log("imgCvTemplateResized", imgCvTemplateResized)
-        const outputCv = findMatch(cv)(state.imgCvTemplateResized, imgCvTemplateResized);
-  
-        const output  =  await toImageBase64(cv)(outputCv);
-        setState({...state, output: output});
+        if (imgCv === null) return;
+        const  imd =  imageResize(cv)(imgCv, 800);
+        console.log("imd", imd)
+        const imgCvTemplateResized = imd.image;
+        const  { image : outputCv, numberPoint}    = findMatch(cv)(state.imgCvTemplateResized, imgCvTemplateResized);
+        const output  = toImageBase64(cv)(outputCv);
+        
+        if(numberPoint > state.bestNumberPoint){
+            const bestOutput  = toImageBase64(cv)(imgCv);
+            console.log("state.numberPoint")
+            console.log(state.bestNumberPoint)
+            const newState = {...state, output: output, bestNumberPoint: numberPoint, bestOutput: bestOutput};
+            setState(newState);
+        } else {
+            const newState = {...state, numberPoint , output: output};
+            setState(newState);
+        }
         imgCv.delete();
         imgCvTemplateResized.delete();
-        //playAlgoWithCurrentTemplateAsync(template, setState, state, file);
     }
 
     return (
@@ -135,31 +148,21 @@ export const TemplateGenerator = () => {
                     <img src={state.templateImage} alt="template image"/>
                 }
                 {state.jsonContent &&
-                    <table>
-                        <tbody>
-                        <tr>
-                            <td>Webcam</td>
-                            <td>Image Found</td>
-                        </tr>
-                        <tr>
-                            <td><WebcamImage captureCallBack={capture} templateJson={state.jsonContent} /></td>
-                            <td>  {state.errorMessage ? (
-                                <p className="template-generator__error">{state.errorMessage}</p>
-                            ) : (
-                                <>
+                    <div style={{"width": "0px", "visibility": "hidden"}}>
+                        <WebcamImage  captureCallBack={capture} templateJson={state.jsonContent} />
+                    </div>}
+                          <div>
                                     {state.output &&
-                                        <><img style={{"maxWidth": "200px"}} src={state.output} alt="image found"/></>
+                                        <><img style={{"maxWidth": "400px"}} src={state.output} alt="image found"/>
+                                            <p>{state.numberPoint}</p></>
                                     }
-                                </>
-                            )
-                            }</td>
-                        </tr>
 
-
-                        </tbody>
-                    </table>}
-
-
+</div>
+    <div>
+                {state.bestOutput &&
+                    <> <p>{state.bestNumberPoint}</p><img style={{"maxWidth": "400px"}} src={state.bestOutput} alt="image found"/></>
+                   
+                }</div>
             </form>
         </Loader>
     )
