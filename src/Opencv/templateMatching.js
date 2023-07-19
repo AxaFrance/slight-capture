@@ -1,19 +1,22 @@
 ﻿
-
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
 export const findMatch = (cv) => (template, image) => {
     let mask = new cv.Mat();
     let destination = new cv.Mat();
-    cv.matchTemplate(image, template, destination, cv.TM_CCOEFF_NORMED, mask);
+    cv.matchTemplate(image, template, destination, cv.TM_CCORR_NORMED, mask);
     let result = cv.minMaxLoc(destination, mask);
     
     
-    console.log(result)
-    console.log(destination)
+    //console.log(result)
+    //console.log(destination)
     let maxPoint = result.maxLoc;
     let color = new cv.Scalar(255, 0, 0, 255);
     let point = new cv.Point(maxPoint.x + template.cols, maxPoint.y + template.rows);
-   // cv.rectangle(image, maxPoint, point, color, 2, cv.LINE_8, 0);
-    
+    //if(maxPoint.x > 20) {
+        cv.rectangle(image, maxPoint, point, color, 2, cv.LINE_8, 0);
+    //}
    
  let colorRed = new cv.Scalar(255, 0, 0, 255);
  let colorBlue = new cv.Scalar(0, 255, 0, 255);
@@ -38,7 +41,7 @@ export const findMatch = (cv) => (template, image) => {
 
          newDst[i][k] = destination.data32F[start];
 
-         if (newDst[i][k] > 0.30) {
+         if (newDst[i][k] > 0.94) {
              //console.log(newDst[i][k])
              let maxPoint = {
                  "x": k,
@@ -50,6 +53,9 @@ export const findMatch = (cv) => (template, image) => {
              if(maxPoint.y < minPointMemory.y) {
                  minPointMemory.y = maxPoint.y;
              }
+             if(maxPoint.x <= 20) {
+                continue;
+             }
              
              numberPoint++;
              let point = new cv.Point(k + template.cols, i + template.rows);
@@ -59,6 +65,7 @@ export const findMatch = (cv) => (template, image) => {
              if(point.y > maxPointMemory.y) {
                  maxPointMemory.y = maxPoint.y;
              }
+             let colorRed = new cv.Scalar(getRandomInt(255), getRandomInt(255),getRandomInt(255), 255);
              cv.rectangle(image, maxPoint, point, colorRed, 1, cv.LINE_8, 0);
          }
          start++;
@@ -68,7 +75,7 @@ export const findMatch = (cv) => (template, image) => {
  }
  console.log(numberPoint)
 
- if(maxPointMemory.x !== 0 && maxPointMemory.y !== 0 && minPointMemory.x !== 999999999 && minPointMemory.y !== 999999999) {
+ if(maxPointMemory.x !== 0 && maxPointMemory.y !== 0 && minPointMemory.x !== 999999999 && minPointMemory.y !== 999999999 ) {
      let marginX = 0;// maxPointMemory.x - minPointMemory.x ;
      let marginY = maxPointMemory.y - minPointMemory.y;
      //cv.rectangle(image, minPointMemory, new cv.Point(maxPointMemory.x + template.cols + marginX, maxPointMemory.y + template.rows + marginY), colorBlue, parseInt(numberPoint / 10, 10), cv.LINE_8, 0);

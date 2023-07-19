@@ -120,7 +120,7 @@ export const isImgGray = (cv) => (img) => {
 }
 
 
-export const converImgToGray = (cv) => (img) => {
+export const convertImgToGray = (cv) => (img) => {
     const imgGray = new cv.Mat();
     cv.cvtColor(img, imgGray, cv.COLOR_RGBA2GRAY, 0);
     return imgGray;
@@ -131,10 +131,12 @@ export const toImageBase64 = (cv) => (imgCv) => {
     outputCanvas.style = 'visibility:hidden;display:none;';
     cv.imshow(outputCanvas, imgCv);
     document.getElementsByTagName('body')[0].appendChild(outputCanvas);
-    return outputCanvas.toDataURL();
+    const url = outputCanvas.toDataURL();
+    outputCanvas.remove();
+    return url;
 }
 
-export const loadImageAsync = (cv) => (url) => {
+export const loadImageAsync = (cv) => (url, color =null ) => {
     return new Promise((resolve, error) => {
         const iDiv = document.createElement('div');
         iDiv.style = 'visibility:hidden;display:none;';
@@ -146,7 +148,7 @@ export const loadImageAsync = (cv) => (url) => {
         imgElement.src = url;
         imgElement.onload = function () {
             function loadImage() {
-                let imgCv = cv.imread(imgElement);
+                let imgCv = !color ? cv.imread(imgElement) : cv.imread(imgElement, color);
                 iDiv.remove();
                 resolve(imgCv);
             }
@@ -158,7 +160,7 @@ export const loadImageAsync = (cv) => (url) => {
             iDiv.remove();
             error()
         };
-    })
+    });
 }
 
 export const cropImage = (cv) => (img, xmin, ymin, witdh, height) => {

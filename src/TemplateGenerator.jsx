@@ -1,7 +1,7 @@
 ﻿import Loader, {LoaderModes} from "@axa-fr/react-toolkit-loader";
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {playAlgoWithCurrentTemplateAsync, toBase64Async} from "./template";
-import {imageResize, loadImageAsync, toImageBase64} from "./Opencv/image";
+import {playAlgoWithCurrentTemplateAsync, toBase64Async, zoneAsync} from "./template";
+import {convertImgToGray, imageResize, loadImageAsync, toImageBase64} from "./Opencv/image";
 import {detectAndComputeSerializable} from "./Opencv/match";
 import useScript from "./Script/useScript";
 import Webcam from "react-webcam";
@@ -54,7 +54,7 @@ function WebcamImage({captureCallBack, templateJson}) {
 
     useInterval(() => {
         capture();
-    }, 100);
+    }, 10);
 
 
     return (
@@ -94,6 +94,8 @@ export const TemplateGenerator = () => {
         output:null,
         bestOutput:null,
         bestNumberPoint:0,
+        url:null,
+        confidenceRate: 0
     });
 
     if (!loaded) {
@@ -107,36 +109,65 @@ export const TemplateGenerator = () => {
         const cv = window.cv;
         const convertedFile = await toBase64Async(file);
         const imgCvTemplate = await loadImageAsync(cv)(convertedFile);
-        const imgCvTemplateResized = imageResize(cv)(imgCvTemplate, 600).image;
+        let imgCvTemplateResized = imageResize(cv)(imgCvTemplate, 600).image;
+        //let imgCvGray = convertImgToGray(cv)(imgCvTemplateResized);
         const resizedImg = detectAndComputeSerializable(cv)(imgCvTemplateResized);
         const jsonValue = JSON.stringify(resizedImg);
-        const templateImage = await toImageBase64(cv)(imgCvTemplateResized);
+        const templateImage = toImageBase64(cv)(imgCvTemplateResized);
         setState({...state, jsonContent: jsonValue, templateImage:templateImage, imgCvTemplateResized});
     }
 
     const capture = async (value) => {
-        const cv = window.cv;
-        if(value === null) return;
-        const imgCv= await loadImageAsync(cv)(value);
-        if (imgCv === null) return;
-        const  imd =  imageResize(cv)(imgCv, 800);
-        console.log("imd", imd)
-        const imgCvTemplateResized = imd.image;
-        const  { image : outputCv, numberPoint}    = findMatch(cv)(state.imgCvTemplateResized, imgCvTemplateResized);
-        const output  = toImageBase64(cv)(outputCv);
-        
-        if(numberPoint > state.bestNumberPoint){
-            const bestOutput  = toImageBase64(cv)(imgCv);
-            console.log("state.numberPoint")
-            console.log(state.bestNumberPoint)
-            const newState = {...state, output: output, bestNumberPoint: numberPoint, bestOutput: bestOutput};
-            setState(newState);
-        } else {
-            const newState = {...state, numberPoint , output: output};
-            setState(newState);
+        try {
+            const cv = window.cv;
+            if (value === null) return;
+            const imgCv = await loadImageAsync(cv)(value);
+            if (imgCv === null) return;
+            const imd = imageResize(cv)(imgCv, 800);
+           
+            const imgCvTemplateResized = imd.image;
+            //const imgGray = convertImgToGray(cv)(imgCvTemplateResized);
+            //console.log("imgGray", imgGray)
+            const {image: outputCv, numberPoint} = findMatch(cv)(state.imgCvTemplateResized, imgCvTemplateResized);
+            console.log("here")
+            const output = toImageBase64(cv)(outputCv);
+
+            if (numberPoint > 10) {
+                const bestOutput = toImageBase64(cv)(imgCv);
+                console.log("state.numberPoint")
+                console.log(state.bestNumberPoint)
+                const imgDescription =  JSON.parse(state.jsonContent)
+                const result =  await zoneAsync(cv)(imgCv, imgDescription, 12)
+                console.log("result", result);
+                if(result?.confidenceRate > state.confidenceRate) {
+                    const newState = {
+                        ...state,
+                        output: output,
+                        bestNumberPoint: numberPoint,
+                        bestOutput: bestOutput,
+                        url: result?.croppedContoursBase64,
+                        confidenceRate: result?.confidenceRate
+                    };
+                    setState(newState);
+                } else{
+                    const newState = {
+                        ...state,
+                        output: output,
+                        bestNumberPoint: numberPoint,
+                        bestOutput: bestOutput,
+                    };
+                    setState(newState);
+                }
+            } else {
+                const newState = {...state, numberPoint, output: output};
+                setState(newState);
+            }
+            imgCv.delete();
+            imgCvTemplateResized.delete();
         }
-        imgCv.delete();
-        imgCvTemplateResized.delete();
+        catch (e) {
+            console.log(e)
+        }
     }
 
     return (
@@ -158,11 +189,19 @@ export const TemplateGenerator = () => {
                                     }
 
 </div>
+                <div>
+                    {state.url &&
+                        <> <p>{state.confidenceRate}</p><img style={{"maxWidth": "400px"}} src={state.url} alt="image found"/></>
+
+                    }
+                </div>
     <div>
                 {state.bestOutput &&
                     <> <p>{state.bestNumberPoint}</p><img style={{"maxWidth": "400px"}} src={state.bestOutput} alt="image found"/></>
                    
                 }</div>
+
+            
             </form>
         </Loader>
     )

@@ -61,7 +61,12 @@ export const playAlgoNoTemplateAsync = async (file) => {
 }
 
 export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeThreshold = 6) => {
-    const imgCv = await loadImageAsync(cv)(sceneUrl);
+    let imgCv = null;
+    if(sceneUrl instanceof String){
+        imgCv = await loadImageAsync(cv)(sceneUrl);
+    } else{
+        imgCv= sceneUrl;
+    }
 
     const isGray = isImgGray(cv)(imgCv);
 
@@ -113,11 +118,11 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         }
 
     }
-    const base64Url = toImageBase64(cv)(imgCv);
+   // const base64Url = toImageBase64(cv)(imgCv);
     if (!result) {
         return {
             expectedOutput: [],
-            url: base64Url,
+           // url: base64Url,
             confidenceRate: 0,
             isGray,
             croppedContoursBase64: null,
@@ -131,8 +136,8 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     let croppedContours = cropContours(cv)(imgCv, contours);
     let croppedContourImgs = croppedContours.map(cc => rotateImage(cv)(cc.img, angle));
     let croppedContoursBase64 = croppedContourImgs.map(cc => {
-        let result = imageResize(cv)(cc, 680);
-        return toImageBase64(cv)(result.image);
+       // let result = imageResize(cv)(cc, 680);
+        return cc;
     });
 
     let outputInfo = {
@@ -157,7 +162,9 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     const height = parseInt(ymax / ratio, 10) - top;
     const expectedOutput = [{left, top, width, height}];
 
-    imgCv.delete();
+    if(sceneUrl instanceof String) {
+        imgCv.delete();
+    }
     imgResized.delete();
 
     let confidenceRate = parseInt((result.goodMatchSize / goodMatchSizeThreshold) * 10, 10);
@@ -168,7 +175,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         confidenceRate = 0;
     }
 
-    return {expectedOutput, url: base64Url, confidenceRate, isGray, croppedContoursBase64, outputInfo};
+    return {expectedOutput, confidenceRate: result.goodMatchSize, isGray, croppedContoursBase64, outputInfo};
 }
 
 export const cropImageAsync = (cv) => async (imageUrlBase64, xmin, ymin, witdh, height, angle = 0) => {
