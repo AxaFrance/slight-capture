@@ -41,7 +41,7 @@ export const findMatch = (cv) => (template, image) => {
 
          newDst[i][k] = destination.data32F[start];
 
-         if (newDst[i][k] > 0.94) {
+         if (newDst[i][k] > 0.92) {
              //console.log(newDst[i][k])
              let maxPoint = {
                  "x": k,
@@ -66,7 +66,7 @@ export const findMatch = (cv) => (template, image) => {
                  maxPointMemory.y = maxPoint.y;
              }
              let colorRed = new cv.Scalar(getRandomInt(255), getRandomInt(255),getRandomInt(255), 255);
-             cv.rectangle(image, maxPoint, point, colorRed, 1, cv.LINE_8, 0);
+             //cv.rectangle(image, maxPoint, point, colorRed, 1, cv.LINE_8, 0);
          }
          start++;
      }

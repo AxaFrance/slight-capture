@@ -15,16 +15,24 @@ export const loadVideoAsync = (cv) => (transformImage) => {
             console.log("getUserMedia() not supported.");
             return;
         }
+       
+
+        const modalStyle = ` position: fixed;z-index: 10000000;padding-top: 0x;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;`
+        const iDiv = document.createElement('div');
+        iDiv.style = modalStyle;
+        const divId = cuid();
+        iDiv.id = divId;
+        document.getElementsByTagName('body')[0].appendChild(iDiv);
+
         const outputCanvas = document.createElement("canvas");
         //outputCanvas.style = 'visibility:hidden;display:none;';
-        document.getElementsByTagName('body')[0].appendChild(outputCanvas);
-        
+        iDiv.appendChild(outputCanvas);
+
         const iVideo = document.createElement('video');
         iVideo.style = 'visibility:hidden;display:none;';
         iVideo.id = cuid();
         
-        
-        document.getElementsByTagName('body')[0].appendChild(iVideo);
+        iDiv.appendChild(iVideo);
 
         let constraints = {
             audio: false,
@@ -70,7 +78,7 @@ export const loadVideoAsync = (cv) => (transformImage) => {
                         try {
                             // start processing.
                             cap.read(src);
-                            const dst = await transformImage(src);
+                            const dst = await transformImage(src, divId);
                             cv.imshow(outputCanvas, dst);
                             return src;
                         } catch (err) {
@@ -100,7 +108,7 @@ export const loadVideoAsync = (cv) => (transformImage) => {
 
                     resolve({
                         processVideo,
-                        start
+                        start,
                     })
                 };
                 

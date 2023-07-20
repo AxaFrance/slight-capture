@@ -7,7 +7,7 @@
     bf.match(descriptors1, descriptors2, matches);
     bf.delete();
     console.log("matches.size: ", matches.size());
-    const matchDistance_option = 70;
+    const matchDistance_option = 100;
     for (let i = 0; i < matches.size(); i++) {
         if (matches.get(i).distance < matchDistance_option) {
             goodMatchesTmp.push(matches.get(i));
@@ -20,13 +20,13 @@
     return goodMatches;
 }
 
-const knnMatch = (cv) => (descriptors1, descriptors2, knnDistanceOption = 0.7) => {
+const knnMatch = (cv) => (descriptors1, descriptors2, knnDistanceOption = 0.9) => {
     console.log("using knnMatch...");
     const goodMatchesTmp = []
     const bf = new cv.BFMatcher(cv.NORM_HAMMING, false); // NORM_L2 NORM_HAMMING
     const matches = new cv.DMatchVectorVector();
     //Reference: https://docs.opencv.org/3.3.0/db/d39/classcv_1_1DescriptorMatcher.html#a378f35c9b1a5dfa4022839a45cdf0e89
-    bf.knnMatch(descriptors1, descriptors2, matches, 2);
+    bf.knnMatch(descriptors1, descriptors2, matches, 3);
     bf.delete();
     let counter = 0;
     console.log("match size : " + matches.size())
@@ -58,10 +58,10 @@ export const matchSwitch = (cv) => (descriptors1, descriptors2, minMatch = 20, m
         goodMatches = knnMatch(cv)(descriptors1, descriptors2);
     }
     if (goodMatches == null || goodMatches.size() <= minMatch) {
-        console.warn(`Less than ${minMatch} good matches found! Counter=${goodMatches.size()} try changing distance.`);
+       // console.warn(`Less than ${minMatch} good matches found! Counter=${goodMatches.size()} try changing distance.`);
         return null;
     }
-    console.log("goodMatches.size: ", goodMatches.size());
+    //console.log("goodMatches.size: ", goodMatches.size());
     return goodMatches;
 }
 
@@ -73,9 +73,9 @@ export const detectAndCompute = (cv) => (img, detectionAlgorithm) => {
 }
 
 export const detectAndComputeSerializable = (cv) => (img) => {
-    const detectionAlgorithm = new cv.BRISK();
+    //const detectionAlgorithm = new cv.BRISK();
     //const detectionAlgorithm = new cv.AKAZE();
-    //const detectionAlgorithm = new cv.ORB(10000);
+    const detectionAlgorithm = new cv.ORB(5000);
 
     // find the keypoints with ORB
     const {keypoints, descriptors} = detectAndCompute(cv)(img, detectionAlgorithm);
@@ -120,10 +120,10 @@ export const detectAndComputeSerializableToCv = (cv) => (descriptorSerializable,
 export const detectAndMatch = (cv) => (imgDescription, im2, minMatch = 20) => {
 
     // Initiate STAR detector
-    //const detectionAlgorithm = new cv.ORB(10000);
-    // const detectionAlgorithm = new cv.SIFT();
+    const detectionAlgorithm = new cv.ORB(5000);
+     //const detectionAlgorithm = new cv.SIFT();
     //const detectionAlgorithm = new cv.AKAZE();
-    const detectionAlgorithm = new cv.BRISK();
+   //const detectionAlgorithm = new cv.BRISK();
 
     // find the keypoints with ORB
     const {
@@ -174,7 +174,7 @@ export const convertHomographyPointsToRectangle = (cv) => (points, witdh, height
     const threshold = 0.2;
 
     let isError = false;
-    if (xmin < 0 && xmin + witdh * threshold < 0) {
+   /* if (xmin < 0 && xmin + witdh * threshold < 0) {
         isError = true;
     }
     if (ymin < 0 && ymin + height * threshold < 0) {
@@ -185,7 +185,7 @@ export const convertHomographyPointsToRectangle = (cv) => (points, witdh, height
     }
     if (xmax > witdh && xmax > witdh + witdh * threshold) {
         isError = true;
-    }
+    }*/
 
     xmin = xmin <= 0 ? 0 : xmin
     ymin = ymin <= 0 ? 0 : ymin;
@@ -358,13 +358,20 @@ export const computeAndComputeHomographyRectangle = (cv) => (imgDescription, sce
     return null;
 }
 
-export const computeAndApplyHomography = (cv) => (objectImg, sceneImg, minMatch = 20) => {
-    const {homographyPoints, clean, goodMatchSize} = computeHomography(cv)(objectImg, sceneImg, minMatch)
+export const computeAndApplyHomography = (cv) => (imgDescription, sceneImg, minMatch = 20) => {
+    const homography = computeHomography(cv)(imgDescription, sceneImg, minMatch);
+    if(!homography) return null;
+    const {homographyPoints, clean, goodMatchSize} = homography;
     if (homographyPoints != null) {
+        console.log("homographyPoints: ", homographyPoints);
         let finalImage = new cv.Mat();
-        cv.warpPerspective(sceneImg, finalImage, homographyPoints, objectImg.size());
+        let dsize = new cv.Size(imgDescription.img.cols, imgDescription.img.rows);
+        console.log("dsize: ", dsize);
+        cv.warpPerspective(sceneImg, finalImage, homographyPoints, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+        console.log("warpPerspective: ");
         homographyPoints.delete();
-        clean();
+       // clean();
+        console.log("clean: ");
         return {finalImage, goodMatchSize};
     }
     return null;

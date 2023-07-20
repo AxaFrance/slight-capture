@@ -68,7 +68,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         imgCv= sceneUrl;
     }
 
-    const isGray = isImgGray(cv)(imgCv);
+   // const isGray = isImgGray(cv)(imgCv);
 
     const {image: imgResized, ratio} = imageResize(cv)(imgCv, 1400);
     //const imgVersoCvTemplate = await loadImageAsync(cv)(imgDescription.template_url);
@@ -123,9 +123,9 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         return {
             expectedOutput: [],
            // url: base64Url,
-            confidenceRate: 0,
-            isGray,
-            croppedContoursBase64: null,
+            goodMatchSize: 0,
+         //   isGray,
+            finalImage: null,
             outputInfo: null
         };
     }
@@ -166,16 +166,8 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         imgCv.delete();
     }
     imgResized.delete();
-
-    let confidenceRate = parseInt((result.goodMatchSize / goodMatchSizeThreshold) * 10, 10);
-    if (confidenceRate > 100) {
-        confidenceRate = 100;
-    }
-    if (isGray) {
-        confidenceRate = 0;
-    }
-
-    return {expectedOutput, confidenceRate: result.goodMatchSize, isGray, croppedContoursBase64, outputInfo};
+    
+    return {expectedOutput, goodMatchSize: result.goodMatchSize, finalImage : croppedContoursBase64[0], outputInfo};
 }
 
 export const cropImageAsync = (cv) => async (imageUrlBase64, xmin, ymin, witdh, height, angle = 0) => {

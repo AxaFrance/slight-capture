@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import Loader, {LoaderModes} from "@axa-fr/react-toolkit-loader";
 import {toBase64Async, zoneAsync} from "./template.js";
 import {imageResize, loadImageAsync, toImageBase64} from "./Opencv/image.js";
-import {detectAndComputeSerializable} from "./Opencv/match.js";
+import {computeAndApplyHomography, detectAndComputeSerializable} from "./Opencv/match.js";
 import {findMatch} from "./Opencv/templateMatching.js";
 import {loadVideoAsync} from "./Opencv/video.js";
 import cuid from "cuid";
@@ -13,11 +13,13 @@ import cuid from "cuid";
 const transformImage = (stateImgCvTemplateResized, imgDescription) => {
 
     let state = {bestNumberPoint: 0, bestOutput: null, confidenceRate: 0}
-    const transformFunction = async (imgCv) => {
+    
+    let promise = null;
+    const transformFunction = async (imgCv, divId) => {
         try {
             const cv = window.cv;
             if (imgCv === null) return;
-            const imd = imageResize(cv)(imgCv, 800);
+            const imd = imageResize(cv)(imgCv, 400);
 
             const imgCvTemplateResized = imd.image;
             const {image: outputCv, numberPoint} = findMatch(cv)(stateImgCvTemplateResized, imgCvTemplateResized);
@@ -28,29 +30,7 @@ const transformImage = (stateImgCvTemplateResized, imgDescription) => {
                 const bestOutput = toImageBase64(cv)(imgCv);
                 console.log("state.numberPoint")
                 console.log(state.bestNumberPoint)
-                // const imgDescription =  JSON.parse(state.jsonContent)
-                const result = await zoneAsync(cv)(imgCv, imgDescription, 12)
-                console.log("result", result);
-                if (result?.confidenceRate > state.confidenceRate) {
-                    const newState = {
-                        ...state,
-                         output: outputCv,
-                        bestNumberPoint: numberPoint,
-                        bestOutput: bestOutput,
-                        url: result?.croppedContoursBase64,
-                        confidenceRate: result?.confidenceRate
-                    };
-                    result?.croppedContoursBase64.forEach(
-                        (croppedContoursBase64) => {
-                            const iVideo = document.createElement('img');
-                            iVideo.id = cuid();
-                            iVideo.src = toImageBase64(cv)(croppedContoursBase64);
-                            document.getElementsByTagName('body')[0].appendChild(iVideo);
-                        }
-                    )
-                  
-                    state = newState;
-                } else {
+                if(promise !== null) {
                     const newState = {
                         ...state,
                         output: outputCv,
@@ -58,7 +38,51 @@ const transformImage = (stateImgCvTemplateResized, imgDescription) => {
                         bestOutput: bestOutput,
                     };
                     state = newState;
+                    return;
                 }
+                // const imgDescription =  JSON.parse(state.jsonContent)
+              /* promise = zoneAsync(cv)(imgCv, imgDescription, state.confidenceRate).then(result => {
+
+                        console.log("result", result);
+                        if (result?.goodMatchSize > state.confidenceRate) {
+                            const newState = {
+                                ...state,
+                                output: outputCv,
+                                bestNumberPoint: numberPoint,
+                                bestOutput: bestOutput,
+                                //url: result?.croppedContoursBase64,
+                                confidenceRate: result?.goodMatchSize
+                            };
+                            const iVideo = document.createElement('img');
+                            iVideo.id = cuid();
+                            iVideo.src = toImageBase64(cv)(result?.finalImage);
+                            document.getElementById(divId).appendChild(iVideo);
+
+
+                            state = newState;
+                        }
+                        promise = null;
+                    }
+                );*/
+                const result = await computeAndApplyHomography(cv)(imgDescription, imgCv, state.confidenceRate);
+                if (result?.goodMatchSize > state.confidenceRate) {
+                    const newState = {
+                        ...state,
+                        output: outputCv,
+                        bestNumberPoint: numberPoint,
+                        bestOutput: bestOutput,
+                        //url: result?.croppedContoursBase64,
+                        confidenceRate: result?.goodMatchSize
+                    };
+                    const iVideo = document.createElement('img');
+                    iVideo.id = cuid();
+                    iVideo.src = toImageBase64(cv)(result?.finalImage);
+                    document.getElementById(divId).appendChild(iVideo);
+
+
+                    state = newState;
+                }
+                
             } else {
                 const newState = {...state, numberPoint, output: outputCv};
                 state = newState;
@@ -108,9 +132,10 @@ export const TemplateVideo= () => {
         const cv = window.cv;
         const convertedFile = await toBase64Async(file);
         const imgCvTemplate = await loadImageAsync(cv)(convertedFile);
-        let imgCvTemplateResized = imageResize(cv)(imgCvTemplate, 600).image;
+        let imgCvTemplateResized = imageResize(cv)(imgCvTemplate, 200).image;
+        let imgCvTemplateResizedMatch = imageResize(cv)(imgCvTemplate, 600).image;
         //let imgCvGray = convertImgToGray(cv)(imgCvTemplateResized);
-        const resizedImg = detectAndComputeSerializable(cv)(imgCvTemplateResized);
+        const resizedImg = detectAndComputeSerializable(cv)(imgCvTemplateResizedMatch);
         const jsonValue = JSON.stringify(resizedImg);
         const templateImage = toImageBase64(cv)(imgCvTemplateResized);
 
