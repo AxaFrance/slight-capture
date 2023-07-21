@@ -32,7 +32,7 @@ export const loadVideoAsync = (cv) => (transformImage) => {
         iDiv.appendChild(iH1);
 
         const outputCanvas = document.createElement("canvas");
-        outputCanvas.style = 'display: inline;';
+        outputCanvas.style = 'display: inline;width: 100%;';
         iDiv.appendChild(outputCanvas);
 
         const iVideo = document.createElement('video');

@@ -12,7 +12,7 @@ import cuid from "cuid";
 
 const transformImage = (stateImgCvTemplateResized, imgDescription) => {
 
-    let state = {bestNumberPoint: 0, bestOutput: null, confidenceRate: 0}
+    let state = {bestNumberPoint: 0, confidenceRate: 0}
     
     let promise = null;
     const transformFunction = async (imgCv, divId) => {
@@ -72,7 +72,7 @@ const transformImage = (stateImgCvTemplateResized, imgDescription) => {
                        }
                        promise = null;
                    } catch (e) {
-console.log(e)
+                        console.log(e)
                        promise = null;
                    }    
            

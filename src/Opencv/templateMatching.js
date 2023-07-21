@@ -18,8 +18,8 @@ export const findMatch = (cv) => (template, image) => {
     //cv.rectangle(image, maxPoint, point, color, 2, cv.LINE_8, 0);
     //}
    
- let colorRed = new cv.Scalar(255, 0, 0, 255);
- let colorBlue = new cv.Scalar(0, 255, 0, 255);
+ 
+
 
  const newDst = [];
  let start = 0;
@@ -86,10 +86,20 @@ export const findMatch = (cv) => (template, image) => {
      //let marginX = 0;// maxPointMemory.x - minPointMemory.x ;
      //let marginY = maxPointMemory.y - minPointMemory.y;
      //cv.rectangle(image, minPointMemory, new cv.Point(maxPointMemory.x + template.cols + marginX, maxPointMemory.y + template.rows + marginY), colorBlue, parseInt(numberPoint / 10, 10), cv.LINE_8, 0);
+
+
+    let colorBlue = new cv.Scalar(200, 255, 100, 255);
+    var point1 = new cv.Point( parseInt((image.cols - template.cols) / 2,10) , parseInt((image.rows - template.rows)/2,10));
+    var point2 = new cv.Point( parseInt((image.cols - template.cols) / 2,10) + template.cols  , parseInt((image.rows - template.rows)/2,10) + template.rows);
+    cv.rectangle(image, point1, point2, colorBlue, 12, cv.LINE_8, 0);
+    let colorRed = new cv.Scalar(255, 100, 200, 255);
+    cv.putText(image, "Number of point: " + numberPoint, new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
+
     if(maxPoint.x > 0 && maxPoint.y > 0) {
         const lineSize = numberPoint < 2000 ? 2 : parseInt(numberPoint / 1000, 10);
         //console.log("lineSize")
         //console.log(lineSize)
+
         cv.rectangle(image, maxPoint, point, color, lineSize, cv.LINE_8, 0);
     }
     else{
