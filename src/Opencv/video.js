@@ -52,7 +52,8 @@ export const loadVideoAsync = (cv) => (transformImage) => {
                 width: { ideal: 1000 },
                 height: { ideal: 800 },
                 facingMode: {
-                    ideal: 'face'
+                    //ideal: 'face'
+                    ideal: 'environment'
                 },
                 
             }
