@@ -49,8 +49,8 @@ export const loadVideoAsync = (cv) => (transformImage) => {
         let constraints = {
             audio: false,
             video: {
-                width: { ideal: 1000 },
-                height: { ideal: 800 },
+                width: { ideal: 1600 },
+                height: { ideal: 1200 },
                 facingMode: {
                     //ideal: 'face'
                     ideal: 'environment'
