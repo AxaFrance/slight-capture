@@ -17,23 +17,35 @@ export const loadVideoAsync = (cv) => (transformImage) => {
         }
        
 
-        const modalStyle = ` position: fixed;z-index: 10000000;padding-top: 0x;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;`
+        const modalStyle = ` position: fixed;z-index: 10000000;padding-top: 0x;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`
         const iDiv = document.createElement('div');
         iDiv.style = modalStyle;
         const divId = cuid();
         iDiv.id = divId;
         document.getElementsByTagName('body')[0].appendChild(iDiv);
 
+        const iH1 = document.createElement('h1');
+        //iH1.style = modalStyle;
+        var text = document.createTextNode("Positionner votre carte d'identité dans le cadre");
+        iH1.appendChild(text);
+        iH1.id = cuid();
+        iDiv.appendChild(iH1);
+
         const outputCanvas = document.createElement("canvas");
-        //outputCanvas.style = 'visibility:hidden;display:none;';
+        outputCanvas.style = 'display: inline;';
         iDiv.appendChild(outputCanvas);
 
         const iVideo = document.createElement('video');
         iVideo.style = 'visibility:hidden;display:none;';
         iVideo.id = cuid();
-        
         iDiv.appendChild(iVideo);
 
+        const iDivImages = document.createElement('div');
+        //iDivImages.style = modalStyle;
+        const iDivImagesId = cuid();
+        iDivImages.id = iDivImagesId;
+        iDiv.appendChild(iDivImages);
+        
         let constraints = {
             audio: false,
             video: {
@@ -78,8 +90,10 @@ export const loadVideoAsync = (cv) => (transformImage) => {
                         try {
                             // start processing.
                             cap.read(src);
-                            const dst = await transformImage(src, divId);
-                            cv.imshow(outputCanvas, dst);
+                            const dst = await transformImage(src, iDivImagesId);
+                            if(dst) {
+                                cv.imshow(outputCanvas, dst)
+                            }
                             return src;
                         } catch (err) {
                             console.error(err);

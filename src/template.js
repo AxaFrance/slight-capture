@@ -67,17 +67,18 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     } else{
         imgCv= sceneUrl;
     }
+    let imgCvCopy = imgCv.clone();
 
    // const isGray = isImgGray(cv)(imgCv);
 
-    const {image: imgResized, ratio} = imageResize(cv)(imgCv, 1400);
+    const {image: imgResized, ratio} = imageResize(cv)(imgCvCopy, 1400);
     //const imgVersoCvTemplate = await loadImageAsync(cv)(imgDescription.template_url);
     //const imgVersoCvTemplateResized = imageResize(cv)(imgVersoCvTemplate, 600).image;
     // const youhou = detectAndComputeSerializable(cv)( imgVersoCvTemplateResized);
 
     const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResized, goodMatchSizeThreshold);
     let angle = 0;
-    let mat = new cv.Mat(imgCv.rows, imgCv.cols, imgCv.type(), new cv.Scalar());
+    let mat = new cv.Mat(imgCvCopy.rows, imgCvCopy.cols, imgCvCopy.type(), new cv.Scalar());
 
     if (result && result.lines) {
         let i = 0;

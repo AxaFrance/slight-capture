@@ -23,7 +23,7 @@
 const knnMatch = (cv) => (descriptors1, descriptors2, knnDistanceOption = 0.9) => {
     console.log("using knnMatch...");
     const goodMatchesTmp = []
-    const bf = new cv.BFMatcher(cv.NORM_HAMMING, false); // NORM_L2 NORM_HAMMING
+    const bf = new cv.BFMatcher(cv.NORM_HAMMING, true); // NORM_L2 NORM_HAMMING
     const matches = new cv.DMatchVectorVector();
     //Reference: https://docs.opencv.org/3.3.0/db/d39/classcv_1_1DescriptorMatcher.html#a378f35c9b1a5dfa4022839a45cdf0e89
     bf.knnMatch(descriptors1, descriptors2, matches, 3);
@@ -43,14 +43,14 @@ const knnMatch = (cv) => (descriptors1, descriptors2, knnDistanceOption = 0.9) =
 
     const goodMatches = new cv.DMatchVector();
 
-    const sorted = goodMatchesTmp.filter(b => b.distance < 100).sort((a, b) => a.distance - b.distance);
+    const sorted = goodMatchesTmp.filter(b => b.distance < 90).sort((a, b) => a.distance - b.distance);
     console.log(sorted);
     sorted.forEach(match => goodMatches.push_back(match));
 
     return goodMatches;
 }
 
-export const matchSwitch = (cv) => (descriptors1, descriptors2, minMatch = 20, matchOption = 1) => {
+export const matchSwitch = (cv) => (descriptors1, descriptors2, minMatch = 20, matchOption = 0) => {
     let goodMatches = null;
     if (matchOption === 0) {//match
         goodMatches = match(cv)(descriptors1, descriptors2);
@@ -73,9 +73,9 @@ export const detectAndCompute = (cv) => (img, detectionAlgorithm) => {
 }
 
 export const detectAndComputeSerializable = (cv) => (img) => {
-    //const detectionAlgorithm = new cv.BRISK();
+    const detectionAlgorithm = new cv.BRISK();
     //const detectionAlgorithm = new cv.AKAZE();
-    const detectionAlgorithm = new cv.ORB(5000);
+    //const detectionAlgorithm = new cv.ORB(5000);
 
     // find the keypoints with ORB
     const {keypoints, descriptors} = detectAndCompute(cv)(img, detectionAlgorithm);
@@ -120,10 +120,10 @@ export const detectAndComputeSerializableToCv = (cv) => (descriptorSerializable,
 export const detectAndMatch = (cv) => (imgDescription, im2, minMatch = 20) => {
 
     // Initiate STAR detector
-    const detectionAlgorithm = new cv.ORB(5000);
+    //const detectionAlgorithm = new cv.ORB(5000);
      //const detectionAlgorithm = new cv.SIFT();
     //const detectionAlgorithm = new cv.AKAZE();
-   //const detectionAlgorithm = new cv.BRISK();
+   const detectionAlgorithm = new cv.BRISK();
 
     // find the keypoints with ORB
     const {
@@ -174,7 +174,7 @@ export const convertHomographyPointsToRectangle = (cv) => (points, witdh, height
     const threshold = 0.2;
 
     let isError = false;
-   /* if (xmin < 0 && xmin + witdh * threshold < 0) {
+    if (xmin < 0 && xmin + witdh * threshold < 0) {
         isError = true;
     }
     if (ymin < 0 && ymin + height * threshold < 0) {
@@ -185,7 +185,7 @@ export const convertHomographyPointsToRectangle = (cv) => (points, witdh, height
     }
     if (xmax > witdh && xmax > witdh + witdh * threshold) {
         isError = true;
-    }*/
+    }
 
     xmin = xmin <= 0 ? 0 : xmin
     ymin = ymin <= 0 ? 0 : ymin;

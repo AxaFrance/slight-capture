@@ -129,16 +129,16 @@ export const TemplateGenerator = () => {
             //const imgGray = convertImgToGray(cv)(imgCvTemplateResized);
             //console.log("imgGray", imgGray)
             const {image: outputCv, numberPoint} = findMatch(cv)(state.imgCvTemplateResized, imgCvTemplateResized);
-            console.log("here")
             const output = toImageBase64(cv)(outputCv);
 
             if (numberPoint > 10) {
                 const bestOutput = toImageBase64(cv)(imgCv);
-                console.log("state.numberPoint")
-                console.log(state.bestNumberPoint)
+                //console.log("state.numberPoint")
+                //console.log(state.bestNumberPoint)
                 const imgDescription =  JSON.parse(state.jsonContent)
+                console.log("Zone");
                 const result =  await zoneAsync(cv)(imgCv, imgDescription, 12)
-                console.log("result", result);
+                //console.log("result", result);
                 if(result?.confidenceRate > state.confidenceRate) {
                     const newState = {
                         ...state,
