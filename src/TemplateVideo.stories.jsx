@@ -44,11 +44,11 @@ const transformImage = (stateImgCvTemplateResized, imgDescription) => {
                 // const imgDescription =  JSON.parse(state.jsonContent)
                // const limiteRate = parseInt((state.confidenceRate + state.confidenceRate / 8), 10);
               //  console.log("limiteRate", limiteRate)
-               /*promise = zoneAsync(cv)(imgCv, imgDescription, 30).then(result => {
+               promise = zoneAsync(cv)(imgCv, imgDescription, 30).then(result => {
                         
                    try {
                        console.log("result", result);
-                       if (result && result?.goodMatchSize > state.confidenceRate -30 ) {
+                       if (result && result?.goodMatchSize > state.confidenceRate) {
                            const bestOutput = toImageBase64(cv)(imgCv);
                            const newState = {
                                ...state,
@@ -77,7 +77,7 @@ const transformImage = (stateImgCvTemplateResized, imgDescription) => {
                    }    
            
                     }
-                );*/
+                );
                 
                 /*
                 const result = await computeAndApplyHomography(cv)(imgDescription, imgCv, state.confidenceRate);

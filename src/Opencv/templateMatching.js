@@ -95,7 +95,7 @@ export const findMatch = (cv) => (template, image) => {
     let colorRed = new cv.Scalar(255, 100, 200, 255);
     cv.putText(image, "" + numberPoint, new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
 
-    if(maxPoint.x > 0 && maxPoint.y > 0 && Math.abs(maxPoint.x - point1.x) < 20 && Math.abs(maxPoint.y - point1.y) < 20 ) {
+    if(maxPoint.x > 0 && maxPoint.y > 0 && Math.abs(maxPoint.x - point1.x) < 10 && Math.abs(maxPoint.y - point1.y) < 10 ) {
         const lineSize = average < 0.1 ? 1 : parseInt(average * 10, 10);
         //console.log("lineSize")
         //console.log(lineSize)
