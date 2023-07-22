@@ -93,10 +93,10 @@ export const findMatch = (cv) => (template, image) => {
     var point2 = new cv.Point( parseInt((image.cols - template.cols) / 2,10) + template.cols  , parseInt((image.rows - template.rows)/2,10) + template.rows);
     cv.rectangle(image, point1, point2, colorBlue, 12, cv.LINE_8, 0);
     let colorRed = new cv.Scalar(255, 100, 200, 255);
-    cv.putText(image, "Number of point: " + numberPoint, new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
+    cv.putText(image, "" + numberPoint, new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
 
     if(maxPoint.x > 0 && maxPoint.y > 0) {
-        const lineSize = numberPoint < 2000 ? 2 : parseInt(numberPoint / 1000, 10);
+        const lineSize = average < 0.1 ? 1 : parseInt(average * 10, 10);
         //console.log("lineSize")
         //console.log(lineSize)
 
