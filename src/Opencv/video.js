@@ -75,11 +75,11 @@ export const loadVideoAsync = (cv) => (transformImage) => {
                     let stream_settings = stream.getVideoTracks()[0].getSettings();
                     console.log(stream_settings)
 
-                    const iP = document.createElement('p');
+                   // const iP = document.createElement('p');
                     const text = document.createTextNode(JSON.stringify(stream_settings));
-                    iP.appendChild(text);
-                    iP.id = cuid();
-                    iDiv.appendChild(iP);
+                    iH1.appendChild(text);
+                    //iP.id = cuid();
+                    //iDiv.appendChild(iP);
                     
                     let src = new cv.Mat(stream_settings.height, stream_settings.width, cv.CV_8UC4);
                     let dst = new cv.Mat(stream_settings.height, stream_settings.width, cv.CV_8UC1);
