@@ -48,7 +48,7 @@ const transformImage = (stateImgCvTemplateResized, imgDescription) => {
                         
                    try {
                        console.log("result", result);
-                       if (result && result?.goodMatchSize > state.confidenceRate -50 ) {
+                       if (result && result?.goodMatchSize > state.confidenceRate -30 ) {
                            const bestOutput = toImageBase64(cv)(imgCv);
                            const newState = {
                                ...state,
