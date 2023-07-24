@@ -1,5 +1,7 @@
 ﻿import cuid from "cuid";
-import {toImageBase64} from "./image.js";
+import {imageResize, toImageBase64} from "./image.js";
+import {findMatch} from "./templateMatching.js";
+import {zoneAsync} from "../template.js";
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -8,7 +10,116 @@ async function getDevices() {
     console.log(devices);
 }
 
-export const loadVideoAsync = (cv) => (transformImage) => {
+const checkImageQuality = (cv) => (imageCvTemplate, imageCvTemplateDescription, imgCv, divId) => {
+    return zoneAsync(cv)(imgCv, imageCvTemplateDescription, 30).then(result => {
+
+            try {
+                console.log("result", result);
+               return result;
+            } catch (e) {
+                console.log(e)
+            }
+
+        }
+    );
+}
+
+    const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, imgCv, divId, state, promise) => {
+        try {
+            const cv = window.cv;
+            if (imgCv === null) return;
+            const imd = imageResize(cv)(imgCv, 400);
+
+            const imgCvTemplateResized = imd.image;
+            
+            const {image: imageCv, matchQuality} = findMatch(cv)(imageCvTemplate, imgCvTemplateResized);
+            return {imageCv, matchQuality};
+            if (matchQuality > 0) {
+
+                if(promise !== null) {
+                    const bestOutput = toImageBase64(cv)(imgCv);
+                    const newState = {
+                        ...state,
+                        output: outputCv,
+                        bestNumberPoint: matchQuality,
+                        bestOutput: bestOutput,
+                    };
+                    state = newState;
+                    return;
+                }
+                // const imgDescription =  JSON.parse(state.jsonContent)
+                // const limiteRate = parseInt((state.confidenceRate + state.confidenceRate / 8), 10);
+                //  console.log("limiteRate", limiteRate)
+               /* promise = zoneAsync(cv)(imgCv, imageCvTemplateDescription, 30).then(result => {
+
+                        try {
+                            console.log("result", result);
+                            if (result && result?.goodMatchSize > state.confidenceRate) {
+                                const bestOutput = toImageBase64(cv)(imgCv);
+                                const newState = {
+                                    ...state,
+                                    output: outputCv,
+                                    bestNumberPoint: numberPoint,
+                                    bestOutput: bestOutput,
+                                    //url: result?.croppedContoursBase64,
+                                    confidenceRate: result?.goodMatchSize
+                                };
+
+                                if( result && result.finalImage) {
+                                    const iVideo = document.createElement('img');
+                                    iVideo.id = cuid();
+                                    iVideo.style = "max-width: 400px";
+                                    iVideo.src = toImageBase64(cv)(result.finalImage);
+                                    document.getElementById(divId).appendChild(iVideo);
+                                }
+
+
+                                state = newState;
+                            }
+                            promise = null;
+                        } catch (e) {
+                            console.log(e)
+                            promise = null;
+                        }
+
+                    }
+                );*/
+
+                /*
+                const result = await computeAndApplyHomography(cv)(imgDescription, imgCv, state.confidenceRate);
+                if (result?.goodMatchSize > state.confidenceRate) {
+                    const bestOutput = toImageBase64(cv)(imgCv);
+                    const newState = {
+                        ...state,
+                        output: outputCv,
+                        bestNumberPoint: numberPoint,
+                        bestOutput: bestOutput,
+                        //url: result?.croppedContoursBase64,
+                        confidenceRate: result?.goodMatchSize
+                    };
+                    const iVideo = document.createElement('img');
+                    iVideo.id = cuid();
+                    iVideo.src = toImageBase64(cv)(result?.finalImage);
+                    document.getElementById(divId).appendChild(iVideo);
+
+
+                    state = newState;
+                }*/
+
+            } else {
+                const newState = {...state, numberPoint, output: outputCv};
+                state = newState;
+            }
+            // imgCv.delete();
+            //  imgCvTemplateResized.delete();
+            return outputCv;
+        } catch (e) {
+            console.log(e)
+        }
+    }
+    
+
+export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescription) => {
     return new Promise((resolve, error) => {
 
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -16,7 +127,6 @@ export const loadVideoAsync = (cv) => (transformImage) => {
             return;
         }
        
-
         const modalStyle = ` position: fixed;z-index: 10000000;padding-top: 0x;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`
         const iDiv = document.createElement('div');
         iDiv.style = modalStyle;
@@ -26,7 +136,7 @@ export const loadVideoAsync = (cv) => (transformImage) => {
 
         const iH1 = document.createElement('h1');
         //iH1.style = modalStyle;
-        var text = document.createTextNode("Positionner votre carte d'identité dans le cadre");
+        const text = document.createTextNode("Positionner votre carte d'identité dans le cadre");
         iH1.appendChild(text);
         iH1.id = cuid();
         iDiv.appendChild(iH1);
@@ -41,10 +151,11 @@ export const loadVideoAsync = (cv) => (transformImage) => {
         iDiv.appendChild(iVideo);
 
         const iDivImages = document.createElement('div');
-        //iDivImages.style = modalStyle;
+        const modalStyleImage = ` position: fixed;z-index: 100000000;padding-top: 0x;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`
+        iDivImages.style = modalStyleImage;
         const iDivImagesId = cuid();
         iDivImages.id = iDivImagesId;
-        iDiv.appendChild(iDivImages);
+        
         
         let constraints = {
             audio: false,
@@ -52,8 +163,8 @@ export const loadVideoAsync = (cv) => (transformImage) => {
                 width: { ideal: 2600 },
                 height: { ideal: 2600 },
                 facingMode: {
-                    //ideal: 'face'
-                    ideal: 'environment'
+                    ideal: 'face'
+                   // ideal: 'environment'
                 },
                 
             }
@@ -90,17 +201,58 @@ export const loadVideoAsync = (cv) => (transformImage) => {
                     const FPS = 30;
 
                     let streaming = true;
+                    let state = {bestNumberPoint: 0, confidenceRate: 0}
+                    let promise = null;
+                    let beginMatch = Date.now();
                     const stopStreaming = () => {
                         streaming = false;
                     };
-
+                    
+                    let numberFollowingMatchQuality = 0;
                     async function processVideo() {
                         try {
                             // start processing.
                             cap.read(src);
-                            const dst = await transformImage(src, iDivImagesId);
-                            if(dst) {
-                                cv.imshow(outputCanvas, dst)
+                            const {imageCv, matchQuality} = await transformFunction(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId, state, promise, true);
+                            let diff;
+                            if(matchQuality > 0) {
+                                numberFollowingMatchQuality++;
+                                let colorRed = new cv.Scalar(255, 100, 200, 255);
+                                diff =  Math.round((Date.now() - beginMatch) / 1000);
+                                cv.putText(imageCv, diff.toString(), new cv.Point(30, 100), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
+                            }
+                            else {
+                                numberFollowingMatchQuality = 0;
+                                diff = 0;
+                                beginMatch = Date.now();
+                            }
+                           
+                            if(diff > 3 && promise === null) {
+                                numberFollowingMatchQuality = 0;
+                                iDiv.appendChild(iDivImages);
+                                await delay(1);
+                                promise = checkImageQuality(cv)(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId).then(result => {
+                                    
+                                    if( result && result.finalImage) {
+                                        const iH1 = document.createElement('h1');
+                                        iH1.id = cuid();
+                                        const text = document.createTextNode("Es-ce que tous les champs sont parfaitement lisibles ?");
+                                        iH1.appendChild(text);
+                                        iDivImages.appendChild(iH1);
+                                        const iVideo = document.createElement('img');
+                                        iVideo.id = cuid();
+                                        iVideo.style = "max-width: 800px";
+                                        iVideo.src = toImageBase64(cv)(result.finalImage);
+                                        iDivImages.appendChild(iVideo);
+                                    }
+                                   
+                                    promise = null;
+                                })
+                                
+                            }
+                            
+                            if(imageCv) {
+                                cv.imshow(outputCanvas, imageCv)
                             }
                             return src;
                         } catch (err) {
