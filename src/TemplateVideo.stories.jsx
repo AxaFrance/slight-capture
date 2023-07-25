@@ -42,8 +42,8 @@ export const TemplateVideo= () => {
         const cv = window.cv;
         const convertedFile = await toBase64Async(file);
         const imgCvTemplate = await loadImageAsync(cv)(convertedFile);
-        let imgCvTemplateResized = imageResize(cv)(imgCvTemplate, 200).image;
-        let imgCvTemplateResizedMatch = imageResize(cv)(imgCvTemplate, 600).image;
+        let imgCvTemplateResized = imageResize(cv)(imgCvTemplate, 100).image;
+        let imgCvTemplateResizedMatch = imageResize(cv)(imgCvTemplate, 800).image;
         //let imgCvGray = convertImgToGray(cv)(imgCvTemplateResized);
         const resizedImg = detectAndComputeSerializable(cv)(imgCvTemplateResizedMatch);
         const jsonValue = JSON.stringify(resizedImg);

@@ -28,7 +28,7 @@ const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, im
     try {
         const cv = window.cv;
         if (imgCv === null) return;
-        const imd = imageResize(cv)(imgCv, 400);
+        const imd = imageResize(cv)(imgCv, 200);
 
         const imgCvTemplateResized = imd.image;
         
@@ -187,8 +187,8 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
         let constraints = {
             audio: false,
             video: {
-                width: { ideal: 2600 },
-                height: { ideal: 2600 },
+                width: { ideal: 1600 },
+                height: { ideal: 1600 },
                 facingMode: {
                     //ideal: 'face'
                     ideal: 'environment'
