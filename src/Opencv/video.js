@@ -28,7 +28,7 @@ const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, im
     try {
         const cv = window.cv;
         if (imgCv === null) return;
-        const imd = imageResize(cv)(imgCv, 200);
+        const imd = imageResize(cv)(imgCv, 100);
 
         const imgCvTemplateResized = imd.image;
         
@@ -187,8 +187,8 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
         let constraints = {
             audio: false,
             video: {
-                width: { ideal: 1600 },
-                height: { ideal: 1600 },
+                width: { ideal: 2000 },
+                height: { ideal: 2000 },
                 facingMode: {
                     //ideal: 'face'
                     ideal: 'environment'
@@ -209,7 +209,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
         iDiv.appendChild(iButton);
 
         const outputCanvas = document.createElement("canvas");
-        outputCanvas.style = 'display: inline;width: 100%;';
+        outputCanvas.style = 'display: inline;width: 600px;';
         iDiv.appendChild(outputCanvas);
 
         const iVideo = document.createElement('video');
