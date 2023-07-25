@@ -81,7 +81,7 @@ export const findMatch = (cv) => (template, image) => {
     cv.putText(image,  matchQuality.toString(), new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
 
     if(maxPoint.x > 0 && maxPoint.y > 0 && Math.abs(maxPoint.x - point1.x) < 10 && Math.abs(maxPoint.y - point1.y) < 10 ) {
-        const lineSize = average < 0.1 ? 1 : Math.round( average * 10, 10);
+        const lineSize = average < 0.1 ? 1 : Math.round( average , 10);
         matchQuality = 0.1  ;
         cv.rectangle(image, maxPoint, point, color, lineSize, cv.LINE_8, 0);
     }

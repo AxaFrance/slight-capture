@@ -187,8 +187,8 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
         let constraints = {
             audio: false,
             video: {
-                width: { ideal: 2000 },
-                height: { ideal: 2000 },
+                width: { ideal: 2600 },
+                height: { ideal: 2600 },
                 facingMode: {
                     //ideal: 'face'
                     ideal: 'environment'
