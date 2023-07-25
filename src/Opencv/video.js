@@ -200,6 +200,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
         const iButton = document.createElement('button');
         iButton.id = cuid();
         iButton.textContent = "Inverser la caméra";
+        iButton.style = 'padding: 0.5em;font-size: 2em;margin: 1em;float: right;'
         iButton.onclick = () => {
             stopStreaming();
             constraints.video.facingMode.ideal = constraints.video.facingMode.ideal === 'face' ? 'environment' : 'face';
@@ -256,14 +257,14 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                    
                     if(diff > 3 && promise === null) {
                         numberFollowingMatchQuality = 0;
+                        stopStreaming();
                         iDiv.appendChild(iDivImages);
-                        await delay(1);
                         promise = checkImageQuality(cv)(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId).then(result => {
-                            
+                            promise = null;
                             if( result && result.finalImage) {
                                 const iH1 = document.createElement('h1');
                                 iH1.id = cuid();
-                                const text = document.createTextNode("Es-ce que tous les champs sont parfaitement lisibles ?");
+                                const text = document.createTextNode("Es-ce que tous les champs sont-ils tous parfaitement lisibles ?");
                                 iH1.appendChild(text);
                                 iDivImages.appendChild(iH1);
                                 const iVideo = document.createElement('img');
@@ -271,10 +272,36 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                 iVideo.style = "max-width: 800px";
                                 iVideo.src = toImageBase64(cv)(result.finalImage);
                                 iDivImages.appendChild(iVideo);
-                                stopStreaming();
+                                
+                                
+                                const iDivButton = document.createElement('div');
+                                iDivButton.id = cuid();
+                                iDivButton.style = 'display: flex;justify-content: center;align-items: center;'
+                                iDivImages.appendChild(iDivButton);
+
+                                const iButtonNo = document.createElement('button');
+                                iButtonNo.id = cuid();
+                                iButtonNo.style = 'padding: 0.5em;font-size: 2em;margin: 1em;'
+                                iButtonNo.textContent = "Non";
+                                iButtonNo.onclick = () => {
+
+                                }
+                                iDivButton.appendChild(iButtonNo);
+
+                                const iButtonYes = document.createElement('button');
+                                iButtonYes.id = cuid();
+                                iButtonYes.style = 'padding: 0.5em;font-size: 2em;margin: 1em;'
+                                iButtonYes.textContent = "Oui";
+                                iButtonYes.onclick = () => {
+
+                                }
+                                iDivButton.appendChild(iButtonYes);
+                                
+                                
+                                
                             }
                            
-                            promise = null;
+                            
                         })
                         
                     }
