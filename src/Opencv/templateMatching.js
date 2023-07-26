@@ -67,27 +67,42 @@ export const findMatch = (cv) => (template, image) => {
      end = end + destination.cols;
  }
 
- let average = Math.round( total/totalPoint * 10);
-
-    matchQuality = average;
+    matchQuality = Math.round(total / totalPoint * 10);
     
 
     let colorBlue = new cv.Scalar(200, 255, 100, 255);
     var point1 = new cv.Point( Math.round( (image.cols - template.cols) / 2) , Math.round( (image.rows - template.rows)/2));
     var point2 = new cv.Point( Math.round( (image.cols - template.cols) / 2) + template.cols  , Math.round( (image.rows - template.rows)/2) + template.rows);
     cv.rectangle(image, point1, point2, colorBlue, 1, cv.LINE_8, 0);
-    let colorRed = new cv.Scalar(255, 100, 200, 255);
+   // let colorRed = new cv.Scalar(255, 100, 200, 255);
     //cv.putText(image,  matchQuality.toString(), new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
-
+    let currentPoints = null;
     if(maxPoint.x > 0 && maxPoint.y > 0 && Math.abs(maxPoint.x - point1.x) < 10 && Math.abs(maxPoint.y - point1.y) < 10 ) {
-        const lineSize = average < 0.1 ? 1 : Math.round( average );
-        matchQuality = 0.1;
+        //const lineSize = average < 0.1 ? 1 : Math.round( average );
+        matchQuality = 1;
         cv.rectangle(image, maxPoint, point, color, 1, cv.LINE_8, 0);
+        currentPoints = {
+            x1: maxPoint.x / image.cols,
+            y1: maxPoint.y / image.rows,
+            x2: point.x / image.cols,
+            y2: point.y / image.rows,
+        }
     }
     else{
         matchQuality = 0;
+ 
     }
  mask.delete();
  destination.delete();
- return {image, matchQuality: matchQuality};
+ return {
+     image, 
+     matchQuality: matchQuality,
+     targetPoints: {
+            x1: point1.x / image.cols,
+            y1: point1.y / image.rows,
+            x2: point2.x / image.cols,
+            y2: point2.y / image.rows
+     },
+     currentPoints
+ };
 }

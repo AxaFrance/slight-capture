@@ -151,85 +151,8 @@ const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, im
 
         const imgCvTemplateResized = imd.image;
         
-        const {image: imageCv, matchQuality} = findMatch(cv)(imageCvTemplate, imgCvTemplateResized);
-        return {imageCv, matchQuality};
-        if (matchQuality > 0) {
-
-                const bestOutput = toImageBase64(cv)(imgCv);
-                const newState = {
-                    ...state,
-                    output: outputCv,
-                    bestNumberPoint: matchQuality,
-                    bestOutput: bestOutput,
-                };
-                state = newState;
-                return;
-            // const imgDescription =  JSON.parse(state.jsonContent)
-            // const limiteRate = parseInt((state.confidenceRate + state.confidenceRate / 8), 10);
-            //  console.log("limiteRate", limiteRate)
-           /* promise = zoneAsync(cv)(imgCv, imageCvTemplateDescription, 30).then(result => {
-
-                    try {
-                        console.log("result", result);
-                        if (result && result?.goodMatchSize > state.confidenceRate) {
-                            const bestOutput = toImageBase64(cv)(imgCv);
-                            const newState = {
-                                ...state,
-                                output: outputCv,
-                                bestNumberPoint: numberPoint,
-                                bestOutput: bestOutput,
-                                //url: result?.croppedContoursBase64,
-                                confidenceRate: result?.goodMatchSize
-                            };
-
-                            if( result && result.finalImage) {
-                                const iVideo = document.createElement('img');
-                                iVideo.id = cuid();
-                                iVideo.style = "max-width: 400px";
-                                iVideo.src = toImageBase64(cv)(result.finalImage);
-                                document.getElementById(divId).appendChild(iVideo);
-                            }
-
-
-                            state = newState;
-                        }
-                        promise = null;
-                    } catch (e) {
-                        console.log(e)
-                        promise = null;
-                    }
-
-                }
-            );*/
-
-            /*
-            const result = await computeAndApplyHomography(cv)(imgDescription, imgCv, state.confidenceRate);
-            if (result?.goodMatchSize > state.confidenceRate) {
-                const bestOutput = toImageBase64(cv)(imgCv);
-                const newState = {
-                    ...state,
-                    output: outputCv,
-                    bestNumberPoint: numberPoint,
-                    bestOutput: bestOutput,
-                    //url: result?.croppedContoursBase64,
-                    confidenceRate: result?.goodMatchSize
-                };
-                const iVideo = document.createElement('img');
-                iVideo.id = cuid();
-                iVideo.src = toImageBase64(cv)(result?.finalImage);
-                document.getElementById(divId).appendChild(iVideo);
-
-
-                state = newState;
-            }*/
-
-        } else {
-            const newState = {...state, numberPoint, output: outputCv};
-            state = newState;
-        }
-        // imgCv.delete();
-        //  imgCvTemplateResized.delete();
-        return outputCv;
+        const {image: imageCv, matchQuality, targetPoints, currentPoints} = findMatch(cv)(imageCvTemplate, imgCvTemplateResized);
+        return {imageCv, matchQuality, targetPoints, currentPoints};
     } catch (e) {
         console.log(e)
     }
@@ -382,20 +305,32 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                 try {
                     // start processing.
                     videoCapture.read(src);
+                    const imageOutput = imageResize(cv)(src, 1600).image;
+                    const {imageCv, matchQuality, targetPoints, currentPoints} = await transformFunction(imageCvTemplate, imageCvTemplateDescription, imageOutput, iDivImagesId, state);
+                    const point1 = new cv.Point(Math.round(targetPoints.x1 * imageOutput.cols), Math.round(targetPoints.y1 * imageOutput.rows));
+                    const point2 = new cv.Point(Math.round(targetPoints.x2 * imageOutput.cols), Math.round(targetPoints.y2 * imageOutput.rows));
                     
-                   const {imageCv, matchQuality} = await transformFunction(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId, state);
+                    let colorBlue = new cv.Scalar(0, 150, 238, 255);
+                    cv.rectangle(imageOutput, point1, point2, colorBlue, 30, cv.LINE_8, 0);
+                    
                     let diff;
-                    if(matchQuality > 0) {
+                    if(currentPoints != null) {
                         numberFollowingMatchQuality++;
                         let colorRed = new cv.Scalar(255, 0, 0, 255);
                         diff =  Math.round((Date.now() - beginMatch) / 1000);
                         const font = cv.FONT_HERSHEY_SIMPLEX;
-                        const fontScale = 0.5;
-                        const thickness = 2;
+                        const fontScale = 10;
+                        const thickness = 20;
                         const baseline=0;
                        // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
-                        const size = new cv.Size(10, 10);
-                        cv.putText(imageCv, diff.toString(), new cv.Point(Math.round( imageCv.cols /2 - size.width /2), Math.round( imageCv.rows /2 - size.height /2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
+                        const size = new cv.Size(280, -280);
+                        cv.putText(imageOutput, diff.toString(), new cv.Point(Math.round( imageOutput.cols /2 - size.width /2), Math.round( imageOutput.rows /2 - size.height /2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
+
+                        const point1 = new cv.Point(Math.round(currentPoints.x1 * imageOutput.cols), Math.round(currentPoints.y1 * imageOutput.rows));
+                        const point2 = new cv.Point(Math.round(currentPoints.x2 * imageOutput.cols), Math.round(currentPoints.y2 * imageOutput.rows));
+
+                        let colorGreen = new cv.Scalar(95, 225, 62, 150);
+                        cv.rectangle(imageOutput, point1, point2, colorGreen, 20, cv.LINE_8, 0);
                     }
                     else {
                         numberFollowingMatchQuality = 0;
@@ -469,9 +404,13 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                         
                     }
                     
-                    if(imageCv) {
-                        cv.imshow(outputCanvas, imageCv)
+                    if(imageCv){
                         imageCv.delete();
+                    }
+                    
+                    if(imageOutput) {
+                        cv.imshow(outputCanvas, imageOutput)
+                        imageOutput.delete();
                     }
                     return src;
                 } catch (err) {
