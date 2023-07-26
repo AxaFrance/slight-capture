@@ -1,5 +1,5 @@
 ﻿import cuid from "cuid";
-import {imageResize, toImageBase64} from "./image.js";
+import {b64toBlob, imageResize, toImageBase64} from "./image.js";
 import {findMatch} from "./templateMatching.js";
 import {zoneAsync} from "../template.js";
 
@@ -10,21 +10,6 @@ async function getDevices() {
     const devices = await navigator.mediaDevices.enumerateDevices();
     console.log(devices);
 }
-
-const checkImageQuality = (cv) => (imageCvTemplate, imageCvTemplateDescription, imgCv, divId) => {
-    return zoneAsync(cv)(imgCv, imageCvTemplateDescription, 30).then(result => {
-
-            try {
-                console.log("result", result);
-               return result;
-            } catch (e) {
-                console.log(e)
-            }
-
-        }
-    );
-}
-
 const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, imgCv, divId, state) => {
     try {
         const cv = window.cv;
@@ -39,7 +24,13 @@ const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, im
         console.log(e)
     }
 }
-    
+
+
+const sligthCaptureDatabase = {
+
+};
+
+
 const startCaptureAsync = cv =>(constraints, iVideo) => {
     return new Promise((resolve, error) => {
         navigator.mediaDevices.getUserMedia(constraints)
@@ -91,7 +82,7 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
 
 }
 
-export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescription) => {
+export const loadVideoAsync = (name) => (cv) => (imageCvTemplate, imageCvTemplateDescription) => {
     return new Promise((resolve, error) => {
 
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -108,7 +99,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
 
         const iH1 = document.createElement('h1');
         
-        const text = document.createTextNode("Positionner votre carte d'identité dans le cadre");
+        const text = document.createTextNode("Positionner 5 secondes votre carte d'identité dans le cadre");
         iH1.style = 'padding-left: 0.5em;padding-right: 0.5em';
         iH1.appendChild(text);
         iH1.id = cuid();
@@ -136,7 +127,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
 
         const iButton = document.createElement('button');
         iButton.id = cuid();
-        iButton.textContent = "Inverser la caméra";
+        iButton.textContent = "Inverser caméra";
         iButton.style = 'padding: 0.5em;font-size: 1em;margin: 1em;position:absolute;'
         iButton.onclick = () => {
             stopStreaming();
@@ -148,7 +139,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
         const iButtonQuit = document.createElement('button');
         iButtonQuit.id = cuid();
         iButtonQuit.textContent = "X";
-        iButtonQuit.style = 'padding: 0.5em;font-size: 1em;margin: 1em;position:absolute; top: 0; right: 0;';
+        iButtonQuit.style = 'padding: 0em;font-size: 1em;margin: 1em;position:absolute; top: 0; right: 0;';
         iButtonQuit.onclick = () => {
             stopStreaming();
             iDiv.removeChild(iVideo);
@@ -162,18 +153,18 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
 
         const iVideo = document.createElement('video');
         iVideo.style = 'visibility:hidden;display:none;';
+        iVideo.autoplay = true;
+        iVideo.playsInline = true;
         iVideo.id = cuid();
         iDiv.appendChild(iVideo);
         
 
         const iDivImages = document.createElement('div');
-        const modalStyleImage = ` position: fixed;z-index: 100000000;padding-top: 0x;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`
-        iDivImages.style = modalStyleImage;
+        iDivImages.style = `position: fixed;z-index: 100000000;padding-top: 0x;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`;
         const iDivImagesId = cuid();
         iDivImages.id = iDivImagesId;
         
         
-   
         getDevices();
             const FPS = 30;
 
@@ -236,7 +227,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                         iDiv.appendChild(iDivImages);
                         
                         delay(1000).then(() => {
-                            checkImageQuality(cv)(imageCvTemplate, imageCvTemplateDescription, finalShot, iDivImagesId).then(result => {
+                            zoneAsync(cv)(finalShot, imageCvTemplateDescription, 30).then(result => {
                             iDivImages.removeChild(iHLoading);
                             finalShot.delete();
                             if( result && result.finalImage) {
@@ -264,7 +255,8 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                 iButtonNo.onclick = async () => {
                                     iDiv.removeChild(iVideo);
                                     document.getElementsByTagName('body')[0].removeChild(iDiv);
-                                    const loadVideo = await loadVideoAsync(cv)(imageCvTemplate, imageCvTemplateDescription);
+                                    result.finalImage.delete();
+                                    const loadVideo = await loadVideoAsync(name)(cv)(imageCvTemplate, imageCvTemplateDescription);
                                     if(loadVideo) {
                                         loadVideo.start();
                                     }
@@ -275,8 +267,11 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                 iButtonYes.id = cuid();
                                 iButtonYes.style = 'padding: 0.5em;font-size: 2em;margin: 1em;'
                                 iButtonYes.textContent = "Oui";
-                                iButtonYes.onclick = () => {
-                                    wait = false;
+                                iButtonYes.onclick = async () => {
+                                    const imageBase64 = await toImageBase64(cv)(result.finalImage);
+                                    sligthCaptureDatabase[name].BlobOutputImage = await b64toBlob(imageBase64, "image/png");
+                                    result.finalImage.delete();
+                                    document.getElementsByTagName('body')[0].removeChild(iDiv);
                                 }
                                 iDivButton.appendChild(iButtonYes);
                             }
@@ -323,14 +318,10 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                         stopStreamTracks();
                     }
                 }
-                
-               
             }
             
             const start = async () => {
-                for await (const val of startStreaming()) {
-
-                }
+                for await (const val of startStreaming()) {}
                 console.log("Fin du streaming");
             }
 
@@ -339,4 +330,17 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
             })
         
     });
+}
+
+
+export const sligthCapturefactory = (name) => {
+    if (sligthCaptureDatabase[name]) {
+        return sligthCaptureDatabase[name];
+    }
+    sligthCaptureDatabase[name] ={
+        loadVideoAsync: loadVideoAsync(name),
+    };
+    
+    return sligthCaptureDatabase[name];
+
 }

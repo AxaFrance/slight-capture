@@ -6,10 +6,10 @@ import {toBase64Async, zoneAsync} from "./template.js";
 import {imageResize, loadImageAsync, toImageBase64} from "./Opencv/image.js";
 import {computeAndApplyHomography, detectAndComputeSerializable} from "./Opencv/match.js";
 import {findMatch} from "./Opencv/templateMatching.js";
-import {loadVideoAsync} from "./Opencv/video.js";
+import {loadVideoAsync, sligthCapturefactory} from "./Opencv/video.js";
 import cuid from "cuid";
 
-
+var sligthCapture = sligthCapturefactory("default");
 
 export const TemplateVideo= () => {
 
@@ -56,7 +56,7 @@ export const TemplateVideo= () => {
         
        // const transform = transformImage(imgCvTemplateResized, resizedImg);
         
-        const video = await loadVideoAsync(cv)(imgCvTemplateResized, resizedImg);
+        const video = await sligthCapture.loadVideoAsync(cv)(imgCvTemplateResized, resizedImg);
         console.log('loadVideoAsync');
         video.start();
         
