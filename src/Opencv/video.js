@@ -143,7 +143,7 @@ const checkImageQuality = (cv) => (imageCvTemplate, imageCvTemplateDescription, 
     );
 }
 
-const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, imgCv, divId, state, promise) => {
+const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, imgCv, divId, state) => {
     try {
         const cv = window.cv;
         if (imgCv === null) return;
@@ -155,7 +155,6 @@ const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, im
         return {imageCv, matchQuality};
         if (matchQuality > 0) {
 
-            if(promise !== null) {
                 const bestOutput = toImageBase64(cv)(imgCv);
                 const newState = {
                     ...state,
@@ -165,7 +164,6 @@ const transformFunction = async (imageCvTemplate, imageCvTemplateDescription, im
                 };
                 state = newState;
                 return;
-            }
             // const imgDescription =  JSON.parse(state.jsonContent)
             // const limiteRate = parseInt((state.confidenceRate + state.confidenceRate / 8), 10);
             //  console.log("limiteRate", limiteRate)
@@ -351,7 +349,6 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
 
             
             let state = { bestNumberPoint: 0, confidenceRate: 0 }
-            let promise = null;
             let beginMatch = Date.now();
 
 
@@ -362,7 +359,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                     // start processing.
                     videoCapture.read(src);
                     
-                   const {imageCv, matchQuality} = await transformFunction(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId, state, promise, true);
+                   const {imageCv, matchQuality} = await transformFunction(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId, state);
                     let diff;
                     if(matchQuality > 0) {
                         numberFollowingMatchQuality++;
@@ -376,18 +373,22 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                         beginMatch = Date.now();
                     }
                    
-                    if(diff > 3 && promise === null) {
+                    if(diff > 3) {
                         numberFollowingMatchQuality = 0;
                         wait = true;
+                        const finalShot = src.clone();
                         stopStreaming();
-                        iDiv.appendChild(iDivImages);
+
+                      
                         const iHLoading = document.createElement('h1');
                         iHLoading.id = cuid();
                         const text = document.createTextNode("Traitement en cours ...");
                         iHLoading.appendChild(text);
                         iDivImages.appendChild(iHLoading);
-                        promise = checkImageQuality(cv)(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId).then(result => {
-                            promise = null;
+                        iDiv.appendChild(iDivImages);
+                        
+                        delay(1000).then(() => {
+                            checkImageQuality(cv)(imageCvTemplate, imageCvTemplateDescription, finalShot, iDivImagesId).then(result => {
                             iDivImages.removeChild(iHLoading);
                             if( result && result.finalImage) {
                                 const iH1 = document.createElement('h1');
@@ -395,13 +396,13 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                 const text = document.createTextNode("Es-ce que tous les champs sont-ils tous parfaitement lisibles ?");
                                 iH1.appendChild(text);
                                 iDivImages.appendChild(iH1);
-                                const iVideo = document.createElement('img');
-                                iVideo.id = cuid();
-                                iVideo.style = "max-width: 800px;width: 100%;";
-                                iVideo.src = toImageBase64(cv)(result.finalImage);
-                                iDivImages.appendChild(iVideo);
-                                
-                                
+                                const iImage = document.createElement('img');
+                                iImage.id = cuid();
+                                iImage.style = "max-width: 800px;width: 100%;";
+                                iImage.src = toImageBase64(cv)(result.finalImage);
+                                iDivImages.appendChild(iImage);
+
+
                                 const iDivButton = document.createElement('div');
                                 iDivButton.id = cuid();
                                 iDivButton.style = 'display: flex;justify-content: center;align-items: center;'
@@ -411,10 +412,11 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                 iButtonNo.id = cuid();
                                 iButtonNo.style = 'padding: 0.5em;font-size: 2em;margin: 1em;'
                                 iButtonNo.textContent = "Non";
-                                iButtonNo.onclick = () => {
-                                    iDiv.removeChild(iDivImages);
-                                    cameraPromise = startCaptureAsync(cv)(constraints, iVideo);
-                                    wait = false;
+                                iButtonNo.onclick = async () => {
+                                    iDiv.removeChild(iVideo);
+                                    document.getElementsByTagName('body')[0].removeChild(iDiv);
+                                    await delay(1000);
+                                    loadVideoAsync(cv)(imageCvTemplate, imageCvTemplateDescription);
                                 }
                                 iDivButton.appendChild(iButtonNo);
 
@@ -426,10 +428,10 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                     wait = false;
                                 }
                                 iDivButton.appendChild(iButtonYes);
-                                
-                                
-                                
+
+
                             }
+                            });
                            
                             
                         })
@@ -462,11 +464,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                         await delay(timeDelay);
                     }
                     src.delete();
-                    
-                    while (wait){
-                        await delay(1000);
-                    }
-                    
+                    console.log("Fermeture Camera");
                     
                 }
                
