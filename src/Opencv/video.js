@@ -244,6 +244,12 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
                 } else {
                     iVideo.src = window.URL.createObjectURL(stream);
                 }
+
+                stream.getTracks().forEach(function(track) {
+                    track.enabled = true;
+                    console.log("enable tracks" + track.label  );
+                });
+      
                 iVideo.onloadedmetadata = async function (e) {
                     await iVideo.play();
 
@@ -260,9 +266,16 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
                     iVideo.height = iVideo.videoHeight;
                     iVideo.width = iVideo.videoWidth;
                     let videoCapture = new cv.VideoCapture(iVideo);
+                    
+                    const stopStreamTracks = () => {
+                        stream.getTracks().forEach(function(track) {
+                            track.stop();
+                            track.enabled = true;
+                            console.log("stopStreamTracks" + track.label  );
+                        });
+                    }
 
-
-                    resolve({ videoCapture, src});
+                    resolve({ videoCapture, src, stopStreamTracks});
 
                 }
             })  .catch(function(err) {
@@ -326,8 +339,19 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
         }
         iDiv.appendChild(iButton);
 
+        const iButtonQuit = document.createElement('button');
+        iButtonQuit.id = cuid();
+        iButtonQuit.textContent = "Quitter";
+        iButtonQuit.style = 'padding: 0.5em;font-size: 1em;margin: 1em;position:absolute; top: 0; right: 0;';
+        iButtonQuit.onclick = () => {
+            stopStreaming();
+            iDiv.removeChild(iVideo);
+            document.getElementsByTagName('body')[0].removeChild(iDiv);
+        }
+        iDiv.appendChild(iButtonQuit);
+
         const outputCanvas = document.createElement("canvas");
-        outputCanvas.style = 'display: inline;width: 600px;';
+        outputCanvas.style = 'display: inline;width: 100%;';
         iDiv.appendChild(outputCanvas);
 
         const iVideo = document.createElement('video');
@@ -363,9 +387,15 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                     let diff;
                     if(matchQuality > 0) {
                         numberFollowingMatchQuality++;
-                        let colorRed = new cv.Scalar(255, 0, 200, 255);
+                        let colorRed = new cv.Scalar(255, 0, 0, 255);
                         diff =  Math.round((Date.now() - beginMatch) / 1000);
-                        cv.putText(imageCv, diff.toString(), new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 2, cv.LINE_AA);
+                        const font = cv.FONT_HERSHEY_SIMPLEX;
+                        const fontScale = 0.5;
+                        const thickness = 2;
+                        const baseline=0;
+                       // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
+                        const size = new cv.Size(10, 10);
+                        cv.putText(imageCv, diff.toString(), new cv.Point(Math.round( imageCv.cols /2 - size.width /2), Math.round( imageCv.rows /2 - size.height /2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
                     }
                     else {
                         numberFollowingMatchQuality = 0;
@@ -390,6 +420,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                         delay(1000).then(() => {
                             checkImageQuality(cv)(imageCvTemplate, imageCvTemplateDescription, finalShot, iDivImagesId).then(result => {
                             iDivImages.removeChild(iHLoading);
+                            finalShot.delete();
                             if( result && result.finalImage) {
                                 const iH1 = document.createElement('h1');
                                 iH1.id = cuid();
@@ -415,8 +446,10 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                 iButtonNo.onclick = async () => {
                                     iDiv.removeChild(iVideo);
                                     document.getElementsByTagName('body')[0].removeChild(iDiv);
-                                    await delay(1000);
-                                    loadVideoAsync(cv)(imageCvTemplate, imageCvTemplateDescription);
+                                    const loadVideo = await loadVideoAsync(cv)(imageCvTemplate, imageCvTemplateDescription);
+                                    if(loadVideo) {
+                                        loadVideo.start();
+                                    }
                                 }
                                 iDivButton.appendChild(iButtonNo);
 
@@ -428,8 +461,6 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                     wait = false;
                                 }
                                 iDivButton.appendChild(iButtonYes);
-
-
                             }
                             });
                            
@@ -440,6 +471,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                     
                     if(imageCv) {
                         cv.imshow(outputCanvas, imageCv)
+                        imageCv.delete();
                     }
                     return src;
                 } catch (err) {
@@ -455,7 +487,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                 
                 while (cameraPromise !== null) {
                     streaming = true;
-                    let { videoCapture, src } = await cameraPromise;
+                    let { videoCapture, src, stopStreamTracks } = await cameraPromise;
                     cameraPromise = null;
                     while (streaming) {
                         let begin = Date.now();
@@ -465,8 +497,11 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                     }
                     src.delete();
                     console.log("Fermeture Camera");
-                    
+                    if(cameraPromise === null){
+                        stopStreamTracks();
+                    }
                 }
+                
                
             }
             
@@ -474,6 +509,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                 for await (const val of startStreaming()) {
 
                 }
+                console.log("Fin du streaming");
             }
 
             resolve({

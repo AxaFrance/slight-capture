@@ -73,14 +73,14 @@ export const findMatch = (cv) => (template, image) => {
     
 
     let colorBlue = new cv.Scalar(200, 255, 100, 255);
-    var point1 = new cv.Point( Math.round( (image.cols - template.cols) / 2,10) , Math.round( (image.rows - template.rows)/2,10));
-    var point2 = new cv.Point( Math.round( (image.cols - template.cols) / 2,10) + template.cols  , Math.round( (image.rows - template.rows)/2,10) + template.rows);
+    var point1 = new cv.Point( Math.round( (image.cols - template.cols) / 2) , Math.round( (image.rows - template.rows)/2));
+    var point2 = new cv.Point( Math.round( (image.cols - template.cols) / 2) + template.cols  , Math.round( (image.rows - template.rows)/2) + template.rows);
     cv.rectangle(image, point1, point2, colorBlue, 1, cv.LINE_8, 0);
     let colorRed = new cv.Scalar(255, 100, 200, 255);
     //cv.putText(image,  matchQuality.toString(), new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
 
     if(maxPoint.x > 0 && maxPoint.y > 0 && Math.abs(maxPoint.x - point1.x) < 10 && Math.abs(maxPoint.y - point1.y) < 10 ) {
-        const lineSize = average < 0.1 ? 1 : Math.round( average , 10);
+        const lineSize = average < 0.1 ? 1 : Math.round( average );
         matchQuality = 0.1;
         cv.rectangle(image, maxPoint, point, color, 1, cv.LINE_8, 0);
     }
