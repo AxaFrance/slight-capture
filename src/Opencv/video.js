@@ -310,20 +310,20 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                     const point1 = new cv.Point(Math.round(targetPoints.x1 * imageOutput.cols), Math.round(targetPoints.y1 * imageOutput.rows));
                     const point2 = new cv.Point(Math.round(targetPoints.x2 * imageOutput.cols), Math.round(targetPoints.y2 * imageOutput.rows));
                     
-                    let colorBlue = new cv.Scalar(0, 150, 238, 255);
+                    let colorBlue = new cv.Scalar(0, 150, 238, 100);
                     cv.rectangle(imageOutput, point1, point2, colorBlue, 30, cv.LINE_8, 0);
                     
                     let diff;
                     if(currentPoints != null) {
                         numberFollowingMatchQuality++;
-                        let colorRed = new cv.Scalar(255, 0, 0, 255);
+                        let colorRed = new cv.Scalar(255, 158, 47, 200);
                         diff =  Math.round((Date.now() - beginMatch) / 1000);
                         const font = cv.FONT_HERSHEY_SIMPLEX;
                         const fontScale = 10;
                         const thickness = 20;
                         const baseline=0;
                        // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
-                        const size = new cv.Size(280, -280);
+                        const size = new cv.Size(300, -280);
                         cv.putText(imageOutput, diff.toString(), new cv.Point(Math.round( imageOutput.cols /2 - size.width /2), Math.round( imageOutput.rows /2 - size.height /2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
 
                         const point1 = new cv.Point(Math.round(currentPoints.x1 * imageOutput.cols), Math.round(currentPoints.y1 * imageOutput.rows));
