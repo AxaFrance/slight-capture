@@ -2,6 +2,125 @@
 import {imageResize, toImageBase64} from "./image.js";
 import {findMatch} from "./templateMatching.js";
 import {zoneAsync} from "../template.js";
+import {findContours} from "./contours.js";
+
+/*
+let dst = src.clone();
+const imgThresh = new cv.Mat();
+const dilate = -1;
+
+//  const imd = imageResize(cv)(dst, 100);
+// dst = imd.image;
+cv.bilateralFilter(src, src, 9, 10, 75, cv.BORDER_DEFAULT);
+// cv.cvtColor(dst, imgThresh, cv.COLOR_RGBA2GRAY, 0);
+
+
+//cv.Sobel(imgThresh, imgThresh, cv.CV_8U, 1, 0, 3, 1, 0, cv.BORDER_DEFAULT);
+//cv.Sobel(imgThresh, imgThresh, cv.CV_8U, 0, 1, 3, 1, 0, cv.BORDER_DEFAULT);
+
+//cv.adaptiveThreshold(imgThresh, imgThresh, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, -2);
+
+/*const M3 = cv.Mat.ones(3, 3, cv.CV_8U);
+const M2 = cv.Mat.ones(2, 2, cv.CV_8U);
+cv.erode(imgThresh, imgThresh, M2);
+cv.dilate(imgThresh, imgThresh, M2);
+cv.dilate(imgThresh, imgThresh, M2);*/
+//cv.dilate(imgThresh, imgThresh, M2);
+
+/*const M = cv.Mat.ones(3, 3, cv.CV_8U);
+cv.morphologyEx(imgThresh, imgThresh, cv.MORPH_CLOSE, M);
+cv.morphologyEx(imgThresh, imgThresh, cv.MORPH_OPEN, M);
+if (dilate <= 0) {
+    const M2 = cv.Mat.ones(6, 6, cv.CV_8U);
+    cv.dilate(imgThresh, imgThresh, M2);
+}*/
+//const s = new cv.Scalar(0, 0, 0, 255);
+//cv.copyMakeBorder(imgThresh, imgThresh, 10, 10, 10, 10, cv.BORDER_CONSTANT, s);
+//cv.threshold(imgThresh, imgThresh, 177, 200, cv.THRESH_BINARY);
+/*   let horizontal = imgThresh.clone();
+   var horizontal_size = Math.round(imgThresh.cols / 4);
+   // # Create structure element for extracting horizontal lines through morphology operations
+   let ksize_horizontal = new cv.Size(horizontal_size, 1);
+   var horizontalStructure = cv.getStructuringElement(cv.MORPH_RECT, ksize_horizontal)
+   // # Apply morphology operations
+   cv.erode(horizontal, horizontal, horizontalStructure)
+   cv.dilate(horizontal, horizontal, horizontalStructure)
+
+
+   let vertical = imgThresh.clone();
+   var vertical_size = Math.round(imgThresh.rows / 4);
+   // # Create structure element for extracting horizontal lines through morphology operations
+   let ksize = new cv.Size(1, vertical_size);
+   var verticalStructure = cv.getStructuringElement(cv.MORPH_RECT, ksize)
+   // # Apply morphology operations
+   cv.erode(vertical, vertical, verticalStructure)
+   cv.dilate(vertical, vertical, verticalStructure)
+
+
+   //const image2 = imgThresh.clone();  //image2 is cloned from image1  to be sure that they have the same size
+   const addWeightedMat = new cv.Mat(imgThresh.rows, imgThresh.cols, imgThresh.type());
+   const alpha = 0.7;
+   const betta = 0.3;
+   const gamma = 0;
+
+   cv.addWeighted(vertical, alpha, horizontal, betta, gamma, addWeightedMat);
+
+   cv.adaptiveThreshold(addWeightedMat, addWeightedMat, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, -2);
+   //cv.dilate(addWeightedMat, addWeightedMat, M2);
+   let contours = new cv.MatVector();
+   let hierarchy = new cv.Mat();
+   cv.findContours(addWeightedMat, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE);
+   for (let i = 0; i < contours.size(); ++i) {
+       let contour = contours.get(i);
+       // You can try more different parameters
+       let rect = cv.boundingRect(contour);
+       let area = cv.contourArea(contour, false);
+      // console.log(area);
+       const height = src.cols;
+       const width = src.rows;
+       const originArea = height * width
+       const percentageAreaMin = Math.round(originArea * 0.0001)
+       console.log(area + " > " + percentageAreaMin)
+       if (area > percentageAreaMin) {
+           let contoursColor = new cv.Scalar(255, 255, 255);
+           let rectangleColor = new cv.Scalar(255, 0, 0);
+           cv.drawContours(dst, contours, 0, contoursColor, 1, 8, hierarchy, 100);
+           let point1 = new cv.Point(rect.x, rect.y);
+           let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
+           cv.rectangle(dst, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
+       }
+   }*/
+//cv.imshow(outputCanvas, src);
+//src.delete(); 
+//dst.delete();
+//  contours.delete(); 
+//hierarchy.delete();
+//imgThresh.delete();
+//addWeightedMat.delete();
+//horizontal.delete();
+//vertical.delete();
+//M3.delete();
+//M2.delete();
+
+/*for (let i = 0; i < contours.size(); ++i) {
+    let contour = contours.get(i);
+    contour.delete();
+}*/
+// cnt.delete();
+/*console.log("here")
+const contours = findContours(cv)(src, 0);
+console.log("after")
+console.log(contours)
+for (let i = 0; i < contours.length; ++i) {
+    var contour = contours[i];
+    let contoursColor = new cv.Scalar(255, 255, 255);
+    let hierarchy = new cv.Mat();
+    cv.drawContours(src, contour, 0, contoursColor, 1, 8, hierarchy, 100);
+    console.log("youhou")
+}
+if(src) {
+    cv.imshow(outputCanvas, src)
+}*/
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -180,6 +299,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
 
         let cameraPromise = null;
         let streaming = true;
+        let wait = false;
         const stopStreaming = () => {
             streaming = false;
         };
@@ -200,7 +320,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
         const iButton = document.createElement('button');
         iButton.id = cuid();
         iButton.textContent = "Inverser la caméra";
-        iButton.style = 'padding: 0.5em;font-size: 2em;margin: 1em;float: right;'
+        iButton.style = 'padding: 0.5em;font-size: 1em;margin: 1em;position:absolute;'
         iButton.onclick = () => {
             stopStreaming();
             constraints.video.facingMode.ideal = constraints.video.facingMode.ideal === 'face' ? 'environment' : 'face';
@@ -241,13 +361,14 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                 try {
                     // start processing.
                     videoCapture.read(src);
-                    const {imageCv, matchQuality} = await transformFunction(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId, state, promise, true);
+                    
+                   const {imageCv, matchQuality} = await transformFunction(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId, state, promise, true);
                     let diff;
                     if(matchQuality > 0) {
                         numberFollowingMatchQuality++;
-                        let colorRed = new cv.Scalar(255, 100, 200, 255);
+                        let colorRed = new cv.Scalar(255, 0, 200, 255);
                         diff =  Math.round((Date.now() - beginMatch) / 1000);
-                        cv.putText(imageCv, diff.toString(), new cv.Point(30, 100), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
+                        cv.putText(imageCv, diff.toString(), new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 2, cv.LINE_AA);
                     }
                     else {
                         numberFollowingMatchQuality = 0;
@@ -257,10 +378,17 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                    
                     if(diff > 3 && promise === null) {
                         numberFollowingMatchQuality = 0;
+                        wait = true;
                         stopStreaming();
                         iDiv.appendChild(iDivImages);
+                        const iHLoading = document.createElement('h1');
+                        iHLoading.id = cuid();
+                        const text = document.createTextNode("Traitement en cours ...");
+                        iHLoading.appendChild(text);
+                        iDivImages.appendChild(iHLoading);
                         promise = checkImageQuality(cv)(imageCvTemplate, imageCvTemplateDescription, src, iDivImagesId).then(result => {
                             promise = null;
+                            iDivImages.removeChild(iHLoading);
                             if( result && result.finalImage) {
                                 const iH1 = document.createElement('h1');
                                 iH1.id = cuid();
@@ -269,7 +397,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                 iDivImages.appendChild(iH1);
                                 const iVideo = document.createElement('img');
                                 iVideo.id = cuid();
-                                iVideo.style = "max-width: 800px";
+                                iVideo.style = "max-width: 800px;width: 100%;";
                                 iVideo.src = toImageBase64(cv)(result.finalImage);
                                 iDivImages.appendChild(iVideo);
                                 
@@ -284,7 +412,9 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                 iButtonNo.style = 'padding: 0.5em;font-size: 2em;margin: 1em;'
                                 iButtonNo.textContent = "Non";
                                 iButtonNo.onclick = () => {
-
+                                    iDiv.removeChild(iDivImages);
+                                    cameraPromise = startCaptureAsync(cv)(constraints, iVideo);
+                                    wait = false;
                                 }
                                 iDivButton.appendChild(iButtonNo);
 
@@ -293,7 +423,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                                 iButtonYes.style = 'padding: 0.5em;font-size: 2em;margin: 1em;'
                                 iButtonYes.textContent = "Oui";
                                 iButtonYes.onclick = () => {
-
+                                    wait = false;
                                 }
                                 iDivButton.appendChild(iButtonYes);
                                 
@@ -332,6 +462,12 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                         await delay(timeDelay);
                     }
                     src.delete();
+                    
+                    while (wait){
+                        await delay(1000);
+                    }
+                    
+                    
                 }
                
             }

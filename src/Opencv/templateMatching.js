@@ -5,6 +5,11 @@ function getRandomInt(max) {
 export const findMatch = (cv) => (template, image) => {
     let mask = new cv.Mat();
     let destination = new cv.Mat();
+
+    let ksize = new cv.Size(3, 3);
+    let anchor = new cv.Point(-1, -1);
+    cv.blur(image, image, ksize, anchor, cv.BORDER_DEFAULT)
+    
     cv.matchTemplate(image, template, destination, cv.TM_CCORR_NORMED, mask);
     let result = cv.minMaxLoc(destination, mask);
     
@@ -61,29 +66,23 @@ export const findMatch = (cv) => (template, image) => {
      start = end;
      end = end + destination.cols;
  }
- //console.log("total")
- let average = Math.round( total/totalPoint * 10,10);
- //console.log(total/totalPoint)
-    
+
+ let average = Math.round( total/totalPoint * 10);
+
     matchQuality = average;
-
- //if(maxPointMemory.x !== 0 && maxPointMemory.y !== 0 && minPointMemory.x !== 999999999 && minPointMemory.y !== 999999999 ) {
-     //let marginX = 0;// maxPointMemory.x - minPointMemory.x ;
-     //let marginY = maxPointMemory.y - minPointMemory.y;
-     //cv.rectangle(image, minPointMemory, new cv.Point(maxPointMemory.x + template.cols + marginX, maxPointMemory.y + template.rows + marginY), colorBlue, parseInt(numberPoint / 10, 10), cv.LINE_8, 0);
-
+    
 
     let colorBlue = new cv.Scalar(200, 255, 100, 255);
     var point1 = new cv.Point( Math.round( (image.cols - template.cols) / 2,10) , Math.round( (image.rows - template.rows)/2,10));
     var point2 = new cv.Point( Math.round( (image.cols - template.cols) / 2,10) + template.cols  , Math.round( (image.rows - template.rows)/2,10) + template.rows);
-    cv.rectangle(image, point1, point2, colorBlue, 12, cv.LINE_8, 0);
+    cv.rectangle(image, point1, point2, colorBlue, 1, cv.LINE_8, 0);
     let colorRed = new cv.Scalar(255, 100, 200, 255);
-    cv.putText(image,  matchQuality.toString(), new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
+    //cv.putText(image,  matchQuality.toString(), new cv.Point(10, 30), cv.FONT_HERSHEY_SIMPLEX, 1.0, colorRed, 1, cv.LINE_AA);
 
     if(maxPoint.x > 0 && maxPoint.y > 0 && Math.abs(maxPoint.x - point1.x) < 10 && Math.abs(maxPoint.y - point1.y) < 10 ) {
         const lineSize = average < 0.1 ? 1 : Math.round( average , 10);
-        matchQuality = 0.1  ;
-        cv.rectangle(image, maxPoint, point, color, lineSize, cv.LINE_8, 0);
+        matchQuality = 0.1;
+        cv.rectangle(image, maxPoint, point, color, 1, cv.LINE_8, 0);
     }
     else{
         matchQuality = 0;

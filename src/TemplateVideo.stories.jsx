@@ -43,6 +43,9 @@ export const TemplateVideo= () => {
         const convertedFile = await toBase64Async(file);
         const imgCvTemplate = await loadImageAsync(cv)(convertedFile);
         let imgCvTemplateResized = imageResize(cv)(imgCvTemplate, 50).image;
+        let ksize = new cv.Size(3, 3);
+        let anchor = new cv.Point(-1, -1);
+        cv.blur(imgCvTemplateResized, imgCvTemplateResized, ksize, anchor, cv.BORDER_DEFAULT)
         let imgCvTemplateResizedMatch = imageResize(cv)(imgCvTemplate, 800).image;
         //let imgCvGray = convertImgToGray(cv)(imgCvTemplateResized);
         const resizedImg = detectAndComputeSerializable(cv)(imgCvTemplateResizedMatch);
