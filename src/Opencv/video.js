@@ -1,5 +1,5 @@
 ﻿import cuid from "cuid";
-import {b64toBlob, imageResize, toImageBase64} from "./image.js";
+import {b64toBlob, base64ToBlob, imageResize, toImageBase64} from "./image.js";
 import {findMatch} from "./templateMatching.js";
 import {zoneAsync} from "../template.js";
 
@@ -268,8 +268,10 @@ export const loadVideoAsync = (name) => (cv) => (imageCvTemplate, imageCvTemplat
                                 iButtonYes.style = 'padding: 0.5em;font-size: 2em;margin: 1em;'
                                 iButtonYes.textContent = "Oui";
                                 iButtonYes.onclick = async () => {
-                                    const imageBase64 = await toImageBase64(cv)(result.finalImage);
-                                    sligthCaptureDatabase[name].BlobOutputImage = await b64toBlob(imageBase64, "image/png");
+                                    const imageBase64 = toImageBase64(cv)(result.finalImage);
+                                    console.log(imageBase64);
+                                    const blob = base64ToBlob(imageBase64);
+                                    sligthCaptureDatabase[name].BlobOutputImage = blob;
                                     result.finalImage.delete();
                                     document.getElementsByTagName('body')[0].removeChild(iDiv);
                                 }
