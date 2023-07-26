@@ -2,125 +2,7 @@
 import {imageResize, toImageBase64} from "./image.js";
 import {findMatch} from "./templateMatching.js";
 import {zoneAsync} from "../template.js";
-import {findContours} from "./contours.js";
 
-/*
-let dst = src.clone();
-const imgThresh = new cv.Mat();
-const dilate = -1;
-
-//  const imd = imageResize(cv)(dst, 100);
-// dst = imd.image;
-cv.bilateralFilter(src, src, 9, 10, 75, cv.BORDER_DEFAULT);
-// cv.cvtColor(dst, imgThresh, cv.COLOR_RGBA2GRAY, 0);
-
-
-//cv.Sobel(imgThresh, imgThresh, cv.CV_8U, 1, 0, 3, 1, 0, cv.BORDER_DEFAULT);
-//cv.Sobel(imgThresh, imgThresh, cv.CV_8U, 0, 1, 3, 1, 0, cv.BORDER_DEFAULT);
-
-//cv.adaptiveThreshold(imgThresh, imgThresh, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, -2);
-
-/*const M3 = cv.Mat.ones(3, 3, cv.CV_8U);
-const M2 = cv.Mat.ones(2, 2, cv.CV_8U);
-cv.erode(imgThresh, imgThresh, M2);
-cv.dilate(imgThresh, imgThresh, M2);
-cv.dilate(imgThresh, imgThresh, M2);*/
-//cv.dilate(imgThresh, imgThresh, M2);
-
-/*const M = cv.Mat.ones(3, 3, cv.CV_8U);
-cv.morphologyEx(imgThresh, imgThresh, cv.MORPH_CLOSE, M);
-cv.morphologyEx(imgThresh, imgThresh, cv.MORPH_OPEN, M);
-if (dilate <= 0) {
-    const M2 = cv.Mat.ones(6, 6, cv.CV_8U);
-    cv.dilate(imgThresh, imgThresh, M2);
-}*/
-//const s = new cv.Scalar(0, 0, 0, 255);
-//cv.copyMakeBorder(imgThresh, imgThresh, 10, 10, 10, 10, cv.BORDER_CONSTANT, s);
-//cv.threshold(imgThresh, imgThresh, 177, 200, cv.THRESH_BINARY);
-/*   let horizontal = imgThresh.clone();
-   var horizontal_size = Math.round(imgThresh.cols / 4);
-   // # Create structure element for extracting horizontal lines through morphology operations
-   let ksize_horizontal = new cv.Size(horizontal_size, 1);
-   var horizontalStructure = cv.getStructuringElement(cv.MORPH_RECT, ksize_horizontal)
-   // # Apply morphology operations
-   cv.erode(horizontal, horizontal, horizontalStructure)
-   cv.dilate(horizontal, horizontal, horizontalStructure)
-
-
-   let vertical = imgThresh.clone();
-   var vertical_size = Math.round(imgThresh.rows / 4);
-   // # Create structure element for extracting horizontal lines through morphology operations
-   let ksize = new cv.Size(1, vertical_size);
-   var verticalStructure = cv.getStructuringElement(cv.MORPH_RECT, ksize)
-   // # Apply morphology operations
-   cv.erode(vertical, vertical, verticalStructure)
-   cv.dilate(vertical, vertical, verticalStructure)
-
-
-   //const image2 = imgThresh.clone();  //image2 is cloned from image1  to be sure that they have the same size
-   const addWeightedMat = new cv.Mat(imgThresh.rows, imgThresh.cols, imgThresh.type());
-   const alpha = 0.7;
-   const betta = 0.3;
-   const gamma = 0;
-
-   cv.addWeighted(vertical, alpha, horizontal, betta, gamma, addWeightedMat);
-
-   cv.adaptiveThreshold(addWeightedMat, addWeightedMat, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 15, -2);
-   //cv.dilate(addWeightedMat, addWeightedMat, M2);
-   let contours = new cv.MatVector();
-   let hierarchy = new cv.Mat();
-   cv.findContours(addWeightedMat, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE);
-   for (let i = 0; i < contours.size(); ++i) {
-       let contour = contours.get(i);
-       // You can try more different parameters
-       let rect = cv.boundingRect(contour);
-       let area = cv.contourArea(contour, false);
-      // console.log(area);
-       const height = src.cols;
-       const width = src.rows;
-       const originArea = height * width
-       const percentageAreaMin = Math.round(originArea * 0.0001)
-       console.log(area + " > " + percentageAreaMin)
-       if (area > percentageAreaMin) {
-           let contoursColor = new cv.Scalar(255, 255, 255);
-           let rectangleColor = new cv.Scalar(255, 0, 0);
-           cv.drawContours(dst, contours, 0, contoursColor, 1, 8, hierarchy, 100);
-           let point1 = new cv.Point(rect.x, rect.y);
-           let point2 = new cv.Point(rect.x + rect.width, rect.y + rect.height);
-           cv.rectangle(dst, point1, point2, rectangleColor, 2, cv.LINE_AA, 0);
-       }
-   }*/
-//cv.imshow(outputCanvas, src);
-//src.delete(); 
-//dst.delete();
-//  contours.delete(); 
-//hierarchy.delete();
-//imgThresh.delete();
-//addWeightedMat.delete();
-//horizontal.delete();
-//vertical.delete();
-//M3.delete();
-//M2.delete();
-
-/*for (let i = 0; i < contours.size(); ++i) {
-    let contour = contours.get(i);
-    contour.delete();
-}*/
-// cnt.delete();
-/*console.log("here")
-const contours = findContours(cv)(src, 0);
-console.log("after")
-console.log(contours)
-for (let i = 0; i < contours.length; ++i) {
-    var contour = contours[i];
-    let contoursColor = new cv.Scalar(255, 255, 255);
-    let hierarchy = new cv.Mat();
-    cv.drawContours(src, contour, 0, contoursColor, 1, 8, hierarchy, 100);
-    console.log("youhou")
-}
-if(src) {
-    cv.imshow(outputCanvas, src)
-}*/
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -227,6 +109,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
         const iH1 = document.createElement('h1');
         
         const text = document.createTextNode("Positionner votre carte d'identité dans le cadre");
+        iH1.style = 'padding-left: 0.5em;padding-right: 0.5em';
         iH1.appendChild(text);
         iH1.id = cuid();
         iDiv.appendChild(iH1);
@@ -264,7 +147,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
 
         const iButtonQuit = document.createElement('button');
         iButtonQuit.id = cuid();
-        iButtonQuit.textContent = "Quitter";
+        iButtonQuit.textContent = "X";
         iButtonQuit.style = 'padding: 0.5em;font-size: 1em;margin: 1em;position:absolute; top: 0; right: 0;';
         iButtonQuit.onclick = () => {
             stopStreaming();
@@ -338,7 +221,7 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
                         beginMatch = Date.now();
                     }
                    
-                    if(diff > 3) {
+                    if(diff > 5) {
                         numberFollowingMatchQuality = 0;
                         wait = true;
                         const finalShot = src.clone();
@@ -454,11 +337,6 @@ export const loadVideoAsync = (cv) => (imageCvTemplate, imageCvTemplateDescripti
             resolve({
                 start,
             })
-          
-  
         
-        
-
-       
     });
 }
