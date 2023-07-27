@@ -1,4 +1,4 @@
-﻿import cuid from "cuid";
+﻿import {cuid} from "./guid.js";
 
 
 export const imageResize = (cv) => (image, max = null) => {
