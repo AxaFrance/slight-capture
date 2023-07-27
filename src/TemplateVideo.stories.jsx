@@ -1,15 +1,14 @@
 ﻿import React, {useState, useEffect} from "react";
-import Loader, {LoaderModes} from "@axa-fr/react-toolkit-loader";
 import {toBase64Async} from "./template.js";
 import { sligthCaptureFactory} from "./Opencv/video.js";
 
 const sligthCapture = sligthCaptureFactory("default");
 
-export const TemplateVideo= () => {
+export const SlightCaptureVideo= () => {
     
 
     const [state, setState] = useState({
-        loaderMode: LoaderModes.none,
+        isLoading: false,
         url:null,
     });
 
@@ -27,20 +26,19 @@ export const TemplateVideo= () => {
         let file = event.target.files[0];
         if (!file) return;
         const cv = window.cv;
-        setState({...state, loaderMode: LoaderModes.get});
+        setState({...state, isLoading: true});
         const video = await sligthCapture.loadVideoAsync(cv)(file, onCapture);
-        setState({...state, loaderMode: LoaderModes.none});
+        setState({...state, isLoading: false});
         video.start();
     }
 
-    if (state.loaderMode !== LoaderModes.none) {
+    if (state.isLoading) {
         return (<p>Loading</p>);
     }
     
     return (
-        <Loader mode={state.loaderMode} text={"Your browser is working"}>
             <form className="af-form ri__form-container" name="myform">
-                <h1>Template Generator</h1>
+                <h1>Slight Capture</h1>
                 <input type="file" id="newFile" onChange={onChange} multiple={true} />
                 <div>
                     {state.url &&
@@ -48,18 +46,17 @@ export const TemplateVideo= () => {
                     }
                 </div>
             </form>
-        </Loader>
     )
 
 };
 
 
 export default {
-    title: 'Demo/Template',
-    component: TemplateVideo,
+    title: 'Component/SlightCapture',
+    component: SlightCaptureVideo,
     tags: ['autodocs'],
     argTypes: {
-        backgroundColor: { control: 'color' },
+        
     },
 };
 

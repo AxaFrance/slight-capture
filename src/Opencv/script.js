@@ -1,4 +1,4 @@
-function sleep(ms) {
+function sleepAsync(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -14,7 +14,7 @@ export const loadScriptAsync = (src) => {
     // If cachedScripts array already includes src that means another instance ...
     // ... of this hook already loaded this script, so no need to load again.
     if (loadingScripts.includes(src)) {
-        const promise = sleep(50);
+        const promise = sleepAsync(50);
         return promise.then(() => loadScriptAsync(src));
     }
     if (cachedScripts.includes(src)) {
