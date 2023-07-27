@@ -1,7 +1,7 @@
 ﻿import cuid from "cuid";
 import {base64ToBlob, imageResize, loadImageAsync, toImageBase64} from "./image.js";
 import {findMatch} from "./templateMatching.js";
-import {toBase64Async, zoneAsync} from "../template.js";
+import {toBase64Async, zoneAsync} from "./template.js";
 import {detectAndComputeSerializable} from "./match.js";
 import {loadScriptAsync} from "./script.js";
 
@@ -101,7 +101,6 @@ const loadOpenCVAsync = async () => {
 }
 
 export const loadVideoAsync = (name) => (cv) => async (file, onCaptureCallback = null, enableDefaultCss = true) => {
-    const {featureMatchingDetectAndComputeSerializable, templateMatchingImage} = await initTemplateAsync(cv)(file);
     if(!openCVPromise) {
         openCVPromise = loadOpenCVAsync();
     }
@@ -109,6 +108,8 @@ export const loadVideoAsync = (name) => (cv) => async (file, onCaptureCallback =
     if(!cv) {
         cv = window.cv;
     }
+    const {featureMatchingDetectAndComputeSerializable, templateMatchingImage} = await initTemplateAsync(cv)(file);
+  
    return await captureAsync(cv)(name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback, enableDefaultCss);
 }
 

@@ -1,7 +1,6 @@
-﻿import {cropImage, imageResize, isImgGray, loadImageAsync, rotateImage, toImageBase64} from "./Opencv/image";
-import {computeAndComputeHomographyRectangle} from "./Opencv/match";
-import {cropContours, findContours} from "./Opencv/contours";
-import {LoaderModes} from "@axa-fr/react-toolkit-loader";
+﻿import {cropImage, imageResize, isImgGray, loadImageAsync, rotateImage, toImageBase64} from "./image";
+import {computeAndComputeHomographyRectangle} from "./match";
+import {cropContours, findContours} from "./contours";
 
 
 export const toBase64Async = file => new Promise((resolve, reject) => {

@@ -1,8 +1,26 @@
 {
-  "name": "react",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@axa-fr/slight-capture",
+  "private": false,
+  "version": "0.0.1",
   "type": "module",
+  "module": "./SlightCapture/index.js",
+  "description": "Pure vanilla javascript library to capture a document image from webcam for web application. Tested on Chrome, Firefox, Safari.",
+  "files": [
+    "src/SlightCapture",
+    "README.md",
+    "package.json",
+    "package-lock.json"
+  ],
+  "keywords": [
+    "image capture",
+    "image",
+    "opencv",
+    "vanilla"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AxaGuilDEv/slight-capture.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "storybook build",
@@ -13,14 +31,12 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@axa-fr/react-toolkit-all": "^2.0.1-alpha.0",
-    "plotty": "^0.4.9",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-webcam": "^7.1.1",
-    "sass": "^1.63.6"
+
   },
   "devDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.63.6",
     "@storybook/addon-essentials": "^7.0.26",
     "@storybook/addon-interactions": "^7.0.26",
     "@storybook/addon-links": "^7.0.26",
@@ -39,5 +55,10 @@
     "prop-types": "^15.8.1",
     "storybook": "^7.0.26",
     "vite": "^4.3.9"
+  },  
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }
