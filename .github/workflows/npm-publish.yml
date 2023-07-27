@@ -121,10 +121,6 @@ jobs:
         run: pnpm i --frozen-lockfile
         working-directory: .
 
-      - name: pnpm prepare
-        run: pnpm run prepare
-        working-directory: .
-
       - name: Commit updates package.json
         uses: stefanzweifel/git-auto-commit-action@v4
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
