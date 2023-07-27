@@ -1,7 +1,5 @@
 ﻿import {cropImage, imageResize, isImgGray, loadImageAsync, rotateImage, toImageBase64} from "./Opencv/image";
 import {computeAndComputeHomographyRectangle} from "./Opencv/match";
-import convertPdfToImagesAsync from "./Pdf/pdf";
-import convertTiffToImagesAsync from "./Tiff/tiff";
 import {cropContours, findContours} from "./Opencv/contours";
 import {LoaderModes} from "@axa-fr/react-toolkit-loader";
 

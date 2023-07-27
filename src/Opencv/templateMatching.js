@@ -6,7 +6,7 @@ export const findMatch = (cv) => (template, image) => {
     let mask = new cv.Mat();
     let destination = new cv.Mat();
 
-    let ksize = new cv.Size(3, 3);
+    let ksize = new cv.Size(2, 2);
     let anchor = new cv.Point(-1, -1);
     cv.blur(image, image, ksize, anchor, cv.BORDER_DEFAULT)
     

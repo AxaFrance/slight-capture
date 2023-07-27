@@ -16,7 +16,9 @@
 
     const goodMatches = new cv.DMatchVector();
     const sorted = goodMatchesTmp.sort((a, b) => a.distance - b.distance);
+    console.log(sorted);
     sorted.forEach(match => goodMatches.push_back(match));
+    
     return goodMatches;
 }
 
@@ -58,10 +60,10 @@ export const matchSwitch = (cv) => (descriptors1, descriptors2, minMatch = 20, m
         goodMatches = knnMatch(cv)(descriptors1, descriptors2);
     }
     if (goodMatches == null || goodMatches.size() <= minMatch) {
-       // console.warn(`Less than ${minMatch} good matches found! Counter=${goodMatches.size()} try changing distance.`);
+        console.warn(`Less than ${minMatch} good matches found! Counter=${goodMatches.size()} try changing distance.`);
         return null;
     }
-    //console.log("goodMatches.size: ", goodMatches.size());
+    console.log("goodMatches.size: ", goodMatches.size());
     return goodMatches;
 }
 
