@@ -82,7 +82,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     console.log("x1", x1, "y1", y1, "w", w, "h", h);
     console.log("imgResized.cols", imgResized.cols, "imgResized.rows", imgResized.rows);
     console.log("templateCols", templateCols, "templateRows", templateRows);
-    const imgResizedAndCropped = cropImage(cv)(imgResized, x1, y1, w, h);
+    const imgResizedAndCropped = imgResized;//cropImage(cv)(imgResized, x1, y1, w, h);
     console.log("youhou");
     //const imgVersoCvTemplate = await loadImageAsync(cv)(imgDescription.template_url);
     //const imgVersoCvTemplateResized = imageResize(cv)(imgVersoCvTemplate, 600).image;
