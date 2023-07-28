@@ -64,7 +64,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     } else{
         imgCv= sceneUrl;
     }
-    let imgCvCopy = imgCv; //.clone();
+    let imgCvCopy = imgCv.clone();
 
    // const isGray = isImgGray(cv)(imgCv);
 
@@ -88,9 +88,9 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     //const imgVersoCvTemplateResized = imageResize(cv)(imgVersoCvTemplate, 600).image;
     // const youhou = detectAndComputeSerializable(cv)( imgVersoCvTemplateResized);
 
-    const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResizedAndCropped, goodMatchSizeThreshold);
+    const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResized, goodMatchSizeThreshold);
     let angle = 0;
-    let mat = new cv.Mat(imgResizedAndCropped.rows, imgResizedAndCropped.cols, imgResizedAndCropped.type(), new cv.Scalar());
+    let mat = new cv.Mat(imgCvCopy.rows, imgCvCopy.cols, imgCvCopy.type(), new cv.Scalar());
 
     if (result && result.lines) {
         let i = 0;
@@ -138,7 +138,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
            // url: base64Url,
             goodMatchSize: 0,
          //   isGray,
-            finalImage: imgResizedAndCropped,
+            finalImage: null,
             outputInfo: null
         };
     }
@@ -146,7 +146,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     const {xmax, xmin, ymax, ymin} = result.rectangle;
 
     const contours = findContours(cv)(mat, 0);
-    let croppedContours = cropContours(cv)(imgResizedAndCropped, contours);
+    let croppedContours = cropContours(cv)(imgCv, contours);
     let croppedContourImgs = croppedContours.map(cc => rotateImage(cv)(cc.img, angle));
     let croppedContoursBase64 = croppedContourImgs.map(cc => {
        // let result = imageResize(cv)(cc, 680);
