@@ -73,7 +73,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     const templateCols = imgDescription.img.cols;
     const templateRows = imgDescription.img.rows;
     
-    const marge = Math.round(1600 * 0.15);
+    const marge = Math.round(1600 * 0.02);
     
     const x1 = Math.round((imgResized.cols - templateCols) / 2) - marge < 0 ? 0 : Math.round((imgResized.cols - templateCols) / 2) - marge;
     const y1 = Math.round((imgResized.rows - templateRows) / 2) - marge < 0 ? 0 : Math.round((imgResized.rows - templateRows) / 2) - marge;
@@ -132,7 +132,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
 
     }
    // const base64Url = toImageBase64(cv)(imgCv);
-    if (!result) {
+   // if (!result) {
         return {
             expectedOutput: [],
            // url: base64Url,
@@ -141,7 +141,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
             finalImage: imgResizedAndCropped,
             outputInfo: null
         };
-    }
+   // }
 
     const {xmax, xmin, ymax, ymin} = result.rectangle;
 
