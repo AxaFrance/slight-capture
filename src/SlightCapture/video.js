@@ -362,7 +362,7 @@ const captureAsync = (cv) => async (name,
                                 const iH1 = document.createElement('h1');
                                 iH1.className = 'sc-modal-confirm__title sc-modal-confirm__title--error';
                                 iH1.id = cuid();
-                                const text = document.createTextNode(translations['sc-modal-confirm__title-error']);
+                                const text = document.createTextNode(translations['sc-modal-confirm__title--error']);
                                 iH1.appendChild(text);
                                 iDivImages.appendChild(iH1);
 

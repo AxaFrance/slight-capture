@@ -73,7 +73,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     const templateCols = imgDescription.img.cols;
     const templateRows = imgDescription.img.rows;
     
-    const marge = 0 // Math.round(1600 * 0.1);
+    const marge = Math.round(1600 * 0.15);
     
     const x1 = Math.round((imgResized.cols - templateCols) / 2) - marge < 0 ? 0 : Math.round((imgResized.cols - templateCols) / 2) - marge;
     const y1 = Math.round((imgResized.rows - templateRows) / 2) - marge < 0 ? 0 : Math.round((imgResized.rows - templateRows) / 2) - marge;
