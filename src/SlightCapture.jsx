@@ -2,11 +2,12 @@
 import {toBase64Async} from "./SlightCapture/index.js";
 import {sligthCaptureFactory} from "./SlightCapture/video.js";
 
-const sligthCapture = sligthCaptureFactory("default");
+import './index.css'
+
+const sligthCapture = sligthCaptureFactory();
 
 export const SlightCaptureVideo = () => {
-
-
+    
     const [state, setState] = useState({
         isLoading: false,
         url: null,
@@ -26,7 +27,7 @@ export const SlightCaptureVideo = () => {
         let file = event.target.files[0];
         if (!file) return;
         setState({...state, isLoading: true});
-        const video = await sligthCapture.loadVideoAsync()(file, onCapture);
+        const video = await sligthCapture.loadVideoAsync()(file, onCapture, false);
         setState({...state, isLoading: false});
         video.start();
     }
@@ -36,12 +37,12 @@ export const SlightCaptureVideo = () => {
     }
 
     return (
-        <form className="af-form ri__form-container" name="myform">
+        <form>
             <h1>Slight Capture</h1>
-            <input type="file" id="newFile" onChange={onChange} multiple={true}/>
+            <input type="file" onChange={onChange} multiple={true}/>
             <div>
                 {state.url &&
-                    <><img style={{"maxWidth": "800px"}} src={state.url} alt="image found"/></>
+                    <img style={{"maxWidth": "800px"}} src={state.url} alt="image found"/>
                 }
             </div>
         </form>

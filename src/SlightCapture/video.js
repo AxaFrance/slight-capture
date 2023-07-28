@@ -1,5 +1,4 @@
-﻿
-import {base64ToBlob, imageResize, loadImageAsync, toImageBase64} from "./image.js";
+﻿import {base64ToBlob, imageResize, loadImageAsync, toImageBase64} from "./image.js";
 import {findMatch} from "./templateMatching.js";
 import {toBase64Async, zoneAsync} from "./template.js";
 import {detectAndComputeSerializable} from "./match.js";
@@ -97,11 +96,25 @@ const initTemplateAsync = (cv) => async (file) => {
 
 let openCVPromise = null;
 
-const loadOpenCVAsync = async () => {
-    return await loadScriptAsync(`https://docs.opencv.org/4.8.0/opencv.js`);
+const loadOpenCVAsync = async (openCVScript = `https://docs.opencv.org/4.8.0/opencv.js` ) => {
+    return await loadScriptAsync(openCVScript);
 }
 
-export const loadVideoAsync = (name) => (cv) => async (file, onCaptureCallback = null, enableDefaultCss = true) => {
+const texts = {
+    'sc-modal-video__title' : 'Positionner 5 secondes votre document dans le cadre',
+    'sc-modal-video__invert-camera' : "Inverser caméra",
+    'sc-modal-video__quit' : "X",
+    'sc-modal-confirm__loading' : "Traitement en cours...",
+    'sc-modal-confirm__title':"Es-ce que tous les champs sont parfaitement lisibles ?",
+    'sc-modal-confirm__button--cancel':"Non",
+    'sc-modal-confirm__button--ok':"Oui",
+    'sc-modal-confirm__title--error':"Votre document n'a pas été bien détecté, veuillez réessayer",
+    'sc-modal-confirm__button--error': "Réessayer",
+}
+export const loadVideoAsync = (name) => (cv=null) => async (file, 
+                                                            onCaptureCallback = null, 
+                                                            enableDefaultCss = true,
+                                                            translations = texts) => {
     if(!openCVPromise) {
         openCVPromise = loadOpenCVAsync();
     }
@@ -111,10 +124,15 @@ export const loadVideoAsync = (name) => (cv) => async (file, onCaptureCallback =
     }
     const {featureMatchingDetectAndComputeSerializable, templateMatchingImage} = await initTemplateAsync(cv)(file);
   
-   return await captureAsync(cv)(name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback, enableDefaultCss);
+   return await captureAsync(cv)(name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback, enableDefaultCss, translations);
 }
 
-const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback = null, enableDefaultCss = true) => {
+const captureAsync = (cv) => async (name, 
+                                    featureMatchingDetectAndComputeSerializable, 
+                                    templateMatchingImage, 
+                                    onCaptureCallback = null, 
+                                    enableDefaultCss = true,
+                                    translations=texts) => {
     return new Promise((resolve, error) => {
         let mediaDevices = navigator.mediaDevices;
         if (!mediaDevices || !mediaDevices.getUserMedia) {
@@ -123,19 +141,19 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
         }
 
         const iDiv = document.createElement('div');
-        iDiv.className = 'sc-modal-video';
+        iDiv.className = `sc-modal-video sc-modal-video--${name}`;
         if (enableDefaultCss) {
-            iDiv.style = ` position: fixed;z-index: 10000000;padding-top: 0x;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`;
+            iDiv.style = `position: fixed;z-index: 10000000;padding-top: 0;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`;
         }
         iDiv.id = cuid();
         document.getElementsByTagName('body')[0].appendChild(iDiv);
 
         const iH1 = document.createElement('h1');
         if (enableDefaultCss) {
-            iH1.style = 'padding-left: 0.5em;padding-right: 0.5em';
+            iH1.style = 'padding-left: 0.5em;padding-right: 0.5em;';
         }
         iH1.className = 'sc-modal-video__title';
-        const text = document.createTextNode("Positionner 5 secondes votre document dans le cadre");
+        const text = document.createTextNode(translations['sc-modal-video__title']);
         iH1.appendChild(text);
         iH1.id = cuid();
         iDiv.appendChild(iH1);
@@ -161,7 +179,7 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
 
         const iButton = document.createElement('button');
         iButton.id = cuid();
-        iButton.textContent = "Inverser caméra";
+        iButton.textContent = translations['sc-modal-video__invert-camera']
         iButton.className = 'sc-modal-video__invert-camera';
         if (enableDefaultCss) {
             iButton.style = 'padding: 0.5em;font-size: 1em;margin: 1em;position:absolute;';
@@ -175,7 +193,7 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
 
         const iButtonQuit = document.createElement('button');
         iButtonQuit.id = cuid();
-        iButtonQuit.textContent = "X";
+        iButtonQuit.textContent = translations['sc-modal-video__quit']
         iButtonQuit.className = 'sc-modal-video__quit';
         if (enableDefaultCss) {
             iButtonQuit.style = 'padding: 0.3em;font-size: 1em;margin: 1em;position:absolute; top: 0; right: 0;';
@@ -203,11 +221,10 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
 
         const iDivImages = document.createElement('div');
         if (enableDefaultCss) {
-            iDivImages.style = `position: fixed;z-index: 100000000;padding-top: 0x;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`;
+            iDivImages.style = `position: fixed;z-index: 100000000;padding-top: 0;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`;
         }
-        iDivImages.className = 'sc-modal-confirm';
-        const iDivImagesId = cuid();
-        iDivImages.id = iDivImagesId;
+        iDivImages.className = `sc-modal-confirm sc-modal-confirm--${name}`;
+        iDivImages.id = cuid();
 
         getDevices();
         const FPS = 30;
@@ -261,11 +278,10 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
                     wait = true;
                     const finalShot = src.clone();
                     stopStreaming();
-
-
+                    
                     const iHLoading = document.createElement('p');
                     iHLoading.id = cuid();
-                    const text = document.createTextNode("Traitement en cours ...");
+                    const text = document.createTextNode(translations['sc-modal-confirm__loading']);
                     iHLoading.className = 'sc-modal-confirm__loading';
                     iHLoading.appendChild(text);
                     iDivImages.appendChild(iHLoading);
@@ -288,7 +304,7 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
                                 const iH1 = document.createElement('h1');
                                 iH1.className = 'sc-modal-confirm__title';
                                 iH1.id = cuid();
-                                const text = document.createTextNode("Es-ce que tous les champs sont parfaitement lisibles ?");
+                                const text = document.createTextNode(translations['sc-modal-confirm__title']);
                                 iH1.appendChild(text);
                                 iDivImages.appendChild(iH1);
                                 const iImage = document.createElement('img');
@@ -314,8 +330,8 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
                                 if (enableDefaultCss) {
                                     iButtonNo.style = 'padding: 0.5em;font-size: 2em;margin: 1em;';
                                 }
-                                iButtonNo.className = 'sc-modal-confirm__button';
-                                iButtonNo.textContent = "Non";
+                                iButtonNo.className = 'sc-modal-confirm__button sc-modal-confirm__button--cancel';
+                                iButtonNo.textContent = translations['sc-modal-confirm__button--cancel'];
                                 iButtonNo.onclick = () => {
                                     result.finalImage.delete();
                                     restart();
@@ -327,8 +343,8 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
                                 if (enableDefaultCss) {
                                     iButtonYes.style = 'padding: 0.5em;font-size: 2em;margin: 1em;';
                                 }
-                                iButtonYes.className = 'sc-modal-confirm__button';
-                                iButtonYes.textContent = "Oui";
+                                iButtonYes.className = 'sc-modal-confirm__button sc-modal-confirm__button--ok';
+                                iButtonYes.textContent = translations['sc-modal-confirm__button--ok'];
                                 iButtonYes.onclick = async () => {
                                     const imageBase64 = toImageBase64(cv)(result.finalImage);
                                     console.log(imageBase64);
@@ -342,9 +358,9 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
                                 iDivButton.appendChild(iButtonYes);
                             } else {
                                 const iH1 = document.createElement('h1');
-                                iH1.className = 'sc-modal-confirm__title-error';
+                                iH1.className = 'sc-modal-confirm__title sc-modal-confirm__title--error';
                                 iH1.id = cuid();
-                                const text = document.createTextNode("Votre document n'a pas été bien détecté, veuillez réessayer");
+                                const text = document.createTextNode(translations['sc-modal-confirm__title-error']);
                                 iH1.appendChild(text);
                                 iDivImages.appendChild(iH1);
 
@@ -353,8 +369,8 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
                                 if (enableDefaultCss) {
                                     iButtonNo.style = 'padding: 0.5em;font-size: 2em;margin: 1em;';
                                 }
-                                iButtonNo.className = 'sc-modal-confirm__button-error';
-                                iButtonNo.textContent = "Recommencer";
+                                iButtonNo.className = 'sc-modal-confirm__button sc-modal-confirm__button--error';
+                                iButtonNo.textContent = translations['sc-modal-confirm__button--error'];
                                 iButtonNo.onclick = restart;
                                 iDivImages.appendChild(iButtonNo);
                             }
@@ -414,7 +430,7 @@ const captureAsync = (cv) => async (name, featureMatchingDetectAndComputeSeriali
 }
 
 
-export const sligthCaptureFactory = (name) => {
+export const sligthCaptureFactory = (name="default") => {
     if (sligthCaptureDatabase[name]) {
         return sligthCaptureDatabase[name];
     }
