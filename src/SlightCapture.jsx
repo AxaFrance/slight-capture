@@ -27,7 +27,7 @@ export const SlightCaptureVideo = () => {
         let file = event.target.files[0];
         if (!file) return;
         setState({...state, isLoading: true});
-        const video = await sligthCapture.loadVideoAsync()(file, onCapture, false);
+        const video = await sligthCapture.loadVideoAsync()(file, onCapture);
         setState({...state, isLoading: false});
         video.start();
     }
