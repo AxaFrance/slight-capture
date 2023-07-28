@@ -237,7 +237,7 @@ const captureAsync = (cv) => async (name,
                 // start processing.
                 videoCapture.read(src);
                 const imageOutput = imageResize(cv)(src, 1600).image;
-                const {
+                /*const {
                     imageCv,
                     matchQuality,
                     targetPoints,
@@ -247,8 +247,9 @@ const captureAsync = (cv) => async (name,
                 const point2 = new cv.Point(Math.round(targetPoints.x2 * imageOutput.cols), Math.round(targetPoints.y2 * imageOutput.rows));
 
                 let colorBlue = new cv.Scalar(0, 150, 238, 100);
-                cv.rectangle(imageOutput, point1, point2, colorBlue, 30, cv.LINE_8, 0);
-
+                cv.rectangle(imageOutput, point1, point2, colorBlue, 30, cv.LINE_8, 0);*/
+                let currentPoints = null;
+                let imageCv = imageOutput.clone();
                 let diff;
                 if (currentPoints != null) {
                     numberFollowingMatchQuality++;

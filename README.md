@@ -17,6 +17,10 @@ Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 
 ## Get Started
 
+```bash
+npm install @axa-fr/slight-capture --save
+```
+
 The sample bellow use react, but the library work with vanilla JS with any framework of your choice.
 
 ```javascript
