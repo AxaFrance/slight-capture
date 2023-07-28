@@ -2,7 +2,7 @@
 import {toBase64Async} from "./SlightCapture/index.js";
 import {sligthCaptureFactory} from "./SlightCapture/video.js";
 
-import './index.css'
+//import './index.css'
 
 const sligthCapture = sligthCaptureFactory();
 
