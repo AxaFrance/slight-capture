@@ -138,7 +138,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
            // url: base64Url,
             goodMatchSize: 0,
          //   isGray,
-            finalImage: null,
+            finalImage: imgResizedAndCropped,
             outputInfo: null
         };
     }
