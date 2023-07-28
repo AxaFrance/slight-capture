@@ -236,7 +236,8 @@ const captureAsync = (cv) => async (name,
             try {
                 // start processing.
                 videoCapture.read(src);
-                const imageOutput = imageResize(cv)(src, 1600).image;
+                const imageOutput = src.clone();
+                //const imageOutput = imageResize(cv)(src, 1600).image;
                 /*const {
                     imageCv,
                     matchQuality,
