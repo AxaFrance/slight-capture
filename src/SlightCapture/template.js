@@ -10,53 +10,6 @@ export const toBase64Async = file => new Promise((resolve, reject) => {
     reader.onerror = error => reject(error);
 });
 
-const findFirstGoodPageAsync = (cv) => async (files, imgDescription, goodMatchSizeThreshold = 6) => {
-    let firstResult = null;
-    for (let i = 0; i < files.length; i++) {
-        const result = await zoneAsync(cv)(files[i], imgDescription, goodMatchSizeThreshold);
-        if (i === 0) {
-            firstResult = result;
-        }
-        if (result.expectedOutput.length > 0) {
-            return result;
-        }
-    }
-    if (firstResult) {
-        return firstResult;
-    }
-}
-
-export const playAlgoAsync = (cv) => async (file, imgDescription, goodMatchSizeThreshold = 6, feedback = message => message) => {
-    const filename = file.name.toLowerCase();
-    let files;
-    if (filename.endsWith(".pdf")) {
-        files = await convertPdfToImagesAsync()(file, 2);
-    } else if (filename.endsWith(".tif") || filename.endsWith(".tiff")) {
-        files = await convertTiffToImagesAsync()(file);
-    } else if (filename.endsWith(".base64")) {
-        files = [file.fileBase64];
-    } else {
-        files = [await toBase64Async(file)];
-    }
-    const data = await findFirstGoodPageAsync(cv)(files, imgDescription, goodMatchSizeThreshold);
-    return {data, filename, files, feedback};
-}
-
-export const playAlgoNoTemplateAsync = async (file) => {
-    const filename = file.name.toLowerCase();
-    let files;
-    if (filename.endsWith(".pdf")) {
-        files = await convertPdfToImagesAsync()(file, 2);
-    } else if (filename.endsWith(".base64")) {
-        files = [file.fileBase64];
-    } else if (filename.endsWith(".tif") || filename.endsWith(".tiff")) {
-        files = await convertTiffToImagesAsync()(file);
-    } else {
-        files = [await toBase64Async(file)];
-    }
-    return files;
-}
-
 export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeThreshold = 6, targetPoints) => {
     let imgCv = null;
     if(sceneUrl instanceof String){
