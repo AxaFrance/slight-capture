@@ -66,28 +66,17 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     }
     let imgCvCopy = imgCv.clone();
 
-   // const isGray = isImgGray(cv)(imgCv);
-
-    const templateCols = imgDescription.img.cols;
-    const templateRows = imgDescription.img.rows;
-
     const marge = Math.round((imgDescription.img.rows+ imgDescription.img.cols) /2 * 0.1);
     
-   /* const x1 = Math.round((imgCvCopy.cols - templateCols) / 2) - marge < 0 ? 0 : Math.round((imgCvCopy.cols - templateCols) / 2) - marge;
-    const y1 = Math.round((imgCvCopy.rows - templateRows) / 2) - marge < 0 ? 0 : Math.round((imgCvCopy.rows - templateRows) / 2) - marge;
-    const w = Math.round( templateCols) + marge *2 > imgCvCopy.cols ? imgCvCopy.cols : Math.round( templateCols) + marge *2;
-    const h = Math.round( templateRows) + marge *2 > imgCvCopy.rows ? imgCvCopy.rows : Math.round( templateRows) + marge *2;
-    console.log("x1", x1, "y1", y1, "w", w, "h", h);
-    console.log("imgResized.cols", imgCvCopy.cols, "imgResized.rows", imgCvCopy.rows);
-    console.log("templateCols", templateCols, "templateRows", templateRows);*/
-    const point1 = new cv.Point(Math.round(targetPoints.x1 * imgCvCopy.cols) - marge, Math.round(targetPoints.y1 * imgCvCopy.rows)- marge);
-    const point2 = new cv.Point(Math.round(targetPoints.x2 * imgCvCopy.cols) + marge, Math.round(targetPoints.y2 * imgCvCopy.rows)+marge);
+    const point1 = new cv.Point(Math.max(0, Math.round(targetPoints.x1 * imgCvCopy.cols) - marge), Math.max(0, Math.round(targetPoints.y1 * imgCvCopy.rows) - marge));
+    const point2 = new cv.Point(Math.min(imgCvCopy.cols, Math.round(targetPoints.x2 * imgCvCopy.cols) + marge), Math.min( imgCvCopy.rows, Math.round(targetPoints.y2 * imgCvCopy.rows) + marge));
     console.log("point1", point1, "point2", point2);
     console.log(marge);
     console.log("imgCvCopy.cols", imgCvCopy.cols, "imgCvCopy.rows", imgCvCopy.rows);
     imgCvCopy = cropImage(cv)(imgCvCopy, point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
     let cropRatio = imgCv.cols / imgCvCopy.cols ;
     console.log("cropRatio", cropRatio);
+    console.log("cropRatio", 1600 * cropRatio);
     const {image: imgResized, ratio} = imageResize(cv)(imgCvCopy, 1600 * cropRatio);
 
     console.log("youhou");
