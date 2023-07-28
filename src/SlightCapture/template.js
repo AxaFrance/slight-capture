@@ -64,18 +64,33 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     } else{
         imgCv= sceneUrl;
     }
-    let imgCvCopy = imgCv.clone();
+    let imgCvCopy = imgCv; //.clone();
 
    // const isGray = isImgGray(cv)(imgCv);
 
     const {image: imgResized, ratio} = imageResize(cv)(imgCvCopy, 1600);
+    
+    const templateCols = imgDescription.img.cols;
+    const templateRows = imgDescription.img.rows;
+    
+    const marge = 0 // Math.round(1600 * 0.1);
+    
+    const x1 = Math.round((imgResized.cols - templateCols) / 2) - marge < 0 ? 0 : Math.round((imgResized.cols - templateCols) / 2) - marge;
+    const y1 = Math.round((imgResized.rows - templateRows) / 2) - marge < 0 ? 0 : Math.round((imgResized.rows - templateRows) / 2) - marge;
+    const w = Math.round( templateCols) + marge *2 > imgResized.cols ? imgResized.cols : Math.round( templateCols) + marge *2;
+    const h = Math.round( templateRows) + marge *2 > imgResized.rows ? imgResized.rows : Math.round( templateRows) + marge *2;
+    console.log("x1", x1, "y1", y1, "w", w, "h", h);
+    console.log("imgResized.cols", imgResized.cols, "imgResized.rows", imgResized.rows);
+    console.log("templateCols", templateCols, "templateRows", templateRows);
+    const imgResizedAndCropped = cropImage(cv)(imgResized, x1, y1, w, h);
+    console.log("youhou");
     //const imgVersoCvTemplate = await loadImageAsync(cv)(imgDescription.template_url);
     //const imgVersoCvTemplateResized = imageResize(cv)(imgVersoCvTemplate, 600).image;
     // const youhou = detectAndComputeSerializable(cv)( imgVersoCvTemplateResized);
 
-    const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResized, goodMatchSizeThreshold);
+    const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResizedAndCropped, goodMatchSizeThreshold);
     let angle = 0;
-    let mat = new cv.Mat(imgCvCopy.rows, imgCvCopy.cols, imgCvCopy.type(), new cv.Scalar());
+    let mat = new cv.Mat(imgResizedAndCropped.rows, imgResizedAndCropped.cols, imgResizedAndCropped.type(), new cv.Scalar());
 
     if (result && result.lines) {
         let i = 0;
@@ -131,7 +146,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     const {xmax, xmin, ymax, ymin} = result.rectangle;
 
     const contours = findContours(cv)(mat, 0);
-    let croppedContours = cropContours(cv)(imgCv, contours);
+    let croppedContours = cropContours(cv)(imgResizedAndCropped, contours);
     let croppedContourImgs = croppedContours.map(cc => rotateImage(cv)(cc.img, angle));
     let croppedContoursBase64 = croppedContourImgs.map(cc => {
        // let result = imageResize(cv)(cc, 680);
@@ -164,11 +179,12 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         imgCv.delete();
     }
     imgResized.delete();
+    //imgResizedAndCropped.delete();
     
     return {expectedOutput, goodMatchSize: result.goodMatchSize, finalImage : croppedContoursBase64[0], outputInfo};
 }
 
-export const cropImageAsync = (cv) => async (imageUrlBase64, xmin, ymin, witdh, height, angle = 0) => {
+    export const cropImageAsync = (cv) => async (imageUrlBase64, xmin, ymin, witdh, height, angle = 0) => {
     const img = await loadImageAsync(cv)(imageUrlBase64);
     let rotatedImage = null;
     if (angle) {
@@ -183,54 +199,4 @@ export const cropImageAsync = (cv) => async (imageUrlBase64, xmin, ymin, witdh, 
     }
     imgCropped.delete();
     return base64url;
-}
-
-export const playAlgoWithCurrentTemplateAsync = (template, setState, state, file) => {
-    return playAlgoAsync(window.cv)(file, template.imgDescription, template.goodMatchSizeThreshold).then(result => {
-        if (result) {
-            setState({
-                ...state, ...result.data,
-                files: result.files,
-                loaderMode: LoaderModes.none,
-                filename: result.filename,
-                errorMessage: "",
-                noTemplateImage: ""
-            });
-        } else {
-            setState({
-                ...state,
-                loaderMode: LoaderModes.none,
-                errorMessage: "An error occured during cropping template application (no result found)"
-            });
-        }
-    })
-};
-
-export const getExpectedOutputWithCurrentTemplateAsync = (template, setState, state, file) => {
-    playAlgoAsync(window.cv)(file, template.imgDescription, template.goodMatchSizeThreshold).then(result => {
-        if (result) {
-            if (result.data.expectedOutput.length > 0) {
-                setState({
-                    ...state, ...result.data,
-                    files: result.files,
-                    loaderMode: LoaderModes.none,
-                    filename: result.filename,
-                    errorMessage: "",
-                    noTemplateImage: ""
-                });
-            } else {
-                setState({
-                    ...state,
-                    loaderMode: LoaderModes.none,
-                    errorMessage: "An error occured during cropping template application"
-                });
-            }
-        } else {
-            setState({
-                ...state,
-                loaderMode: LoaderModes.none,
-                errorMessage: "An error occured during cropping template application (no result found)"
-            });
-        }
-    })
 }
