@@ -290,7 +290,7 @@ const captureAsync = (cv) => async (name,
                     iDiv.appendChild(iDivImages);
 
                     delay(50).then(() => {
-                        zoneAsync(cv)(finalShot, featureMatchingDetectAndComputeSerializable, 30).then(result => {
+                        zoneAsync(cv)(finalShot, featureMatchingDetectAndComputeSerializable, 30, targetPoints).then(result => {
                             iDivImages.removeChild(iHLoading);
                             finalShot.delete();
 

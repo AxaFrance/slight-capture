@@ -57,7 +57,7 @@ export const playAlgoNoTemplateAsync = async (file) => {
     return files;
 }
 
-export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeThreshold = 6) => {
+export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeThreshold = 6, targetPoints) => {
     let imgCv = null;
     if(sceneUrl instanceof String){
         imgCv = await loadImageAsync(cv)(sceneUrl);
@@ -68,21 +68,28 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
 
    // const isGray = isImgGray(cv)(imgCv);
 
-    const {image: imgResized, ratio} = imageResize(cv)(imgCvCopy, 1600);
-    
     const templateCols = imgDescription.img.cols;
     const templateRows = imgDescription.img.rows;
+
+    const marge = Math.round((imgDescription.img.rows+ imgDescription.img.cols) /2 * 0.1);
     
-    const marge = Math.round(1600 * 0.1);
-    
-    const x1 = Math.round((imgResized.cols - templateCols) / 2) - marge < 0 ? 0 : Math.round((imgResized.cols - templateCols) / 2) - marge;
-    const y1 = Math.round((imgResized.rows - templateRows) / 2) - marge < 0 ? 0 : Math.round((imgResized.rows - templateRows) / 2) - marge;
-    const w = Math.round( templateCols) + marge *2 > imgResized.cols ? imgResized.cols : Math.round( templateCols) + marge *2;
-    const h = Math.round( templateRows) + marge *2 > imgResized.rows ? imgResized.rows : Math.round( templateRows) + marge *2;
+   /* const x1 = Math.round((imgCvCopy.cols - templateCols) / 2) - marge < 0 ? 0 : Math.round((imgCvCopy.cols - templateCols) / 2) - marge;
+    const y1 = Math.round((imgCvCopy.rows - templateRows) / 2) - marge < 0 ? 0 : Math.round((imgCvCopy.rows - templateRows) / 2) - marge;
+    const w = Math.round( templateCols) + marge *2 > imgCvCopy.cols ? imgCvCopy.cols : Math.round( templateCols) + marge *2;
+    const h = Math.round( templateRows) + marge *2 > imgCvCopy.rows ? imgCvCopy.rows : Math.round( templateRows) + marge *2;
     console.log("x1", x1, "y1", y1, "w", w, "h", h);
-    console.log("imgResized.cols", imgResized.cols, "imgResized.rows", imgResized.rows);
-    console.log("templateCols", templateCols, "templateRows", templateRows);
-    const imgResizedAndCropped = imgResized;//cropImage(cv)(imgResized, x1, y1, w, h);
+    console.log("imgResized.cols", imgCvCopy.cols, "imgResized.rows", imgCvCopy.rows);
+    console.log("templateCols", templateCols, "templateRows", templateRows);*/
+    const point1 = new cv.Point(Math.round(targetPoints.x1 * imgCvCopy.cols) - marge, Math.round(targetPoints.y1 * imgCvCopy.rows)- marge);
+    const point2 = new cv.Point(Math.round(targetPoints.x2 * imgCvCopy.cols) + marge, Math.round(targetPoints.y2 * imgCvCopy.rows)+marge);
+    console.log("point1", point1, "point2", point2);
+    console.log(marge);
+    console.log("imgCvCopy.cols", imgCvCopy.cols, "imgCvCopy.rows", imgCvCopy.rows);
+    imgCvCopy = cropImage(cv)(imgCvCopy, point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
+    let cropRatio = imgCv.cols / imgCvCopy.cols ;
+    console.log("cropRatio", cropRatio);
+    const {image: imgResized, ratio} = imageResize(cv)(imgCvCopy, 1600 * cropRatio);
+
     console.log("youhou");
     //const imgVersoCvTemplate = await loadImageAsync(cv)(imgDescription.template_url);
     //const imgVersoCvTemplateResized = imageResize(cv)(imgVersoCvTemplate, 600).image;
@@ -146,7 +153,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     const {xmax, xmin, ymax, ymin} = result.rectangle;
 
     const contours = findContours(cv)(mat, 0);
-    let croppedContours = cropContours(cv)(imgCv, contours);
+    let croppedContours = cropContours(cv)(imgCvCopy, contours);
     let croppedContourImgs = croppedContours.map(cc => rotateImage(cv)(cc.img, angle));
     let croppedContoursBase64 = croppedContourImgs.map(cc => {
        // let result = imageResize(cv)(cc, 680);
