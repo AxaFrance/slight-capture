@@ -1,4 +1,4 @@
-# Contributing to @axa-fr/axa-fr-ocr
+# Contributing to @axa-fr/slight-capture
 
 First, ensure you have using Python 3.8.
 
