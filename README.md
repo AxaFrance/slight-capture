@@ -1,6 +1,6 @@
 ﻿# Slight Capture
 
-[![Continuous Integration](https://github.com/AxaGuilDEv/slight-capture/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaGuilDEv/slight-capture/actions/workflows/npm-publish.yml)
+[![Continuous Integration](https://github.com/AcaFrance/slight-capture/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/slight-capture/actions/workflows/npm-publish.yml)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_slight-capture&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_slight-capture) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_slight-capture&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_slight-capture&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_slight-capture&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_slight-capture&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_slight-capture&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_slight-capture&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
 
 - [About](#about)
@@ -15,7 +15,7 @@ The usage is easy for user. Your data is lighter and cleaner for future OCR in y
 
 Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 
-## Get Started
+## Get Started  [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Fslight-capture)
 
 ```bash
 npm install @axa-fr/slight-capture --save
