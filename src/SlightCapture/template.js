@@ -118,7 +118,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     const expectedOutput = [{left, top, width, height}];
 
     deleteClean();
-    croppedContours.forEach(cc => cc.img.delete());
+   // croppedContours.forEach(cc => cc.img.delete());
     
     return {expectedOutput, goodMatchSize: result.goodMatchSize, finalImage : croppedContoursBase64[0], outputInfo};
 }
