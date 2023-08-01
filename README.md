@@ -11,7 +11,7 @@
 
 Simple vanilla JS library to capture a clean image and light from documents from a webcam. 
 It use Opencv.js under the hood.
-The usage is easy for user. Your data is lighter and cleaner for future OCR in your backend system
+The usage is easy for user. Your data is lighter and cleaner for future OCR in your backend system.
 
 Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 
