@@ -15,7 +15,7 @@ The usage is easy for user. Your data is lighter and cleaner for future OCR in y
 
 Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 
-## Get Started  [![npm version](https://badge.fury.io/js/%40axa-fr%2Freact-oidc.svg)](https://badge.fury.io/js/%40axa-fr%2Fslight-capture)
+## Get Started  [![npm version](https://badge.fury.io/js/%40axa-fr%2Fslight-capture.svg)](https://badge.fury.io/js/%40axa-fr%2Fslight-capture)
 
 ```bash
 npm install @axa-fr/slight-capture --save
