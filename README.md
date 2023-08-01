@@ -129,6 +129,7 @@ css use BEM (Block Element Modifier) convention.
   font-size: 1em;
   margin: 1em;
   position:absolute;
+  background-color:#a8a8a88f;
 }
 
 .sc-modal-video__quit {

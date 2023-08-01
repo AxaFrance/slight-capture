@@ -39,7 +39,10 @@ export const SlightCaptureVideo = () => {
     return (
         <form>
             <h1>Slight Capture</h1>
+            <a href={'https://github.com/AxaFrance/slight-capture'}>Slight Capture Github</a>
+            <div>
             <input type="file" onChange={onChange} multiple={true}/>
+            </div>
             <div>
                 {state.url &&
                     <img style={{"maxWidth": "800px"}} src={state.url} alt="image found"/>

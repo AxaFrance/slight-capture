@@ -182,7 +182,7 @@ const captureAsync = (cv) => async (name,
         iButton.textContent = translations['sc-modal-video__invert-camera']
         iButton.className = 'sc-modal-video__invert-camera';
         if (enableDefaultCss) {
-            iButton.style = 'padding: 0.5em;font-size: 1em;margin: 1em;position:absolute;';
+            iButton.style = 'padding: 0.5em;font-size: 1em;margin: 1em;position:absolute;background-color:#a8a8a842;';
         }
         iButton.onclick = () => {
             stopStreaming();
@@ -195,6 +195,7 @@ const captureAsync = (cv) => async (name,
         iButtonQuit.id = cuid();
         iButtonQuit.textContent = translations['sc-modal-video__quit']
         iButtonQuit.className = 'sc-modal-video__quit';
+        
         if (enableDefaultCss) {
             iButtonQuit.style = 'padding: 0.3em;font-size: 1em;margin: 1em;position:absolute; top: 0; right: 0;';
         }
