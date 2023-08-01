@@ -111,7 +111,6 @@ export const detectAndComputeSerializable = (cv) => (img) => {
 
 export const detectAndComputeSerializableToCv = (cv) => (descriptorSerializable, keyPointsSerializable) => {
     let descriptors = cv.matFromArray(descriptorSerializable.rows, descriptorSerializable.cols, descriptorSerializable.type, descriptorSerializable.data);
-
     const keypoints = {
         get: (i) => keyPointsSerializable[i]
     }
@@ -122,9 +121,9 @@ export const detectAndComputeSerializableToCv = (cv) => (descriptorSerializable,
 export const detectAndMatch = (cv) => (imgDescription, im2, minMatch = 20) => {
 
     // Initiate STAR detector
-    //const detectionAlgorithm = new cv.ORB(5000);
-     //const detectionAlgorithm = new cv.SIFT();
-    //const detectionAlgorithm = new cv.AKAZE();
+   //const detectionAlgorithm = new cv.ORB(5000);
+   //const detectionAlgorithm = new cv.SIFT();
+   //const detectionAlgorithm = new cv.AKAZE();
    const detectionAlgorithm = new cv.BRISK();
 
     // find the keypoints with ORB
@@ -384,7 +383,7 @@ const drawMatch = (cv) => (findHomographyMask, h, points1, points2, goodMatches,
     console.log("", h.data64F[3], ",", h.data64F[4], ",", h.data64F[5]);
     console.log("", h.data64F[6], ",", h.data64F[7], ",", h.data64F[8], "]");
 
-    console.log("here are the inliers from RANSAC, compare to the goodMatches array above", findHomographyMask.rows);//test
+    console.log("here are the inliers from RANSAC, compare to the goodMatches array above", findHomographyMask.rows);
     let good_inlier_matches = new cv.DMatchVector();
     for (let i = 0; i < findHomographyMask.rows; i = i + 2) {
         if (findHomographyMask.data[i] === 1 || findHomographyMask.data[i + 1] === 1) {

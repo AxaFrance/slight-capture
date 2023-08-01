@@ -17,13 +17,14 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     } else{
         imgCv= sceneUrl;
     }
-    let imgCvCopy = imgCv.clone();
+    let imgCvClone = imgCv.clone();
 
     const marge = Math.round((imgDescription.img.rows+ imgDescription.img.cols) /2 * 0.1);
     
-    const point1 = new cv.Point(Math.max(0, Math.round(targetPoints.x1 * imgCvCopy.cols) - marge), Math.max(0, Math.round(targetPoints.y1 * imgCvCopy.rows) - marge));
-    const point2 = new cv.Point(Math.min(imgCvCopy.cols, Math.round(targetPoints.x2 * imgCvCopy.cols) + marge), Math.min( imgCvCopy.rows, Math.round(targetPoints.y2 * imgCvCopy.rows) + marge));
-    imgCvCopy = cropImage(cv)(imgCvCopy, point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
+    const point1 = new cv.Point(Math.max(0, Math.round(targetPoints.x1 * imgCvClone.cols) - marge), Math.max(0, Math.round(targetPoints.y1 * imgCvClone.rows) - marge));
+    const point2 = new cv.Point(Math.min(imgCvClone.cols, Math.round(targetPoints.x2 * imgCvClone.cols) + marge), Math.min( imgCvClone.rows, Math.round(targetPoints.y2 * imgCvClone.rows) + marge));
+    const imgCvCopy = cropImage(cv)(imgCvClone, point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
+    imgCvClone.delete();
     let cropRatio = imgCv.cols / imgCvCopy.cols ;
     const {image: imgResized, ratio} = imageResize(cv)(imgCvCopy, 1600 * cropRatio);
     const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResized, goodMatchSizeThreshold);
@@ -69,7 +70,17 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         }
 
     }
+    
+    const deleteClean = () => {
+        if(sceneUrl instanceof String) {
+            imgCv.delete();
+        }
+        imgResized.delete();
+        imgCvCopy.delete();
+    }
+    
     if (!result) {
+        deleteClean();
         return {
             expectedOutput: [],
             goodMatchSize: 0,
@@ -82,11 +93,8 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
 
     const contours = findContours(cv)(mat, 0);
     let croppedContours = cropContours(cv)(imgCvCopy, contours);
-    let croppedContourImgs = croppedContours.map(cc => rotateImage(cv)(cc.img, angle));
-    let croppedContoursBase64 = croppedContourImgs.map(cc => {
-        return cc;
-    });
-
+    let croppedContoursBase64 = croppedContours.map(cc => rotateImage(cv)(cc.img, angle));
+    
     let outputInfo = {
         result: croppedContours.map(cc => {
             return {
@@ -109,16 +117,13 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     const height = Math.round(ymax / ratio) - top;
     const expectedOutput = [{left, top, width, height}];
 
-    if(sceneUrl instanceof String) {
-        imgCv.delete();
-    }
-    imgResized.delete();
-    //imgResizedAndCropped.delete();
+    deleteClean();
+    croppedContours.forEach(cc => cc.img.delete());
     
     return {expectedOutput, goodMatchSize: result.goodMatchSize, finalImage : croppedContoursBase64[0], outputInfo};
 }
 
-    export const cropImageAsync = (cv) => async (imageUrlBase64, xmin, ymin, witdh, height, angle = 0) => {
+    /*export const cropImageAsync = (cv) => async (imageUrlBase64, xmin, ymin, witdh, height, angle = 0) => {
     const img = await loadImageAsync(cv)(imageUrlBase64);
     let rotatedImage = null;
     if (angle) {
@@ -133,4 +138,4 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     }
     imgCropped.delete();
     return base64url;
-}
+}*/
