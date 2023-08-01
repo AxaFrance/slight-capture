@@ -372,7 +372,6 @@ export const computeAndApplyHomography = (cv) => (imgDescription, sceneImg, minM
         cv.warpPerspective(sceneImg, finalImage, homographyPoints, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
         console.log("warpPerspective: ");
         homographyPoints.delete();
-       // clean();
         console.log("clean: ");
         return {finalImage, goodMatchSize};
     }

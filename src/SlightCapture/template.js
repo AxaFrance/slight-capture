@@ -23,20 +23,9 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     
     const point1 = new cv.Point(Math.max(0, Math.round(targetPoints.x1 * imgCvCopy.cols) - marge), Math.max(0, Math.round(targetPoints.y1 * imgCvCopy.rows) - marge));
     const point2 = new cv.Point(Math.min(imgCvCopy.cols, Math.round(targetPoints.x2 * imgCvCopy.cols) + marge), Math.min( imgCvCopy.rows, Math.round(targetPoints.y2 * imgCvCopy.rows) + marge));
-    console.log("point1", point1, "point2", point2);
-    console.log(marge);
-    console.log("imgCvCopy.cols", imgCvCopy.cols, "imgCvCopy.rows", imgCvCopy.rows);
     imgCvCopy = cropImage(cv)(imgCvCopy, point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
     let cropRatio = imgCv.cols / imgCvCopy.cols ;
-    console.log("cropRatio", cropRatio);
-    console.log("cropRatio", 1600 * cropRatio);
     const {image: imgResized, ratio} = imageResize(cv)(imgCvCopy, 1600 * cropRatio);
-
-    console.log("youhou");
-    //const imgVersoCvTemplate = await loadImageAsync(cv)(imgDescription.template_url);
-    //const imgVersoCvTemplateResized = imageResize(cv)(imgVersoCvTemplate, 600).image;
-    // const youhou = detectAndComputeSerializable(cv)( imgVersoCvTemplateResized);
-
     const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResized, goodMatchSizeThreshold);
     let angle = 0;
     let mat = new cv.Mat(imgCvCopy.rows, imgCvCopy.cols, imgCvCopy.type(), new cv.Scalar());
@@ -80,13 +69,10 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         }
 
     }
-   // const base64Url = toImageBase64(cv)(imgCv);
     if (!result) {
         return {
             expectedOutput: [],
-           // url: base64Url,
             goodMatchSize: 0,
-         //   isGray,
             finalImage: null,
             outputInfo: null
         };
@@ -98,7 +84,6 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     let croppedContours = cropContours(cv)(imgCvCopy, contours);
     let croppedContourImgs = croppedContours.map(cc => rotateImage(cv)(cc.img, angle));
     let croppedContoursBase64 = croppedContourImgs.map(cc => {
-       // let result = imageResize(cv)(cc, 680);
         return cc;
     });
 
@@ -118,10 +103,10 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         }
     }
 
-    const left = parseInt(xmin / ratio, 10);
-    const top = parseInt(ymin / ratio, 10);
-    const width = parseInt(xmax / ratio, 10) - left;
-    const height = parseInt(ymax / ratio, 10) - top;
+    const left = Math.round(xmin / ratio);
+    const top = Math.round(ymin / ratio);
+    const width = Math.round(xmax / ratio) - left;
+    const height = Math.round(ymax / ratio) - top;
     const expectedOutput = [{left, top, width, height}];
 
     if(sceneUrl instanceof String) {

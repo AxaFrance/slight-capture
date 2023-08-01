@@ -44,7 +44,6 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
 
                 stream.getTracks().forEach(function(track) {
                     track.enabled = true;
-                    console.log("enable tracks" + track.label  );
                 });
       
                 iVideo.onloadedmetadata = async function (e) {
@@ -52,13 +51,8 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
 
                     let width = iVideo.width;
                     let height = iVideo.height;
-                    console.log({width, height});
                     let stream_settings = stream.getVideoTracks()[0].getSettings();
-                    console.log(stream_settings)
                     
-                    //const text = document.createTextNode(JSON.stringify(stream_settings));
-                    //iH1.appendChild(text);
-
                     let src = new cv.Mat(stream_settings.height, stream_settings.width, cv.CV_8UC4);
                     iVideo.height = iVideo.videoHeight;
                     iVideo.width = iVideo.videoWidth;
