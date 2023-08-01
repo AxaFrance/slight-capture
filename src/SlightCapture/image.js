@@ -37,26 +37,6 @@ export const imageResize = (cv) => (image, max = null) => {
     return {image: resized, ratio};
 }
 
-export const imageMaxSize = (ciResized) => {
-    const width = ciResized.rows;
-    const height = ciResized.cols;
-
-    let max = 0;
-    if (width > height) {
-        max = width;
-    }
-    if (height > width) {
-        max = height;
-    }
-    return max;
-}
-
-export const convertScaleAbs = (cv) => (img, alpha = 1, beta = 0) => {
-    const imgGray = new cv.Mat();
-    cv.convertScaleAbs(img, imgGray, alpha, beta);
-    return imgGray;
-}
-
 export const rotateImage = (cv) => (img, angleDeg) => {
     const src = img;
     let dst = new cv.Mat();
@@ -96,34 +76,6 @@ export const rotateImage = (cv) => (img, angleDeg) => {
     cv.warpAffine(src, dst, rotation_mat, dsize, cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
     rotation_mat.delete();
     return dst;
-}
-
-export const isImgGray = (cv) => (img) => {
-    const {image: src} = imageResize(cv)(img, 64);
-    if (src.isContinuous()) {
-        for (let row = 0; row < src.rows; row++) {
-            for (let col = 0; col < src.cols; col++) {
-                let R = src.data[row * src.cols * src.channels() + col * src.channels()];
-                let G = src.data[row * src.cols * src.channels() + col * src.channels() + 1];
-                let B = src.data[row * src.cols * src.channels() + col * src.channels() + 2];
-                if (Math.abs(R - G) > 30 || Math.abs(R - B) > 30) {
-                    src.delete();
-                    return false;
-                }
-            }
-        }
-        src.delete();
-        return true;
-    }
-    src.delete();
-    return true;
-}
-
-
-export const convertImgToGray = (cv) => (img) => {
-    const imgGray = new cv.Mat();
-    cv.cvtColor(img, imgGray, cv.COLOR_RGBA2GRAY, 0);
-    return imgGray;
 }
 
 export const toImageBase64 = (cv) => (imgCv) => {
@@ -167,39 +119,6 @@ export const cropImage = (cv) => (img, xmin, ymin, witdh, height) => {
     let rect = new cv.Rect(xmin, ymin, witdh, height);
     return img.roi(rect);
 }
-
-export const computeMargin = (img, xmin, ymin, xmax, ymax, margin_ratio_percentage) => {
-    const imgWidth = img.cols;
-    const imgHeigth = img.rows;
-    const marginRatio = Math.max(imgWidth, imgHeigth) * margin_ratio_percentage / 100;
-    const newXmin = Math.max(0, xmin - marginRatio);
-    const newYmin = Math.max(0, ymin - marginRatio);
-    const newXmax = Math.min(imgWidth, xmax + marginRatio);
-    const newYmax = Math.min(imgHeigth, ymax + marginRatio);
-    const rectangle = {xmin: newXmin, ymin: newYmin, xmax: newXmax, ymax: newYmax, marginRatio: marginRatio};
-    console.log(rectangle)
-    return rectangle;
-}
-
-export const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
-    const byteCharacters = atob(b64Data);
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        const slice = byteCharacters.slice(offset, offset + sliceSize);
-
-        const byteNumbers = new Array(slice.length);
-        for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-        }
-
-        const byteArray = new Uint8Array(byteNumbers);
-        byteArrays.push(byteArray);
-    }
-
-    return new Blob(byteArrays, {type: contentType});
-}
-
 
 export function base64ToBlob(base64String) {
     const arr = base64String.split(',');

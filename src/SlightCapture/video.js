@@ -8,10 +8,6 @@ import {cuid} from "./guid.js";
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
-async function getDevices() {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    console.log(devices);
-}
 const transformFunction = async (imageCvTemplate, imgCv) => {
     try {
         const cv = window.cv;
@@ -48,9 +44,6 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
       
                 iVideo.onloadedmetadata = async function (e) {
                     await iVideo.play();
-
-                    let width = iVideo.width;
-                    let height = iVideo.height;
                     let stream_settings = stream.getVideoTracks()[0].getSettings();
                     
                     let src = new cv.Mat(stream_settings.height, stream_settings.width, cv.CV_8UC4);
@@ -154,7 +147,6 @@ const captureAsync = (cv) => async (name,
 
         let cameraPromise = null;
         let streaming = true;
-        let wait = false;
         const stopStreaming = () => {
             streaming = false;
         };
@@ -221,9 +213,7 @@ const captureAsync = (cv) => async (name,
         iDivImages.className = `sc-modal-confirm sc-modal-confirm--${name}`;
         iDivImages.id = cuid();
 
-        getDevices();
         const FPS = 30;
-        let state = {bestNumberPoint: 0, confidenceRate: 0}
         let beginMatch = Date.now();
         let numberFollowingMatchQuality = 0;
 
@@ -232,7 +222,6 @@ const captureAsync = (cv) => async (name,
                 // start processing.
                 videoCapture.read(src);
                 const imageOutput = src.clone();
-                //const imageOutput = imageResize(cv)(src, 1600).image;
                 const {
                     imageCv,
                     matchQuality,
@@ -244,20 +233,19 @@ const captureAsync = (cv) => async (name,
 
                 let colorBlue = new cv.Scalar(0, 150, 238, 100);
                 cv.rectangle(imageOutput, point1, point2, colorBlue, 30, cv.LINE_8, 0);
-                //let currentPoints = null;
-                //let imageCv = imageOutput.clone();
-                let diff;
+
+                let counterTime;
                 if (currentPoints != null) {
                     numberFollowingMatchQuality++;
                     let colorRed = new cv.Scalar(255, 158, 47, 200);
-                    diff = Math.round((Date.now() - beginMatch) / 1000);
+                    counterTime = Math.round((Date.now() - beginMatch) / 1000);
                     const font = cv.FONT_HERSHEY_SIMPLEX;
                     const fontScale = 10;
                     const thickness = 20;
                     // const baseline=0;
                     // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
                     const size = new cv.Size(300, -280);
-                    cv.putText(imageOutput, diff.toString(), new cv.Point(Math.round(imageOutput.cols / 2 - size.width / 2), Math.round(imageOutput.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
+                    cv.putText(imageOutput, counterTime.toString(), new cv.Point(Math.round(imageOutput.cols / 2 - size.width / 2), Math.round(imageOutput.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
 
                     const point1 = new cv.Point(Math.round(currentPoints.x1 * imageOutput.cols), Math.round(currentPoints.y1 * imageOutput.rows));
                     const point2 = new cv.Point(Math.round(currentPoints.x2 * imageOutput.cols), Math.round(currentPoints.y2 * imageOutput.rows));
@@ -266,13 +254,12 @@ const captureAsync = (cv) => async (name,
                     cv.rectangle(imageOutput, point1, point2, colorGreen, 20, cv.LINE_8, 0);
                 } else {
                     numberFollowingMatchQuality = 0;
-                    diff = 0;
+                    counterTime = 0;
                     beginMatch = Date.now();
                 }
 
-                if (diff > 5) {
+                if (counterTime > 5) {
                     numberFollowingMatchQuality = 0;
-                    wait = true;
                     const finalShot = src.clone();
                     stopStreaming();
                     

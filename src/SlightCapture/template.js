@@ -1,6 +1,6 @@
-﻿import {cropImage, imageResize, isImgGray, loadImageAsync, rotateImage, toImageBase64} from "./image";
-import {computeAndComputeHomographyRectangle} from "./match";
-import {cropContours, findContours} from "./contours";
+﻿import {cropImage, imageResize, loadImageAsync, rotateImage} from "./image.js";
+import {computeAndComputeHomographyRectangle} from "./match.js";
+import {cropContours, findContours} from "./contours.js";
 
 
 export const toBase64Async = file => new Promise((resolve, reject) => {
@@ -118,24 +118,6 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     const expectedOutput = [{left, top, width, height}];
 
     deleteClean();
-   // croppedContours.forEach(cc => cc.img.delete());
     
     return {expectedOutput, goodMatchSize: result.goodMatchSize, finalImage : croppedContoursBase64[0], outputInfo};
 }
-
-    /*export const cropImageAsync = (cv) => async (imageUrlBase64, xmin, ymin, witdh, height, angle = 0) => {
-    const img = await loadImageAsync(cv)(imageUrlBase64);
-    let rotatedImage = null;
-    if (angle) {
-        rotatedImage = rotateImage(cv)(img, angle);
-    }
-
-    const imgCropped = cropImage(cv)(rotatedImage ? rotatedImage : img, xmin, ymin, witdh, height);
-    const base64url = toImageBase64(cv)(imgCropped);
-    img.delete();
-    if (rotatedImage) {
-        rotatedImage.delete();
-    }
-    imgCropped.delete();
-    return base64url;
-}*/
