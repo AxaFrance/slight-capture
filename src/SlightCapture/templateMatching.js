@@ -14,14 +14,12 @@ export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8) => {
         }
     }
     const ratio = ((brightness /3) / (255 * src.cols * src.rows)) / minimumBrightness;
-    console.log("ratio", ratio);
-    console.log("1/ ratio", 1 / ratio);
     if(ratio < 1 && ratio > 0) {
         let alpha = 1 / ratio; // # Brightness control 
         let beta = 0;  // # Contrast control
 
         cv.convertScaleAbs(image, image, alpha, beta)
-        return {image, ratio: 1 / ratio};
+        return {image, ratio: alpha};
     }
     return { image, ratio: 0 };
 }

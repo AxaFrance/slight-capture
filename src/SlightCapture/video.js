@@ -261,7 +261,7 @@ const captureAsync = (cv) => async (name,
                 }
 
 
-                if(autoAdjustBrightnessRatio > 2){
+                if(autoAdjustBrightnessRatio > 1.9){
                     const size = new cv.Size(300, -280);
                     const font = cv.FONT_HERSHEY_SIMPLEX;
                     const fontScale = 2;
