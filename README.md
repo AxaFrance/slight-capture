@@ -80,6 +80,7 @@ Texts can be override by passing a translation object to the initAsync method.
 const translations = {
     'sc-modal-video__title' : 'Positionner 5 secondes votre document dans le cadre',
     'sc-modal-video__invert-camera' : "Inverser caméra",
+    'sc-modal-video__message-too-dark' : "Image trop sombre",
     'sc-modal-video__quit' : "X",
     'sc-modal-confirm__loading' : "Traitement en cours...",
     'sc-modal-confirm__title':"Es-ce que tous les champs sont parfaitement lisibles ?",
