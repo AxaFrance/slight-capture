@@ -1,6 +1,7 @@
 ﻿import {cropImage, imageResize, loadImageAsync, rotateImage} from "./image.js";
-import {computeAndComputeHomographyRectangle} from "./match.js";
+import {computeAndComputeHomographyRectangle} from "./featureMatching.js";
 import {cropContours, findContours} from "./contours.js";
+import {autoAdjustBrightness} from "./templateMatching.js";
 
 
 export const toBase64Async = file => new Promise((resolve, reject) => {
@@ -18,15 +19,19 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         imgCv= sceneUrl;
     }
     let imgCvClone = imgCv.clone();
-
+    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(imgCvClone, 0.5);
+    imgCvClone = autoAdjustBrightnessResult.image;
     const marge = Math.round((imgDescription.img.rows+ imgDescription.img.cols) /2 * 0.1);
     
     const point1 = new cv.Point(Math.max(0, Math.round(targetPoints.x1 * imgCvClone.cols) - marge), Math.max(0, Math.round(targetPoints.y1 * imgCvClone.rows) - marge));
     const point2 = new cv.Point(Math.min(imgCvClone.cols, Math.round(targetPoints.x2 * imgCvClone.cols) + marge), Math.min( imgCvClone.rows, Math.round(targetPoints.y2 * imgCvClone.rows) + marge));
-    const imgCvCopy = cropImage(cv)(imgCvClone, point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
+    let imgCvCopy = cropImage(cv)(imgCvClone, point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
+    
     imgCvClone.delete();
     let cropRatio = imgCv.cols / imgCvCopy.cols ;
     const {image: imgResized, ratio} = imageResize(cv)(imgCvCopy, 1600 * cropRatio);
+    
+    
     const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResized, goodMatchSizeThreshold);
     let angle = 0;
     let mat = new cv.Mat(imgCvCopy.rows, imgCvCopy.cols, imgCvCopy.type(), new cv.Scalar());

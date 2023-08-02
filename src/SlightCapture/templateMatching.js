@@ -1,12 +1,41 @@
 ﻿
-export const findMatch = (cv) => (template, image, isDrawRectangle = false) => {
+export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8) => {
+    let brightness = 0;
+    const src = image;
+    console.log(src.isContinuous())
+    if (src.isContinuous()) {
+        for (let row = 0; row < src.rows; row++) {
+            for (let col = 0; col < src.cols; col++) {
+                let R = src.data[row * src.cols * src.channels() + col * src.channels()];
+                let G = src.data[row * src.cols * src.channels() + col * src.channels() + 1];
+                let B = src.data[row * src.cols * src.channels() + col * src.channels() + 2];
+                brightness +=  R +  G + B;
+            }
+        }
+    }
+    const ratio = ((brightness /3) / (255 * src.cols * src.rows)) / minimumBrightness;
+    console.log("ratio", ratio);
+    console.log("1/ ratio", 1 / ratio);
+    if(ratio < 1 && ratio > 0) {
+        let alpha = 1 / ratio; // # Brightness control 
+        let beta = 0;  // # Contrast control
+
+        cv.convertScaleAbs(image, image, alpha, beta)
+        return {image, ratio: 1 / ratio};
+    }
+    return { image, ratio: 0 };
+}
+
+export const findMatch = (cv) => (template, image, isDrawRectangle = true) => {
     let mask = new cv.Mat();
     let destination = new cv.Mat();
 
     let ksize = new cv.Size(2, 2);
     let anchor = new cv.Point(-1, -1);
     cv.blur(image, image, ksize, anchor, cv.BORDER_DEFAULT)
-    
+
+    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(image);
+    image = autoAdjustBrightnessResult.image;
     cv.matchTemplate(image, template, destination, cv.TM_CCORR_NORMED, mask);
     let result = cv.minMaxLoc(destination, mask);
     
@@ -51,6 +80,7 @@ export const findMatch = (cv) => (template, image, isDrawRectangle = false) => {
  return {
      image, 
      matchQuality: matchQuality,
+     autoAdjustBrightnessRatio : autoAdjustBrightnessResult.ratio,
      targetPoints: {
             x1: point1.x / imageWidth,
             y1: point1.y / imageHeight,

@@ -1,7 +1,7 @@
 ﻿import {base64ToBlob, imageResize, loadImageAsync, toImageBase64} from "./image.js";
 import {findMatch} from "./templateMatching.js";
 import {toBase64Async, zoneAsync} from "./template.js";
-import {detectAndComputeSerializable} from "./match.js";
+import {detectAndComputeSerializable} from "./featureMatching.js";
 import {loadScriptAsync} from "./script.js";
 import {cuid} from "./guid.js";
 
@@ -14,8 +14,8 @@ const transformFunction = async (imageCvTemplate, imgCv) => {
         if (imgCv === null) return;
         const imd = imageResize(cv)(imgCv, 100);
         const imgCvTemplateResized = imd.image;
-        const {image: imageCv, matchQuality, targetPoints, currentPoints} = findMatch(cv)(imageCvTemplate, imgCvTemplateResized);
-        return {imageCv, matchQuality, targetPoints, currentPoints};
+        const {image: imageCv, matchQuality, targetPoints, currentPoints, autoAdjustBrightnessRatio} = findMatch(cv)(imageCvTemplate, imgCvTemplateResized);
+        return {imageCv, matchQuality, targetPoints, currentPoints, autoAdjustBrightnessRatio};
     } catch (e) {
         console.log(e)
         return null;
@@ -55,7 +55,6 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
                         stream.getTracks().forEach(function(track) {
                             track.stop();
                             track.enabled = true;
-                            console.log("stopStreamTracks" + track.label  );
                         });
                     }
 
@@ -92,12 +91,13 @@ const texts = {
     'sc-modal-video__invert-camera' : "Inverser caméra",
     'sc-modal-video__quit' : "X",
     'sc-modal-confirm__loading' : "Traitement en cours...",
-    'sc-modal-confirm__title':"Es-ce que tous les champs sont parfaitement lisibles ?",
+    'sc-modal-confirm__title':"Est-ce que tous les champs sont parfaitement lisibles ?",
     'sc-modal-confirm__button--cancel':"Non",
     'sc-modal-confirm__button--ok':"Oui",
     'sc-modal-confirm__title--error':"Votre document n'a pas été bien détecté, veuillez réessayer",
     'sc-modal-confirm__button--error': "Réessayer",
-}
+};
+
 export const loadVideoAsync = (name) => (cv=null) => async (file, 
                                                             onCaptureCallback = null, 
                                                             enableDefaultCss = true,
@@ -226,13 +226,15 @@ const captureAsync = (cv) => async (name,
                     imageCv,
                     matchQuality,
                     targetPoints,
-                    currentPoints
+                    currentPoints,
+                    autoAdjustBrightnessRatio
                 } = await transformFunction(templateMatchingImage, imageOutput);
                 const point1 = new cv.Point(Math.round(targetPoints.x1 * imageOutput.cols), Math.round(targetPoints.y1 * imageOutput.rows));
                 const point2 = new cv.Point(Math.round(targetPoints.x2 * imageOutput.cols), Math.round(targetPoints.y2 * imageOutput.rows));
 
-                let colorBlue = new cv.Scalar(0, 150, 238, 100);
+                let colorBlue = new cv.Scalar(0, 200, 238, 150);
                 cv.rectangle(imageOutput, point1, point2, colorBlue, 30, cv.LINE_8, 0);
+
 
                 let counterTime;
                 if (currentPoints != null) {
@@ -256,6 +258,16 @@ const captureAsync = (cv) => async (name,
                     numberFollowingMatchQuality = 0;
                     counterTime = 0;
                     beginMatch = Date.now();
+                }
+
+
+                if(autoAdjustBrightnessRatio > 2){
+                    const size = new cv.Size(300, -280);
+                    const font = cv.FONT_HERSHEY_SIMPLEX;
+                    const fontScale = 2;
+                    const thickness = 10;
+                    let colorRed = new cv.Scalar(200, 200, 0, 100);
+                    cv.putText(imageOutput, "Image trop sombre", new cv.Point(Math.round(size.width + size.width * 0.1), Math.round(imageOutput.rows *0.12)), font, fontScale, colorRed, thickness, cv.LINE_AA);
                 }
 
                 if (counterTime > 5) {
@@ -363,8 +375,10 @@ const captureAsync = (cv) => async (name,
                 }
 
                 if (imageCv) {
+                   // cv.imshow(outputCanvas, imageCv)
                     imageCv.delete();
                 }
+
 
                 if (imageOutput) {
                     cv.imshow(outputCanvas, imageOutput)
