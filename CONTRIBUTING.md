@@ -1,14 +1,14 @@
 # Contributing to @axa-fr/slight-capture
 
-First, ensure you have using Python 3.8.
+First, ensure you have last version of pnpm.
 
 To get started with the repository:
 
 ```sh
 git clone https://github.com/AxaFrance/slight-capture.git
 cd slight-capture
-npm install
-npm run storybook
+pnpm install
+pnpm run storybook
 ```
 You are now ready to contribute!
 
