@@ -1,4 +1,5 @@
-﻿
+﻿import {imageResize} from "./image.js";
+
 export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8) => {
     let brightness = 0;
     const src = image;
@@ -79,4 +80,17 @@ export const findMatch = (cv) => (template, image, isDrawRectangle = true) => {
      },
      currentPoints
  };
+}
+
+export const applyTemplateMatching = (cv) => async (imageCvTemplate, imgCv) => {
+    try {
+        if (imgCv === null) return;
+        const imd = imageResize(cv)(imgCv, 100);
+        const imgCvTemplateResized = imd.image;
+        const {image: imageCv, targetPoints, currentPoints, autoAdjustBrightnessRatio} = findMatch(cv)(imageCvTemplate, imgCvTemplateResized);
+        return {imageCv, targetPoints, currentPoints, autoAdjustBrightnessRatio};
+    } catch (e) {
+        console.log(e)
+        return null;
+    }
 }

@@ -3,14 +3,6 @@ import {computeAndComputeHomographyRectangle} from "./featureMatching.js";
 import {cropContours, findContours} from "./contours.js";
 import {autoAdjustBrightness} from "./templateMatching.js";
 
-
-export const blobToBase64Async = file => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-});
-
 function drawLinesInsideBlackImage(cv, imgCvCopy, lines, ratio) {
     let blackImage = new cv.Mat(imgCvCopy.rows, imgCvCopy.cols, imgCvCopy.type(), new cv.Scalar());
     let i = 0;

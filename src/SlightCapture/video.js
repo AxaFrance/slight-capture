@@ -1,32 +1,16 @@
-﻿import {base64ToBlob, imageResize, loadImageAsync, toImageBase64} from "./image.js";
-import {findMatch} from "./templateMatching.js";
-import {blobToBase64Async, zoneAsync} from "./template.js";
+﻿import {imageResize, loadImageAsync, toImageBase64} from "./image.js";
+import {applyTemplateMatching} from "./templateMatching.js";
+import {zoneAsync} from "./template.js";
+import {blobToBase64Async, base64ToBlob} from "./blob.js";
 import {detectAndComputeSerializable} from "./featureMatching.js";
 import {loadScriptAsync} from "./script.js";
 import {cuid} from "./guid.js";
 
-
 const delay = ms => new Promise(res => setTimeout(res, ms));
-
-const transformFunction = async (imageCvTemplate, imgCv) => {
-    try {
-        const cv = window.cv;
-        if (imgCv === null) return;
-        const imd = imageResize(cv)(imgCv, 100);
-        const imgCvTemplateResized = imd.image;
-        const {image: imageCv, targetPoints, currentPoints, autoAdjustBrightnessRatio} = findMatch(cv)(imageCvTemplate, imgCvTemplateResized);
-        return {imageCv, targetPoints, currentPoints, autoAdjustBrightnessRatio};
-    } catch (e) {
-        console.log(e)
-        return null;
-    }
-}
-
 
 const sligthCaptureDatabase = {
 
 };
-
 
 const startCaptureAsync = cv =>(constraints, iVideo) => {
     return new Promise((resolve, error) => {
@@ -87,16 +71,17 @@ const loadOpenCVAsync = async (openCVScript = `https://docs.opencv.org/4.8.0/ope
 }
 
 const texts = {
-    'sc-modal-video__title' : 'Positionner 5 secondes votre document dans le cadre',
-    'sc-modal-video__invert-camera' : "Inverser caméra",
-    'sc-modal-video__message-too-dark' : "Image trop sombre",
-    'sc-modal-video__quit' : "X",
-    'sc-modal-confirm__loading' : "Traitement en cours...",
-    'sc-modal-confirm__title':"Est-ce que tous les champs sont parfaitement lisibles ?",
-    'sc-modal-confirm__button--cancel':"Non",
-    'sc-modal-confirm__button--ok':"Oui",
-    'sc-modal-confirm__title--error':"Votre document n'a pas été bien détecté, veuillez réessayer",
-    'sc-modal-confirm__button--error': "Réessayer",
+    'sc-modal__video-title' : 'Positionner 5 secondes votre document dans le cadre',
+    'sc-modal__video-invert-camera' : "Inverser caméra",
+    'sc-modal__video-message-too-dark' : "Image trop sombre",
+    'sc-modal__video-quit' : "X",
+    'sc-modal__confirm-loading' : "Traitement en cours...",
+    'sc-modal__confirm-title':"Est-ce que tous les champs sont parfaitement lisibles ?",
+    'sc-modal__confirm-button--ko':"Non",
+    'sc-modal__confirm-button--ok':"Oui",
+    'sc-modal__error-title': "Une erreur est survenue",
+    'sc-modal__error-button--restart': "Recommencer",
+    'sc-modal__error-button--quit': "Quitter",
 };
 
 export const loadVideoAsync = (name) => (cv=null) => async (file, 
@@ -117,24 +102,25 @@ export const loadVideoAsync = (name) => (cv=null) => async (file,
 
 const displayError = (iDiv, translations, enableDefaultCss, stopStreaming, name, restart, quit) => {
     stopStreaming();
+    removeAllChildren(iDiv);
     const iDivError = document.createElement('div');
     if (enableDefaultCss) {
         iDivError.style = `position:absolute;z-index:200000000;padding-top:0;left:0px;top:0px;width:100%;height:100vh;overflow:auto;background-color: white;text-align:center;`;
     }
-    iDivError.className = `sc-modal-confirm sc-modal-confirm--${name}`;
+    iDivError.className = `sc-modal__error-container sc-modal__error-container--${name}`;
     iDivError.id = cuid();
     iDiv.appendChild(iDivError);
 
     const iH1 = document.createElement('h1');
-    iH1.className = 'sc-modal-confirm__title sc-modal-confirm__title--error';
+    iH1.className = 'sc-modal__error-title';
     iH1.id = cuid();
-    const text = document.createTextNode(translations['sc-modal-confirm__title--error']);
+    const text = document.createTextNode(translations['sc-modal__error-title']);
     iH1.appendChild(text);
     iDivError.appendChild(iH1);
 
     const iDivButton = document.createElement('div');
     iDivButton.id = cuid();
-    iDivButton.className = 'sc-modal-confirm__button-container';
+    iDivButton.className = 'sc-modal__error-button-container';
     if (enableDefaultCss) {
         iDivButton.style = 'display: flex;justify-content: center;align-items: center;';
     }
@@ -145,8 +131,8 @@ const displayError = (iDiv, translations, enableDefaultCss, stopStreaming, name,
     if (enableDefaultCss) {
         iButtonRestart.style = 'padding: 0.5em;font-size: 2em;margin: 1em;';
     }
-    iButtonRestart.className = 'sc-modal-confirm__button sc-modal-confirm__button--error';
-    iButtonRestart.textContent = translations['sc-modal-confirm__button--error'];
+    iButtonRestart.className = 'sc-modal__error-button sc-modal__error-button--restart';
+    iButtonRestart.textContent = translations['sc-modal__error-button--restart'];
     iButtonRestart.onclick = restart;
     iDivButton.appendChild(iButtonRestart);
 
@@ -155,8 +141,8 @@ const displayError = (iDiv, translations, enableDefaultCss, stopStreaming, name,
     if (enableDefaultCss) {
         iButtonQuit.style = 'padding: 0.5em;font-size: 2em;margin: 1em;';
     }
-    iButtonQuit.className = 'sc-modal-confirm__button sc-modal-confirm__button--error';
-    iButtonQuit.textContent = translations['sc-modal-confirm__button--error'];
+    iButtonQuit.className = 'sc-modal__error-button sc-modal__error-button--quit';
+    iButtonQuit.textContent = translations['sc-modal__error-button--quit'];
     iButtonQuit.onclick = quit;
     iDivButton.appendChild(iButtonQuit);
 }
@@ -181,7 +167,7 @@ const captureAsync = (cv) => async (name,
         }
 
         const iDiv = document.createElement('div');
-        iDiv.className = `sc-modal-video sc-modal-video--${name}`;
+        iDiv.className = `sc-modal sc-modal--${name}`;
         if (enableDefaultCss) {
             iDiv.style = `position: fixed;z-index: 10000000;padding-top: 0;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`;
         }
@@ -189,7 +175,7 @@ const captureAsync = (cv) => async (name,
         document.getElementsByTagName('body')[0].appendChild(iDiv);
 
         const iDivContainerVideo = document.createElement('div');
-        iDivContainerVideo.className = `sc-modal-video__conatiner-video`;
+        iDivContainerVideo.className = `sc-modal__video-container`;
         if (enableDefaultCss) {
             iDivContainerVideo.style = `position: absolute;z-index: 10000000;padding-top: 0;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`;
         }
@@ -200,8 +186,8 @@ const captureAsync = (cv) => async (name,
         if (enableDefaultCss) {
             iH1.style = 'padding-left: 0.5em;padding-right: 0.5em;';
         }
-        iH1.className = 'sc-modal-video__title';
-        const text = document.createTextNode(translations['sc-modal-video__title']);
+        iH1.className = 'sc-modal__video-title';
+        const text = document.createTextNode(translations['sc-modal__video-title']);
         iH1.appendChild(text);
         iH1.id = cuid();
         iDivContainerVideo.appendChild(iH1);
@@ -218,8 +204,7 @@ const captureAsync = (cv) => async (name,
                 width: {ideal: 2600},
                 height: {ideal: 2600},
                 facingMode: {
-                    //ideal: 'face'
-                    ideal: 'environment'
+                    ideal: 'environment' // 'face'
                 },
             }
         };
@@ -231,8 +216,8 @@ const captureAsync = (cv) => async (name,
 
         const iButton = document.createElement('button');
         iButton.id = cuid();
-        iButton.textContent = translations['sc-modal-video__invert-camera']
-        iButton.className = 'sc-modal-video__invert-camera';
+        iButton.textContent = translations['sc-modal__video-invert-camera']
+        iButton.className = 'sc-modal__video-invert-camera';
         if (enableDefaultCss) {
             iButton.style = 'padding:0.5em;font-size:1em;margin:1em;position:absolute;background-color:#a8a8a842;';
         }
@@ -245,8 +230,8 @@ const captureAsync = (cv) => async (name,
 
         const iButtonQuit = document.createElement('button');
         iButtonQuit.id = cuid();
-        iButtonQuit.textContent = translations['sc-modal-video__quit']
-        iButtonQuit.className = 'sc-modal-video__quit';
+        iButtonQuit.textContent = translations['sc-modal__video-quit']
+        iButtonQuit.className = 'sc-modal__video-quit';
         
         if (enableDefaultCss) {
             iButtonQuit.style = 'padding:0.3em;font-size:1em;margin:1em;position:absolute;top:0;right:0;';
@@ -258,7 +243,7 @@ const captureAsync = (cv) => async (name,
         if (enableDefaultCss) {
             outputCanvas.style = 'display:inline;width:100%;';
         }
-        outputCanvas.className = 'sc-modal-video__video';
+        outputCanvas.className = 'sc-modal__video-video';
         iDivContainerVideo.appendChild(outputCanvas);
 
         const iVideo = document.createElement('video');
@@ -272,7 +257,7 @@ const captureAsync = (cv) => async (name,
         if (enableDefaultCss) {
             iDivContainerImage.style = `position:absolute;z-index:100000000;padding-top:0;left:0;top:0;width:100%;height:100vh;overflow:auto;background-color: white;text-align:center;`;
         }
-        iDivContainerImage.className = `sc-modal-confirm sc-modal-confirm--${name}`;
+        iDivContainerImage.className = `sc-modal__confirm-container`;
         iDivContainerImage.id = cuid();
 
         const FPS = 30;
@@ -288,146 +273,137 @@ const captureAsync = (cv) => async (name,
         }
 
         async function processVideo(videoCapture, src) {
-            try {
-                // start processing.
-                videoCapture.read(src);
-                const imageSourceClone = src.clone();
-                const {
-                    imageCv,
-                    targetPoints,
-                    currentPoints,
-                    autoAdjustBrightnessRatio
-                } = await transformFunction(templateMatchingImage, imageSourceClone);
-                const point1TargetRectangle = new cv.Point(Math.round(targetPoints.x1 * imageSourceClone.cols), Math.round(targetPoints.y1 * imageSourceClone.rows));
-                const point2TargetRectangle = new cv.Point(Math.round(targetPoints.x2 * imageSourceClone.cols), Math.round(targetPoints.y2 * imageSourceClone.rows));
+            // start processing.
+            videoCapture.read(src);
+            const imageSourceClone = src.clone();
+            const {
+                imageCv,
+                targetPoints,
+                currentPoints,
+                autoAdjustBrightnessRatio
+            } = await applyTemplateMatching(cv)(templateMatchingImage, imageSourceClone);
+            const point1TargetRectangle = new cv.Point(Math.round(targetPoints.x1 * imageSourceClone.cols), Math.round(targetPoints.y1 * imageSourceClone.rows));
+            const point2TargetRectangle = new cv.Point(Math.round(targetPoints.x2 * imageSourceClone.cols), Math.round(targetPoints.y2 * imageSourceClone.rows));
 
-                let colorBlue = new cv.Scalar(0, 200, 238, 150);
-                cv.rectangle(imageSourceClone, point1TargetRectangle, point2TargetRectangle, colorBlue, 30, cv.LINE_8, 0);
+            let colorBlue = new cv.Scalar(0, 200, 238, 150);
+            cv.rectangle(imageSourceClone, point1TargetRectangle, point2TargetRectangle, colorBlue, 30, cv.LINE_8, 0);
 
-                let counterTime;
-                if (currentPoints != null) {
-                    numberFollowingMatchQuality++;
-                    let colorRed = new cv.Scalar(255, 158, 47, 200);
-                    counterTime = Math.round((Date.now() - beginMatch) / 1000);
-                    const font = cv.FONT_HERSHEY_SIMPLEX;
-                    const fontScale = 10;
-                    const thickness = 20;
-                    // const baseline=0;
-                    // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
-                    const size = new cv.Size(300, -280);
-                    cv.putText(imageSourceClone, counterTime.toString(), new cv.Point(Math.round(imageSourceClone.cols / 2 - size.width / 2), Math.round(imageSourceClone.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
+            let counterTime;
+            if (currentPoints != null) {
+                numberFollowingMatchQuality++;
+                let colorRed = new cv.Scalar(255, 158, 47, 200);
+                counterTime = Math.round((Date.now() - beginMatch) / 1000);
+                const font = cv.FONT_HERSHEY_SIMPLEX;
+                const fontScale = imageSourceClone.cols > 2000 ? 15 : 10;
+                const thickness = 20;
+                // const baseline=0;
+                // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
+                const size = new cv.Size(300, -280);
+                cv.putText(imageSourceClone, counterTime.toString(), new cv.Point(Math.round(imageSourceClone.cols / 2 - size.width / 2), Math.round(imageSourceClone.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
 
-                    const point1 = new cv.Point(Math.round(currentPoints.x1 * imageSourceClone.cols), Math.round(currentPoints.y1 * imageSourceClone.rows));
-                    const point2 = new cv.Point(Math.round(currentPoints.x2 * imageSourceClone.cols), Math.round(currentPoints.y2 * imageSourceClone.rows));
+                const point1 = new cv.Point(Math.round(currentPoints.x1 * imageSourceClone.cols), Math.round(currentPoints.y1 * imageSourceClone.rows));
+                const point2 = new cv.Point(Math.round(currentPoints.x2 * imageSourceClone.cols), Math.round(currentPoints.y2 * imageSourceClone.rows));
 
-                    let colorGreen = new cv.Scalar(95, 225, 62, 150);
-                    cv.rectangle(imageSourceClone, point1, point2, colorGreen, 20, cv.LINE_8, 0);
-                } else {
-                    numberFollowingMatchQuality = 0;
-                    counterTime = 0;
-                    beginMatch = Date.now();
-                }
-
-                if(autoAdjustBrightnessRatio > 1.9){
-                    const size = new cv.Size(300, -280);
-                    const font = cv.FONT_HERSHEY_SIMPLEX;
-                    const fontScale = 4;
-                    const thickness = 10;
-                    let colorRed = new cv.Scalar(200, 200, 0, 100);
-                    cv.putText(imageSourceClone, translations['sc-modal-video__message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorRed, thickness, cv.LINE_AA);
-                }
-
-                if (counterTime > 5) {
-                    numberFollowingMatchQuality = 0;
-                    const finalShot = src.clone();
-                    stopStreaming();
-                    
-                    const iHLoading = document.createElement('p');
-                    iHLoading.id = cuid();
-                    const text = document.createTextNode(translations['sc-modal-confirm__loading']);
-                    iHLoading.className = 'sc-modal-confirm__loading';
-                    iHLoading.appendChild(text);
-                    iDivContainerImage.appendChild(iHLoading);
-                    removeAllChildren(iDiv);
-                    iDiv.appendChild(iDivContainerImage);
-
-                    delay(50).then(() => {
-                        zoneAsync(cv)(finalShot, featureMatchingDetectAndComputeSerializable, 30, targetPoints).then(result => {
-                            iDivContainerImage.removeChild(iHLoading);
-                            finalShot.delete();
-                            
-                            const iH1 = document.createElement('h1');
-                            iH1.className = 'sc-modal-confirm__title';
-                            iH1.id = cuid();
-                            const text = document.createTextNode(translations['sc-modal-confirm__title']);
-                            iH1.appendChild(text);
-                            iDivContainerImage.appendChild(iH1);
-                            const iImage = document.createElement('img');
-                            iImage.id = cuid();
-                            iImage.className = 'sc-modal-confirm__image';
-                            if (enableDefaultCss) {
-                                iImage.style = "max-width: 800px;width: 100%;";
-                            }
-                            iImage.src = toImageBase64(cv)(result.finalImage);
-                            iDivContainerImage.appendChild(iImage);
-
-
-                            const iDivButton = document.createElement('div');
-                            iDivButton.id = cuid();
-                            iDivButton.className = 'sc-modal-confirm__button-container';
-                            if (enableDefaultCss) {
-                                iDivButton.style = 'display: flex;justify-content: center;align-items: center;';
-                            }
-                            iDivContainerImage.appendChild(iDivButton);
-
-                            const iButtonNo = document.createElement('button');
-                            iButtonNo.id = cuid();
-                            if (enableDefaultCss) {
-                                iButtonNo.style = 'padding: 0.5em;font-size: 2em;margin: 1em;';
-                            }
-                            iButtonNo.className = 'sc-modal-confirm__button sc-modal-confirm__button--cancel';
-                            iButtonNo.textContent = translations['sc-modal-confirm__button--cancel'];
-                            iButtonNo.onclick = () => {
-                                result.finalImage.delete();
-                                restartAsync();
-                            }
-                            iDivButton.appendChild(iButtonNo);
-
-                            const iButtonYes = document.createElement('button');
-                            iButtonYes.id = cuid();
-                            if (enableDefaultCss) {
-                                iButtonYes.style = 'padding: 0.5em;font-size: 2em;margin: 1em;';
-                            }
-                            iButtonYes.className = 'sc-modal-confirm__button sc-modal-confirm__button--ok';
-                            iButtonYes.textContent = translations['sc-modal-confirm__button--ok'];
-                            iButtonYes.onclick = async () => {
-                                const imageBase64 = toImageBase64(cv)(result.finalImage);
-                                const blob = base64ToBlob(imageBase64);
-                                result.finalImage.delete();
-                                document.getElementsByTagName('body')[0].removeChild(iDiv);
-                                if(onCaptureCallback){
-                                    onCaptureCallback(blob);
-                                }
-                            }
-                            iDivButton.appendChild(iButtonYes);
-                        });
-                    })
-                }
-
-                if (imageCv) {
-                    imageCv.delete();
-                }
-
-                if (imageSourceClone) {
-                    cv.imshow(outputCanvas, imageSourceClone)
-                    imageSourceClone.delete();
-                }
-                return src;
-            } catch (err) {
-                console.error(err);
-                error(err);
-                return null
+                let colorGreen = new cv.Scalar(95, 225, 62, 150);
+                cv.rectangle(imageSourceClone, point1, point2, colorGreen, 20, cv.LINE_8, 0);
+            } else {
+                numberFollowingMatchQuality = 0;
+                counterTime = 0;
+                beginMatch = Date.now();
             }
+
+            if(autoAdjustBrightnessRatio > 1.9){
+                const size = new cv.Size(300, -280);
+                const font = cv.FONT_HERSHEY_SIMPLEX;
+                const fontScale = imageSourceClone.cols > 2000 ? 10 : 4;
+                const thickness = 10;
+                let colorRed = new cv.Scalar(200, 200, 0, 100);
+                cv.putText(imageSourceClone, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorRed, thickness, cv.LINE_AA);
+            }
+
+            if (counterTime > 5) {
+                numberFollowingMatchQuality = 0;
+                const finalShot = src.clone();
+                stopStreaming();
+                
+                const iHLoading = document.createElement('p');
+                iHLoading.id = cuid();
+                const text = document.createTextNode(translations['sc-modal__confirm-loading']);
+                iHLoading.className = 'sc-modal__confirm-loading';
+                iHLoading.appendChild(text);
+                iDivContainerImage.appendChild(iHLoading);
+                removeAllChildren(iDiv);
+                iDiv.appendChild(iDivContainerImage);
+
+                await delay(50);
+                const zoneResult = await zoneAsync(cv)(finalShot, featureMatchingDetectAndComputeSerializable, 30, targetPoints);
+                iDivContainerImage.removeChild(iHLoading);
+                finalShot.delete();
+                
+                const iH1 = document.createElement('h1');
+                iH1.className = 'sc-modal__confirm-title';
+                iH1.id = cuid();
+                const textConfirmTitle = document.createTextNode(translations['sc-modal__confirm-title']);
+                iH1.appendChild(textConfirmTitle);
+                iDivContainerImage.appendChild(iH1);
+                const iImage = document.createElement('img');
+                iImage.id = cuid();
+                iImage.className = 'sc-modal__confirm-image';
+                if (enableDefaultCss) {
+                    iImage.style = "max-width: 800px;width: 100%;";
+                }
+                iImage.src = toImageBase64(cv)(zoneResult.finalImage);
+                iDivContainerImage.appendChild(iImage);
+                
+                const iDivButton = document.createElement('div');
+                iDivButton.id = cuid();
+                iDivButton.className = 'sc-modal__confirm-button-container';
+                if (enableDefaultCss) {
+                    iDivButton.style = 'display: flex;justify-content: center;align-items: center;';
+                }
+                iDivContainerImage.appendChild(iDivButton);
+
+                const iButtonNo = document.createElement('button');
+                iButtonNo.id = cuid();
+                if (enableDefaultCss) {
+                    iButtonNo.style = 'padding: 0.5em;font-size: 2em;margin: 1em;';
+                }
+                iButtonNo.className = 'sc-modal__confirm-button sc-modal__confirm-button--ko';
+                iButtonNo.textContent = translations['sc-modal__confirm-button--ko'];
+                iButtonNo.onclick = () => {
+                    zoneResult.finalImage.delete();
+                    restartAsync();
+                }
+                iDivButton.appendChild(iButtonNo);
+
+                const iButtonYes = document.createElement('button');
+                iButtonYes.id = cuid();
+                if (enableDefaultCss) {
+                    iButtonYes.style = 'padding: 0.5em;font-size: 2em;margin: 1em;';
+                }
+                iButtonYes.className = 'sc-modal__confirm-button sc-modal__confirm-button--ok';
+                iButtonYes.textContent = translations['sc-modal__confirm-button--ok'];
+                iButtonYes.onclick = async () => {
+                    const imageBase64 = toImageBase64(cv)(zoneResult.finalImage);
+                    const blob = base64ToBlob(imageBase64);
+                    zoneResult.finalImage.delete();
+                    document.getElementsByTagName('body')[0].removeChild(iDiv);
+                    if(onCaptureCallback){
+                        onCaptureCallback(blob);
+                    }
+                }
+                iDivButton.appendChild(iButtonYes);
+            }
+
+            if (imageCv) {
+                imageCv.delete();
+            }
+
+            if (imageSourceClone) {
+                cv.imshow(outputCanvas, imageSourceClone)
+                imageSourceClone.delete();
+            }
+            return src;
         }
 
         async function* startStreaming() {
@@ -452,6 +428,7 @@ const captureAsync = (cv) => async (name,
                 } 
             }
             catch (err) {
+                console.error(err);
                 displayError(iDiv, translations, enableDefaultCss, stopStreaming, name, restartAsync, quit);
             }
         }

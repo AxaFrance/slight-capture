@@ -78,17 +78,19 @@ Texts can be override by passing a translation object to the initAsync method.
 
 ```javascript
 const translations = {
-    'sc-modal-video__title' : 'Positionner 5 secondes votre document dans le cadre',
-    'sc-modal-video__invert-camera' : "Inverser caméra",
-    'sc-modal-video__message-too-dark' : "Image trop sombre",
-    'sc-modal-video__quit' : "X",
-    'sc-modal-confirm__loading' : "Traitement en cours...",
-    'sc-modal-confirm__title':"Es-ce que tous les champs sont parfaitement lisibles ?",
-    'sc-modal-confirm__button--cancel':"Non",
-    'sc-modal-confirm__button--ok':"Oui",
-    'sc-modal-confirm__title--error':"Votre document n'a pas été bien détecté, veuillez réessayer",
-    'sc-modal-confirm__button--error': "Réessayer",
-}
+    'sc-modal__video-title' : 'Positionner 5 secondes votre document dans le cadre',
+    'sc-modal__video-invert-camera' : "Inverser caméra",
+    'sc-modal__video-message-too-dark' : "Image trop sombre",
+    'sc-modal__video-quit' : "X",
+    'sc-modal__confirm-loading' : "Traitement en cours...",
+    'sc-modal__confirm-title':"Est-ce que tous les champs sont parfaitement lisibles ?",
+    'sc-modal__confirm-button--ko':"Non",
+    'sc-modal__confirm-button--ok':"Oui",
+    'sc-modal__error-title': "Une erreur est survenue",
+    'sc-modal__error-button--restart': "Recommencer",
+    'sc-modal__error-button--quit': "Quitter",
+};
+
 
 const onChange = async event => {
     // ...
@@ -107,7 +109,7 @@ css use BEM (Block Element Modifier) convention.
    const video = await sligthCapture.loadVideoAsync()(file: file, onCaptureCallback: onCapture, enableDefaultCss: false);
    disable default inline css by passing enableDefaultCss: false to take the control of the css 
 */
-.sc-modal-video {
+.sc-modal {
   position: fixed;
   z-index: 10000000;
   padding-top: 0;
@@ -120,12 +122,12 @@ css use BEM (Block Element Modifier) convention.
   text-align:center;
 }
 
-.sc-modal-video__title {
+.sc-modal__video-title {
   padding-left: 0.5em;
   padding-right: 0.5em;
 }
 
-.sc-modal-video__invert-camera {
+.sc-modal__video-invert-camera {
   padding: 0.5em;
   font-size: 1em;
   margin: 1em;
@@ -133,7 +135,7 @@ css use BEM (Block Element Modifier) convention.
   background-color:#a8a8a88f;
 }
 
-.sc-modal-video__quit {
+.sc-modal__video-quit {
   padding: 0.3em;
   font-size: 1em;
   margin: 1em;
@@ -142,13 +144,13 @@ css use BEM (Block Element Modifier) convention.
   right: 0;
 }
 
-.sc-modal-video__video {
+.sc-modal__video-video {
   display: inline;
   width: 100%;
 }
 
-.sc-modal-confirm {
-  position: fixed;
+.sc-modal__confirm-container {
+  position: absolute;
   z-index: 100000000;
   padding-top: 0;
   left: 0;
@@ -160,36 +162,62 @@ css use BEM (Block Element Modifier) convention.
   text-align:center;
 }
 
-.sc-modal-confirm__loading {
+.sc-modal__confirm-loading {
   
 }
 
-.sc-modal-confirm__title {
+.sc-modal__confirm-title {
   
 }
 
-.sc-modal-confirm__image {
+.sc-modal__confirm-image {
   max-width: 800px;
   width: 100%;
 }
 
-.sc-modal-confirm__button-container {
+.sc-modal__confirm-button-container {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.sc-modal-confirm__button {
+.sc-modal__confirm-button {
   padding: 0.5em;
   font-size: 2em;
   margin: 1em;
 }
 
-.sc-modal-confirm__title-error{
-  padding: 0.5em;
-  font-size: 2em;
-  margin: 1em;
+
+
+.sc-modal__error-container {
+    position: absolute;
+    z-index: 100000000;
+    padding-top: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+    background-color: white;
+    text-align:center;
 }
+
+.sc-modal__error-title {
+
+}
+
+.sc-modal__error-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sc-modal__error-button {
+    padding: 0.5em;
+    font-size: 2em;
+    margin: 1em;
+}
+
 
 ```
 
