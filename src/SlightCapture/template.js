@@ -73,7 +73,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         imgCv= sceneUrl;
     }
     let imgCvClone = imgCv.clone();
-    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(imgCvClone, 0.5);
+    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(imgCvClone, 0.4);
     imgCvClone = autoAdjustBrightnessResult.image;
     const marge = Math.round((imgDescription.img.rows+ imgDescription.img.cols) /2 * 0.1);
     

@@ -1,6 +1,6 @@
 ﻿import {imageResize} from "./image.js";
 
-export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8) => {
+export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.7) => {
     let brightness = 0;
     const src = image;
     if (src.isContinuous()) {
