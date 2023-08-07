@@ -6,6 +6,18 @@ import {sligthCaptureFactory} from "./SlightCapture/video.js";
 
 const sligthCapture = sligthCaptureFactory();
 
+
+const loadTemplateAsync = async (url, filename) => {
+    return new Promise(async (resolve, reject) => {
+        const files = await fetch(url);
+        const blob = await files.blob();
+        blob.lastModifiedDate = new Date();
+        blob.name = filename;
+        blob.filename = filename;
+        resolve(blob);
+    });
+};
+
 export const SlightCaptureVideo = () => {
     
     const [state, setState] = useState({
@@ -14,7 +26,7 @@ export const SlightCaptureVideo = () => {
     });
 
     useEffect(() => {
-        sligthCapture.initAsync();
+        sligthCapture.initAsync("opencv.js");
     });
 
     const onCapture = async (file) => {
@@ -31,6 +43,16 @@ export const SlightCaptureVideo = () => {
         setState({...state, isLoading: false});
         video.start();
     }
+    
+    const onClick = async (event, url) => {
+        event.preventDefault();
+        const file = await loadTemplateAsync(url, 'template.jpg');
+        if (!file) return;
+        setState({...state, isLoading: true});
+        const video = await sligthCapture.loadVideoAsync()(file, onCapture);
+        setState({...state, isLoading: false});
+        video.start();
+    }
 
     if (state.isLoading) {
         return (<p>Loading</p>);
@@ -39,15 +61,30 @@ export const SlightCaptureVideo = () => {
     return (
         <form>
             <h1>Slight Capture</h1>
-            <a href={'https://github.com/AxaFrance/slight-capture'}>Slight Capture Github</a>
-            <div>
-            <input type="file" onChange={onChange} multiple={true}/>
-            </div>
             <div>
                 {state.url &&
                     <img style={{"maxWidth": "800px"}} src={state.url} alt="image found"/>
                 }
             </div>
+            <a href={'https://github.com/AxaFrance/slight-capture'}>Slight Capture Github</a>
+
+            <div>
+                <button onClick={(e) => onClick(e, "./template_cni_recto.jpg") } style={{"fontSize":"2em", margin: "1em"}}>French ID card recto</button>
+            </div>
+            <div>
+                <button onClick={(e) => onClick(e, "./template_cni_verso.jpg") } style={{"fontSize":"2em", margin: "1em"}}>French ID card verso</button>
+            </div>
+            <div>
+                <button onClick={(e) => onClick(e, "./template_new_cni_recto.jpg") } style={{"fontSize":"2em", margin: "1em"}}>New french ID card recto</button>
+            </div>
+            <div>
+                <button onClick={(e) => onClick(e, "./template_new_cni_verso.jpg") } style={{"fontSize":"2em", margin: "1em"}}>New french ID card verso</button>
+            </div>
+            <div>
+                <label style={{"fontSize":"2em", margin: "1em"}}>Your own template :</label>
+                <input type="file" onChange={onChange} multiple={true} style={{"fontSize":"2em", margin: "1em"}}/>
+            </div>
+
         </form>
     )
 
