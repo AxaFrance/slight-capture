@@ -22,7 +22,6 @@ jobs:
         uses: Legorooj/skip-ci@main
 
   build:
-    environment: react-oidc
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     steps:
