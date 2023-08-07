@@ -22,7 +22,6 @@ jobs:
         uses: Legorooj/skip-ci@main
 
   build:
-    environment: react-oidc
     runs-on: ubuntu-latest
     if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     steps:
@@ -82,6 +81,24 @@ jobs:
           if [[ '${{ steps.which_tag.outputs.tag }}' = 'beta' ]]; then
             echo "new_version=$version-beta.${{ github.run_number }}" >> $GITHUB_OUTPUT
           fi
+          
+      - name: Build OpenCV
+        id: build_open_cv
+        if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
+        run: |
+          mkdir opencv_build
+          cd opencv_build
+          # https://docs.opencv.org/3.4/d4/da1/tutorial_js_setup.html
+          git clone https://github.com/opencv/opencv.git
+          cd opencv
+          sed -i "s/white_list = makeWhiteList(\[core, imgproc, objdetect, video, dnn, features2d, photo, calib3d\])/white_list = makeWhiteList([core, imgproc, features2d])/g" ./platforms/js/opencv_js.config.py
+          docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk:2.0.10 emcmake python3 ./platforms/js/build_js.py build_js
+
+      - name: Copy OpenCV
+        id: copy_open_cv
+        if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
+        run: |
+          cp -f ./opencv_build/opencv/build_js/bin/opencv.js ./public/
 
       - uses: actions/setup-node@v2
         with:
@@ -98,14 +115,14 @@ jobs:
         run: |
           git config --global user.email "github-action@bot.com"
           git config --global user.name "GitHub"
-      
-      - name: npm version ${{ steps.tag.outputs.new_version }}
-        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
-        run: npm version ${{ steps.tag.outputs.new_version }}
-        working-directory: .
-
+          
       - name: pnpm ci
         run: pnpm i --frozen-lockfile
+        working-directory: .
+      
+      - name: pnpm version ${{ steps.tag.outputs.new_version }}
+        if: (github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release') || steps.which_tag.outputs.tag == 'alpha' || steps.which_tag.outputs.tag == 'beta'
+        run: pnpm version ${{ steps.tag.outputs.new_version }}
         working-directory: .
 
       - name: Commit updates package.json

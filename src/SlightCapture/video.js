@@ -1,6 +1,6 @@
 ﻿import {imageResize, loadImageAsync, toImageBase64} from "./image.js";
 import {applyTemplateMatching} from "./templateMatching.js";
-import {zoneAsync} from "./template.js";
+import {zoneAsync} from "./zoning.js";
 import {blobToBase64Async, base64ToBlob} from "./blob.js";
 import {detectAndComputeSerializable} from "./featureMatching.js";
 import {loadScriptAsync} from "./script.js";
@@ -67,7 +67,8 @@ const initTemplateAsync = (cv) => async (file) => {
 let openCVPromise = null;
 
 const loadOpenCVAsync = async (openCVScript = `https://docs.opencv.org/4.8.0/opencv.js` ) => {
-    return await loadScriptAsync(openCVScript);
+    openCVPromise = loadScriptAsync(openCVScript);
+    return await openCVPromise;
 }
 
 const texts = {
@@ -89,11 +90,16 @@ export const loadVideoAsync = (name) => (cv=null) => async (file,
                                                             enableDefaultCss = true,
                                                             translations = texts) => {
     if(!openCVPromise) {
-        openCVPromise = loadOpenCVAsync();
+        openCVPromise = await loadOpenCVAsync();
     }
     await openCVPromise;
     if(!cv) {
-        cv = window.cv;
+        if(window.cv instanceof Promise){
+            cv = await window.cv;    
+        } else {
+            cv = window.cv;
+        }
+        
     }
     const {featureMatchingDetectAndComputeSerializable, templateMatchingImage} = await initTemplateAsync(cv)(file);
   
@@ -315,7 +321,7 @@ const captureAsync = (cv) => async (name,
             if(autoAdjustBrightnessRatio > 1.9){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
-                const fontScale = imageSourceClone.cols > 2000 ? 10 : 4;
+                const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
                 const thickness = 10;
                 let colorRed = new cv.Scalar(200, 200, 0, 100);
                 cv.putText(imageSourceClone, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorRed, thickness, cv.LINE_AA);
