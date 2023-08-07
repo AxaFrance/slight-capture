@@ -67,26 +67,30 @@ export const SlightCaptureVideo = () => {
     return (
         <form>
             <h1>Slight Capture</h1>
-            <a href={'https://github.com/AxaFrance/slight-capture'}>Slight Capture Github</a>
-      
-                <div>
-            <input type="file" onChange={onChange} multiple={true} style={{"fontSize":"2em", margin: "1em"}}/>
-                </div>
-                <div>
-                    
-                    <button onClick={(e) => onClick(e, "./template_cni_recto.jpg") } style={{"fontSize":"2em", margin: "1em"}}>Carte identité recto</button>
-                    </div>
-                        <div>
-                    <button onClick={(e) => onClick(e, "./template_cni_verso.jpg") } style={{"fontSize":"2em", margin: "1em"}}>Carte identité verso</button>
-            </div>
-            <div>
-                <button onClick={(e) => onClick(e, "./template_new_cni_recto.jpg") } style={{"fontSize":"2em", margin: "1em"}}>Nouvelle Carte identité recto</button>
-            </div>
             <div>
                 {state.url &&
                     <img style={{"maxWidth": "800px"}} src={state.url} alt="image found"/>
                 }
             </div>
+            <a href={'https://github.com/AxaFrance/slight-capture'}>Slight Capture Github</a>
+
+            <div>
+                <button onClick={(e) => onClick(e, "./template_cni_recto.jpg") } style={{"fontSize":"2em", margin: "1em"}}>French ID card recto</button>
+            </div>
+            <div>
+                <button onClick={(e) => onClick(e, "./template_cni_verso.jpg") } style={{"fontSize":"2em", margin: "1em"}}>French ID card verso</button>
+            </div>
+            <div>
+                <button onClick={(e) => onClick(e, "./template_new_cni_recto.jpg") } style={{"fontSize":"2em", margin: "1em"}}>New french ID card recto</button>
+            </div>
+            <div>
+                <button onClick={(e) => onClick(e, "./template_new_cni_verso.jpg") } style={{"fontSize":"2em", margin: "1em"}}>New french ID card verso</button>
+            </div>
+            <div>
+                <label style={{"fontSize":"2em", margin: "1em"}}>Your own template :</label>
+                <input type="file" onChange={onChange} multiple={true} style={{"fontSize":"2em", margin: "1em"}}/>
+            </div>
+
         </form>
     )
 
