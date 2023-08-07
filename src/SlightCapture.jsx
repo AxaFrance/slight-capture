@@ -15,13 +15,7 @@ const loadTemplateAsync = async (url, filename) => {
         blob.name = filename;
         blob.filename = filename;
         resolve(blob);
-       /* const reader = new FileReader();
-        reader.onloadend = () => {
-            resolve(blob);
-        };
-        reader.readAsDataURL(blob);*/
     });
-   
 };
 
 export const SlightCaptureVideo = () => {

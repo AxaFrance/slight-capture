@@ -1,6 +1,6 @@
 ﻿import {imageResize} from "./image.js";
 
-export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.85, minimumRatio = 0.5) => {
+export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.85, minimumRatio = 0, maximumRatio = 100) => {
     let brightness = 0;
     const src = image;
     if (src.isContinuous()) {
@@ -14,10 +14,9 @@ export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.85, mini
         }
     }
     const ratio = ((brightness /3) / (255 * src.cols * src.rows)) / minimumBrightness;
-    if(ratio > minimumRatio) {
+    if(ratio < maximumRatio && ratio > minimumRatio) {
         let alpha = 1 / ratio; // # Brightness control
         let beta = 0;  // # Contrast control
-        console.log(`Brightness alpha: ${alpha}`);
         cv.convertScaleAbs(image, image, alpha, beta)
         return {image, ratio: alpha};
     }
