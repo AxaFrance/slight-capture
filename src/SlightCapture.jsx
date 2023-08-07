@@ -6,6 +6,24 @@ import {sligthCaptureFactory} from "./SlightCapture/video.js";
 
 const sligthCapture = sligthCaptureFactory();
 
+
+const loadTemplateAsync = async (url, filename) => {
+    return new Promise(async (resolve, reject) => {
+        const files = await fetch(url);
+        const blob = await files.blob();
+        blob.lastModifiedDate = new Date();
+        blob.name = filename;
+        blob.filename = filename;
+        resolve(blob);
+       /* const reader = new FileReader();
+        reader.onloadend = () => {
+            resolve(blob);
+        };
+        reader.readAsDataURL(blob);*/
+    });
+   
+};
+
 export const SlightCaptureVideo = () => {
     
     const [state, setState] = useState({
@@ -31,6 +49,16 @@ export const SlightCaptureVideo = () => {
         setState({...state, isLoading: false});
         video.start();
     }
+    
+    const onClick = async (event, url) => {
+        event.preventDefault();
+        const file = await loadTemplateAsync(url, 'template.jpg');
+        if (!file) return;
+        setState({...state, isLoading: true});
+        const video = await sligthCapture.loadVideoAsync()(file, onCapture);
+        setState({...state, isLoading: false});
+        video.start();
+    }
 
     if (state.isLoading) {
         return (<p>Loading</p>);
@@ -40,8 +68,19 @@ export const SlightCaptureVideo = () => {
         <form>
             <h1>Slight Capture</h1>
             <a href={'https://github.com/AxaFrance/slight-capture'}>Slight Capture Github</a>
+      
+                <div>
+            <input type="file" onChange={onChange} multiple={true} style={{"fontSize":"2em", margin: "1em"}}/>
+                </div>
+                <div>
+                    
+                    <button onClick={(e) => onClick(e, "./template_cni_recto.jpg") } style={{"fontSize":"2em", margin: "1em"}}>Carte identité recto</button>
+                    </div>
+                        <div>
+                    <button onClick={(e) => onClick(e, "./template_cni_verso.jpg") } style={{"fontSize":"2em", margin: "1em"}}>Carte identité verso</button>
+            </div>
             <div>
-            <input type="file" onChange={onChange} multiple={true}/>
+                <button onClick={(e) => onClick(e, "./template_new_cni_recto.jpg") } style={{"fontSize":"2em", margin: "1em"}}>Nouvelle Carte identité recto</button>
             </div>
             <div>
                 {state.url &&

@@ -315,7 +315,7 @@ const captureAsync = (cv) => async (name,
             if(autoAdjustBrightnessRatio > 1.9){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
-                const fontScale = imageSourceClone.cols > 2000 ? 10 : 4;
+                const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
                 const thickness = 10;
                 let colorRed = new cv.Scalar(200, 200, 0, 100);
                 cv.putText(imageSourceClone, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorRed, thickness, cv.LINE_AA);

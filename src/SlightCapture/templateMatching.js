@@ -1,6 +1,6 @@
 ﻿import {imageResize} from "./image.js";
 
-export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.7) => {
+export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.66) => {
     let brightness = 0;
     const src = image;
     if (src.isContinuous()) {
@@ -14,7 +14,7 @@ export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.7) => {
         }
     }
     const ratio = ((brightness /3) / (255 * src.cols * src.rows)) / minimumBrightness;
-    if(ratio < 1 && ratio > 0) {
+    if(ratio > 0) {
         let alpha = 1 / ratio; // # Brightness control 
         let beta = 10;  // # Contrast control
         console.log(`Brightness alpha: ${alpha}`);
