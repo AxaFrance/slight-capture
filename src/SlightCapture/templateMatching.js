@@ -3,17 +3,19 @@
 export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8, minimumRatio = 0, maximumRatio = 100) => {
     let brightness = 0;
     const src = image;
+    let cols = src.cols;
     if (src.isContinuous()) {
+        let channels = src.channels();
         for (let row = 0; row < src.rows; row++) {
-            for (let col = 0; col < src.cols; col++) {
-                let R = src.data[row * src.cols * src.channels() + col * src.channels()];
-                let G = src.data[row * src.cols * src.channels() + col * src.channels() + 1];
-                let B = src.data[row * src.cols * src.channels() + col * src.channels() + 2];
+            for (let col = 0; col < cols; col++) {
+                let R = src.data[row * cols * channels + col * channels];
+                let G = src.data[row * cols * channels + col * channels + 1];
+                let B = src.data[row * cols * channels + col * channels + 2];
                 brightness +=  R +  G + B;
             }
         }
     }
-    const ratio = ((brightness /3) / (255 * src.cols * src.rows)) / minimumBrightness;
+    const ratio = ((brightness /3) / (255 * cols * src.rows)) / minimumBrightness;
     if(ratio < maximumRatio && ratio > minimumRatio) {
         let alpha = 1 / ratio; // # Brightness control
         let beta = 0;  // # Contrast control
