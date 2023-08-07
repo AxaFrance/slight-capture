@@ -67,14 +67,14 @@ function extractCroppedContour(cv, imgCvCopy, result, ratio) {
 
 export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeThreshold = 6, targetPoints) => {
     let imgCv = null;
-    if(sceneUrl instanceof String){
+    if(sceneUrl instanceof String) {
         imgCv = await loadImageAsync(cv)(sceneUrl);
-    } else{
+    } else {
         imgCv= sceneUrl;
     }
     let imgCvClone = imgCv.clone();
-    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(imgCvClone, 0.4);
-    imgCvClone = autoAdjustBrightnessResult.image;
+    //const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(imgCvClone, 0.4);
+    //imgCvClone = autoAdjustBrightnessResult.image;
     const marge = Math.round((imgDescription.img.rows+ imgDescription.img.cols) /2 * 0.1);
     
     const point1 = new cv.Point(Math.max(0, Math.round(targetPoints.x1 * imgCvClone.cols) - marge), Math.max(0, Math.round(targetPoints.y1 * imgCvClone.rows) - marge));
