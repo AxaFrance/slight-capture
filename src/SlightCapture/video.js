@@ -1,6 +1,6 @@
 ﻿import {imageResize, loadImageAsync, toImageBase64} from "./image.js";
 import {applyTemplateMatching} from "./templateMatching.js";
-import {zoneAsync} from "./template.js";
+import {zoneAsync} from "./zoning.js";
 import {blobToBase64Async, base64ToBlob} from "./blob.js";
 import {detectAndComputeSerializable} from "./featureMatching.js";
 import {loadScriptAsync} from "./script.js";
@@ -396,11 +396,12 @@ const captureAsync = (cv) => async (name,
             }
 
             if (imageCv) {
+                cv.imshow(outputCanvas, imageCv)
                 imageCv.delete();
             }
 
             if (imageSourceClone) {
-                cv.imshow(outputCanvas, imageSourceClone)
+               //cv.imshow(outputCanvas, imageSourceClone)
                 imageSourceClone.delete();
             }
             return src;
