@@ -38,7 +38,7 @@ jobs:
           git clone https://github.com/opencv/opencv.git
           cd opencv 
           docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk:2.0.10 emcmake python3 ./platforms/js/build_js.py build_js
-          cd opencv
+          
 
       - name: Determine Alpha, Beta or Release
         id: which_tag
