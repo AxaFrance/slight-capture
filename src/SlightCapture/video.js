@@ -67,7 +67,8 @@ const initTemplateAsync = (cv) => async (file) => {
 let openCVPromise = null;
 
 const loadOpenCVAsync = async (openCVScript = `https://docs.opencv.org/4.8.0/opencv.js` ) => {
-    return await loadScriptAsync(openCVScript);
+    openCVPromise = loadScriptAsync(openCVScript);
+    return await openCVPromise;
 }
 
 const texts = {
@@ -89,11 +90,16 @@ export const loadVideoAsync = (name) => (cv=null) => async (file,
                                                             enableDefaultCss = true,
                                                             translations = texts) => {
     if(!openCVPromise) {
-        openCVPromise = loadOpenCVAsync();
+        openCVPromise = await loadOpenCVAsync();
     }
     await openCVPromise;
     if(!cv) {
-        cv = window.cv;
+        if(window.cv instanceof Promise){
+            cv = await window.cv;    
+        } else {
+            cv = window.cv;
+        }
+        
     }
     const {featureMatchingDetectAndComputeSerializable, templateMatchingImage} = await initTemplateAsync(cv)(file);
   

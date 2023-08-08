@@ -28,6 +28,15 @@ jobs:
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.GIT_TOKEN }}
+          
+      - name: Determine Alpha, Beta or Release
+        id: build_open_cv
+        run: |
+          mkdir build
+          cd build
+          git clone https://github.com/opencv/opencv.git
+          docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk emcmake python3 ./platforms/js/build_js.py build_js
+          cd opencv
 
       - name: Determine Alpha, Beta or Release
         id: which_tag
