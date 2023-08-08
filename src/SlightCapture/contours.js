@@ -53,10 +53,11 @@ export const cropContours = (cv) => (img, filteredContours) => {
         let vertices = cv.RotatedRect.points(rotatedRect);
 
         // Find the corners
-        let corner1 = new cv.Point(vertices[0].x - 10, vertices[0].y - 10);
-        let corner2 = new cv.Point(vertices[1].x - 10, vertices[1].y - 10);
-        let corner3 = new cv.Point(vertices[2].x - 10, vertices[2].y - 10);
-        let corner4 = new cv.Point(vertices[3].x - 10, vertices[3].y - 10);
+        const margin = 10;
+        let corner1 = new cv.Point(vertices[0].x - margin, vertices[0].y - margin);
+        let corner2 = new cv.Point(vertices[1].x - margin, vertices[1].y - margin);
+        let corner3 = new cv.Point(vertices[2].x - margin, vertices[2].y - margin);
+        let corner4 = new cv.Point(vertices[3].x - margin, vertices[3].y - margin);
 
         // Order the corners
         let cornerArray = [{corner: corner1}, {corner: corner2}, {corner: corner3}, {corner: corner4}];
