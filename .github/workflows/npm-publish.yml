@@ -36,6 +36,7 @@ jobs:
           cd build
           # https://docs.opencv.org/3.4/d4/da1/tutorial_js_setup.html
           git clone https://github.com/opencv/opencv.git
+          cd opencv 
           docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk:2.0.10 emcmake python3 ./platforms/js/build_js.py build_js
           cd opencv
 
