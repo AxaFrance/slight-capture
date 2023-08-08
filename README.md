@@ -19,7 +19,20 @@ Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 
 ```bash
 npm install @axa-fr/slight-capture --save
+
+# To install in your public folder a light version of opencv.js
+node ./node_modules/@axa-fr/react-oidc/bin/copy-opencv.mjs public
 ```
+
+
+WARNING : To keep opencv.js up to date. You may setup a postinstall script in your package.json file to update it at each npm install. For example :
+```sh
+  "scripts": {
+    ...
+    "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-opencv.mjs public"
+  },
+```
+
 
 The sample bellow use react, but the library work with vanilla JS with any framework of your choice.
 

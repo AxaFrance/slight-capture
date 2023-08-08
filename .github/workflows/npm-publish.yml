@@ -29,16 +29,21 @@ jobs:
         with:
           token: ${{ secrets.GIT_TOKEN }}
           
-      - name: Determine Alpha, Beta or Release
+      - name: Build OpenCV
         id: build_open_cv
         run: |
           mkdir build
           cd build
           # https://docs.opencv.org/3.4/d4/da1/tutorial_js_setup.html
           git clone https://github.com/opencv/opencv.git
-          cd opencv 
+          cd opencv
+          sed -i "s/white_list = makeWhiteList(\[core, imgproc, objdetect, video, dnn, features2d, photo, calib3d\])/white_list = makeWhiteList([core, imgproc, video, features2d])/g" ./platforms/js/opencv_js.config.py
           docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk:2.0.10 emcmake python3 ./platforms/js/build_js.py build_js
           
+      - name: Copy OpenCV
+        id: copy_open_cv
+        run: |
+          cp -f ./build/opencv/build_js/bin/opencv.js ./public/
 
       - name: Determine Alpha, Beta or Release
         id: which_tag
