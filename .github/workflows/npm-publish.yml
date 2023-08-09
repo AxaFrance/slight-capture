@@ -94,7 +94,7 @@ jobs:
 
       - name: pnpm ci
         run: pnpm i --frozen-lockfile
-        working-directory: .
+        working-directory: . 
         
       - name: Git Configuration
         id: gitconfig
