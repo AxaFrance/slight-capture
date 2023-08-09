@@ -31,6 +31,7 @@ jobs:
           
       - name: Build OpenCV
         id: build_open_cv
+        if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         run: |
           mkdir build
           cd build
@@ -42,6 +43,7 @@ jobs:
           
       - name: Copy OpenCV
         id: copy_open_cv
+        if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         run: |
           cp -f ./build/opencv/build_js/bin/opencv.js ./public/
 
