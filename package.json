@@ -1,12 +1,13 @@
 {
   "name": "@axa-fr/slight-capture",
   "private": false,
-  "version": "0.0.1",
+  "version": "0.2.4",
   "type": "module",
   "module": "./src/SlightCapture/index.js",
   "description": "Pure vanilla javascript library to capture a document image from webcam for web application. Tested on Chrome, Firefox, Safari.",
   "files": [
     "src/SlightCapture",
+    "public/opencv.js",
     "README.md",
     "package.json",
     "package-lock.json"
@@ -28,11 +29,10 @@
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "postinstall": "echo 'WARNING keep up to date opencv.js file'"
   },
-  "dependencies": {
-
-  },
+  "dependencies": {},
   "devDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -55,7 +55,7 @@
     "prop-types": "^15.8.1",
     "storybook": "^7.0.26",
     "vite": "^4.3.9"
-  },  
+  },
   "license": "MIT",
   "publishConfig": {
     "access": "public",
