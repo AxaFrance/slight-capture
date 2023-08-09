@@ -7,6 +7,7 @@
   "description": "Pure vanilla javascript library to capture a document image from webcam for web application. Tested on Chrome, Firefox, Safari.",
   "files": [
     "src/SlightCapture",
+    "bin",
     "public/opencv.js",
     "README.md",
     "package.json",
