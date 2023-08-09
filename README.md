@@ -21,7 +21,7 @@ Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 npm install @axa-fr/slight-capture --save
 
 # To install in your public folder a light version of opencv.js
-node ./node_modules/@axa-fr/react-oidc/bin/copy-opencv.mjs public
+node ./node_modules/@axa-fr/slight-capture/bin/copy-opencv.mjs public
 ```
 
 
@@ -29,7 +29,7 @@ WARNING : To keep opencv.js up to date. You may setup a postinstall script in yo
 ```sh
   "scripts": {
     ...
-    "postinstall": "node ./node_modules/@axa-fr/react-oidc/bin/copy-opencv.mjs public"
+    "postinstall": "node ./node_modules/@axa-fr/slight-capture/bin/copy-opencv.mjs public"
   },
 ```
 
@@ -50,7 +50,7 @@ export const SlightCaptureVideo = () => {
     });
 
     useEffect(() => {
-        sligthCapture.initAsync();
+        sligthCapture.initAsync('./opencv.js');
     });
 
     const onCapture = async (file) => {
