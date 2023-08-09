@@ -9,7 +9,7 @@ try {
      *
      * Copy selected files to user's directory
      */
-    const script_prefix= 'oidc-client';
+    const script_prefix= 'slight-capture';
 
     const copyFile = async (src, dest, overwrite) => {
         if(!fileExists(src)) {
