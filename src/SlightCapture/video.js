@@ -1,7 +1,7 @@
 ﻿import {imageResize, loadImageAsync, toImageBase64} from "./image.js";
 import {applyTemplateMatching} from "./templateMatching.js";
 import {zoneAsync} from "./zoning.js";
-import {blobToBase64Async, base64ToBlob} from "./blob.js";
+import {blobToBase64Async, base64ToBlob, toBlobAsync} from "./blob.js";
 import {detectAndComputeSerializable} from "./featureMatching.js";
 import {loadScriptAsync} from "./script.js";
 import {cuid} from "./guid.js";
@@ -328,7 +328,7 @@ const captureAsync = (cv) => async (name,
                 cv.putText(imageSourceClone, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorYellow, thickness, cv.LINE_AA);
             }
 
-            if(autoAdjustBrightnessRatio < 1){
+            if(autoAdjustBrightnessRatio < 1.3){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
                 const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
@@ -400,8 +400,7 @@ const captureAsync = (cv) => async (name,
                 iButtonYes.className = 'sc-modal__confirm-button sc-modal__confirm-button--ok';
                 iButtonYes.textContent = translations['sc-modal__confirm-button--ok'];
                 iButtonYes.onclick = async () => {
-                    const imageBase64 = toImageBase64(cv)(zoneResult.finalImage);
-                    const blob = base64ToBlob(imageBase64);
+                    const blob = await toBlobAsync(cv)(zoneResult.finalImage);
                     zoneResult.finalImage.delete();
                     document.getElementsByTagName('body')[0].removeChild(iDiv);
                     if(onCaptureCallback){

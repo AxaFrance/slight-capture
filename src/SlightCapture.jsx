@@ -23,6 +23,7 @@ export const SlightCaptureVideo = () => {
     const [state, setState] = useState({
         isLoading: false,
         url: null,
+        size:0
     });
 
     useEffect(() => {
@@ -31,7 +32,7 @@ export const SlightCaptureVideo = () => {
 
     const onCapture = async (file) => {
         const convertedFile = await blobToBase64Async(file);
-        setState({...state, url: convertedFile});
+        setState({...state, url: convertedFile, size:file.size});
     }
 
     const onChange = async event => {
@@ -62,8 +63,10 @@ export const SlightCaptureVideo = () => {
         <form>
             <h1>Slight Capture</h1>
             <div>
-                {state.url &&
+                {state.url &&<>
+                    <p>{state.size} Bytes</p>
                     <img style={{"maxWidth": "800px"}} src={state.url} alt="image found"/>
+                </>
                 }
             </div>
             <a href={'https://github.com/AxaFrance/slight-capture'}>Slight Capture Github</a>
