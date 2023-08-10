@@ -1,26 +1,36 @@
-﻿import {imageResize} from "./image.js";
+﻿import {cropImage, imageResize} from "./image.js";
 
-export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8, minimumRatio = 0, maximumRatio = 100) => {
+export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8, minimumRatio = 0, maximumRatio = 100, template=null) => {
     let brightness = 0;
     const src = image;
-    let cols = src.cols;
-    if (src.isContinuous()) {
-        let channels = src.channels();
-        for (let row = 0; row < src.rows; row++) {
+    
+    
+    if(template == null){
+        template = image;
+    }
+
+    let cols = template.cols;
+    let rows = template.rows;
+    
+    if(template.isContinuous()) {
+        let channels = template.channels();
+        let data = template.data;
+        for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-                let R = src.data[row * cols * channels + col * channels];
-                let G = src.data[row * cols * channels + col * channels + 1];
-                let B = src.data[row * cols * channels + col * channels + 2];
-                brightness +=  R +  G + B;
+                let R = data[row * cols * channels + col * channels];
+                let G = data[row * cols * channels + col * channels + 1];
+                let B = data[row * cols * channels + col * channels + 2];
+                brightness += R + G + B;
             }
         }
     }
-    const ratio = ((brightness /3) / (255 * cols * src.rows)) / minimumBrightness;
+    const ratio = ((brightness /3) / (255 * cols * rows)) / minimumBrightness;
     if(ratio < maximumRatio && ratio > minimumRatio) {
         let alpha = 1 / ratio; // # Brightness control
         let beta = 0;  // # Contrast control
         cv.convertScaleAbs(image, image, alpha, beta)
-        return {image, ratio: alpha};
+        console.log("Brightness adjusted: " + alpha);
+        return { image, ratio: alpha };
     }
     return { image, ratio: 0 };
 }
@@ -33,7 +43,15 @@ export const findMatch = (cv) => (template, image, isDrawRectangle = true) => {
     let anchor = new cv.Point(-1, -1);
     cv.blur(image, image, ksize, anchor, cv.BORDER_DEFAULT)
 
-    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(image);
+    let templateWidth = template.cols;
+    let templateHeight = template.rows;
+    let imageWidth = image.cols;
+    let imageHeight = image.rows;
+    const point1RectangleToDetect = new cv.Point(Math.round((imageWidth - templateWidth) / 2), Math.round((imageHeight - templateHeight) / 2));
+    const point2RectangleToDetect = new cv.Point(Math.round((imageWidth - templateWidth) / 2) + templateWidth, Math.round((imageHeight - templateHeight) / 2) + templateHeight);
+    const croppedImage = cropImage(cv)(image.clone(), point1RectangleToDetect.x, point1RectangleToDetect.y, templateWidth, templateHeight);
+    
+    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(image, 0.8, 0,100, croppedImage);
     image = autoAdjustBrightnessResult.image;
     cv.matchTemplate(image, template, destination, cv.TM_CCORR_NORMED, mask);
     let result = cv.minMaxLoc(destination, mask);
@@ -43,14 +61,11 @@ export const findMatch = (cv) => (template, image, isDrawRectangle = true) => {
    
     let maxPointX = point1DetectedRectangle.x;
     let maxPointY = point1DetectedRectangle.y;
-    let templateWidth = template.cols;
-    let templateHeight = template.rows;
+
     let point2DetectedRectangle = new cv.Point(maxPointX + templateWidth, maxPointY + templateHeight);
     
-    let imageWidth = image.cols;
-    let imageHeight = image.rows;
-    const point1RectangleToDetect = new cv.Point(Math.round((imageWidth - templateWidth) / 2), Math.round((imageHeight - templateHeight) / 2));
-    const point2RectangleToDetect = new cv.Point(Math.round((imageWidth - templateWidth) / 2) + templateWidth, Math.round((imageHeight - templateHeight) / 2) + templateHeight);
+
+
     if(isDrawRectangle) {
         let colorBlue = new cv.Scalar(200, 255, 100, 255);
         cv.rectangle(image, point1RectangleToDetect, point2RectangleToDetect, colorBlue, 1, cv.LINE_8, 0);

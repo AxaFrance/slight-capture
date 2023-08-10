@@ -83,6 +83,7 @@ const texts = {
     'sc-modal__error-title': "Une erreur est survenue",
     'sc-modal__error-button--restart': "Recommencer",
     'sc-modal__error-button--quit': "Quitter",
+    'sc-modal__video-message-too-white': "Image trop claire",
 };
 
 export const loadVideoAsync = (name) => (cv=null) => async (file, 
@@ -318,13 +319,22 @@ const captureAsync = (cv) => async (name,
                 beginMatch = Date.now();
             }
 
-            if(autoAdjustBrightnessRatio > 1.9){
+            if(autoAdjustBrightnessRatio > 2){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
                 const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
                 const thickness = 10;
-                let colorRed = new cv.Scalar(200, 200, 0, 100);
-                cv.putText(imageSourceClone, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorRed, thickness, cv.LINE_AA);
+                let colorYellow = new cv.Scalar(200, 200, 0, 100);
+                cv.putText(imageSourceClone, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorYellow, thickness, cv.LINE_AA);
+            }
+
+            if(autoAdjustBrightnessRatio < 1){
+                const size = new cv.Size(300, -280);
+                const font = cv.FONT_HERSHEY_SIMPLEX;
+                const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
+                const thickness = 10;
+                let colorWhite = new cv.Scalar(0, 0, 0, 0);
+                cv.putText(imageSourceClone, translations['sc-modal__video-message-too-white'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorWhite, thickness, cv.LINE_AA);
             }
 
             if (counterTime > 5) {
@@ -402,11 +412,12 @@ const captureAsync = (cv) => async (name,
             }
 
             if (imageCv) {
+                cv.imshow(outputCanvas, imageCv)
                 imageCv.delete();
             }
 
             if (imageSourceClone) {
-                cv.imshow(outputCanvas, imageSourceClone)
+              //  cv.imshow(outputCanvas, imageSourceClone)
                 imageSourceClone.delete();
             }
             return src;

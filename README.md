@@ -102,6 +102,7 @@ const translations = {
     'sc-modal__error-title': "Une erreur est survenue",
     'sc-modal__error-button--restart': "Recommencer",
     'sc-modal__error-button--quit': "Quitter",
+    'sc-modal__video-message-too-white': "Image trop claire",
 };
 
 

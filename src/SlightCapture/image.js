@@ -117,6 +117,9 @@ export const loadImageAsync = (cv) => (url, color =null ) => {
 
 export const cropImage = (cv) => (img, xmin, ymin, witdh, height) => {
     let rect = new cv.Rect(xmin, ymin, witdh, height);
-    return img.roi(rect);
+    const imageNoContiuous = img.roi(rect);
+    const image = imageNoContiuous.clone();
+    imageNoContiuous.delete();
+    return image
 }
 

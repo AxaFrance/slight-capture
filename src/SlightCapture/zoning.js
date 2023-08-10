@@ -73,15 +73,15 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         imgCv= sceneUrl;
     }
     let imgCvClone = imgCv.clone();
-    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(imgCvClone, 0.5, 10);
-    imgCvClone = autoAdjustBrightnessResult.image;
     const marge = Math.round((imgDescription.img.rows+ imgDescription.img.cols) /2 * 0.1);
-    
     const point1 = new cv.Point(Math.max(0, Math.round(targetPoints.x1 * imgCvClone.cols) - marge), Math.max(0, Math.round(targetPoints.y1 * imgCvClone.rows) - marge));
     const point2 = new cv.Point(Math.min(imgCvClone.cols, Math.round(targetPoints.x2 * imgCvClone.cols) + marge), Math.min( imgCvClone.rows, Math.round(targetPoints.y2 * imgCvClone.rows) + marge));
     let imgCvCropped = cropImage(cv)(imgCvClone, point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
-    
     imgCvClone.delete();
+    
+    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(imgCvCropped, 0.6, 0.5, 50);
+    imgCvCropped = autoAdjustBrightnessResult.image;
+    
     let cropRatio = imgCv.cols / imgCvCropped.cols ;
     const { image: imgResized, ratio} = imageResize(cv)(imgCvCropped, 1600 * cropRatio);
     const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResized, goodMatchSizeThreshold);
@@ -135,16 +135,16 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     deleteClean();
 
     
-    const finalImage = croppedContoursBase64[0];
+    const finalImage = croppedContoursBase64.length > 0 ?  croppedContoursBase64[0] : null;
     
-    /*if(finalImage.isValid()){
+    if(!finalImage || !finalImage.isContinuous()){
         return {
             expectedOutput: [],
             goodMatchSize: 0,
             finalImage: imgCvCropped,
             outputInfo: null
         };
-    }*/
+    }
     imgCvCropped.delete();
     
     return {expectedOutput, goodMatchSize: result.goodMatchSize, finalImage, outputInfo};
