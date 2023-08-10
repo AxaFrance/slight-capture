@@ -20,7 +20,7 @@ export const blobToBase64Async = file => new Promise((resolve, reject) => {
 });
 
 
-export const toBlobAsync = (cv) => (imgCv, mimeType ="image/jpeg", quality= 0.6) => {
+export const toBlobAsync = (cv) => (imgCv, mimeType ="image/jpeg", quality= 0.7) => {
     return new Promise((resolve) => {
 
         const outputCanvas = document.createElement("canvas");

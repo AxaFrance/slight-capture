@@ -29,7 +29,6 @@ export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8, minim
         let alpha = 1 / ratio; // # Brightness control
         let beta = 0;  // # Contrast control
         cv.convertScaleAbs(image, image, alpha, beta)
-        console.log("Brightness adjusted: " + alpha);
         return { image, ratio: alpha };
     }
     return { image, ratio: 0 };

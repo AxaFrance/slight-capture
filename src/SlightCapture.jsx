@@ -18,6 +18,16 @@ const loadTemplateAsync = async (url, filename) => {
     });
 };
 
+function formatSizeUnits(bytes){
+    if      (bytes >= 1073741824) { bytes = (bytes / 1073741824).toFixed(2) + " GB"; }
+    else if (bytes >= 1048576)    { bytes = (bytes / 1048576).toFixed(2) + " MB"; }
+    else if (bytes >= 1024)       { bytes = (bytes / 1024).toFixed(2) + " KB"; }
+    else if (bytes > 1)           { bytes = bytes + " bytes"; }
+    else if (bytes == 1)          { bytes = bytes + " byte"; }
+    else                          { bytes = "0 bytes"; }
+    return bytes;
+}
+
 export const SlightCaptureVideo = () => {
     
     const [state, setState] = useState({
@@ -64,7 +74,7 @@ export const SlightCaptureVideo = () => {
             <h1>Slight Capture</h1>
             <div>
                 {state.url &&<>
-                    <p>{state.size} Bytes</p>
+                    <p>{formatSizeUnits(state.size)}</p>
                     <img style={{"maxWidth": "800px"}} src={state.url} alt="image found"/>
                 </>
                 }
