@@ -35,7 +35,7 @@ export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8, minim
     return { image, ratio: 0 };
 }
 
-export const findMatch = (cv) => (template, image, isDrawRectangle = true) => {
+export const findMatch = (cv) => (template, image, isDrawRectangle = false) => {
     let mask = new cv.Mat();
     let destination = new cv.Mat();
 

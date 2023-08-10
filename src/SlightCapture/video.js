@@ -319,7 +319,7 @@ const captureAsync = (cv) => async (name,
                 beginMatch = Date.now();
             }
 
-            if(autoAdjustBrightnessRatio > 2){
+            if(autoAdjustBrightnessRatio > 2.5){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
                 const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
@@ -412,12 +412,11 @@ const captureAsync = (cv) => async (name,
             }
 
             if (imageCv) {
-                cv.imshow(outputCanvas, imageCv)
                 imageCv.delete();
             }
 
             if (imageSourceClone) {
-              //  cv.imshow(outputCanvas, imageSourceClone)
+                cv.imshow(outputCanvas, imageSourceClone)
                 imageSourceClone.delete();
             }
             return src;
