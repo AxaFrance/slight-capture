@@ -50,7 +50,7 @@ export const SlightCaptureVideo = () => {
     });
 
     useEffect(() => {
-        sligthCapture.initAsync('./opencv.js');
+        sligthCapture.initAsync('opencv.js');
     });
 
     const onCapture = async (file) => {

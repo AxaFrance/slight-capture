@@ -33,7 +33,7 @@ try {
 
     const initPath = process.cwd();
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const srcDir = path.join(__dirname, "public");
+    const srcDir = path.join(__dirname, "..", "public");
     const destinationFolder = process.argv.length >= 3 ? process.argv[2] : 'public';
     const destinationDir = path.join(initPath, destinationFolder);
 

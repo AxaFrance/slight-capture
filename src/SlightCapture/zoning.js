@@ -108,7 +108,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         croppedContours,
         croppedContoursBase64
     } = extractCroppedContour(cv, imgCvCropped, result, ratio);
-
+    
     let outputInfo = {
         result: croppedContours.map(cc => {
             return {
@@ -125,15 +125,27 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         }
     }
     
-    const {xmax, xmin, ymax, ymin} = result.rectangle;
+    const { xmax, xmin, ymax, ymin} = result.rectangle;
     const left = Math.round(xmin / ratio);
     const top = Math.round(ymin / ratio);
     const width = Math.round(xmax / ratio) - left;
     const height = Math.round(ymax / ratio) - top;
     const expectedOutput = [{left, top, width, height}];
-
+    
     deleteClean();
+
+    
+    const finalImage = croppedContoursBase64[0];
+    
+    /*if(finalImage.isValid()){
+        return {
+            expectedOutput: [],
+            goodMatchSize: 0,
+            finalImage: imgCvCropped,
+            outputInfo: null
+        };
+    }*/
     imgCvCropped.delete();
     
-    return {expectedOutput, goodMatchSize: result.goodMatchSize, finalImage : croppedContoursBase64[0], outputInfo};
+    return {expectedOutput, goodMatchSize: result.goodMatchSize, finalImage, outputInfo};
 }
