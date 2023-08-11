@@ -126,11 +126,11 @@ jobs:
           cp -f ./opencv_build/opencv/build_js/bin/opencv.js ./public/
           rm -rf ./opencv_build
       
-      - name: git tag ${{ steps.tag.outputs.new_version }} -a
+      - name: git tag v${{ steps.tag.outputs.new_version }} -a
         id: git_tag
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         run: |
-          git tag ${{ steps.tag_release.outputs.new_version }} -a -m "Release ${{ steps.tag_release.outputs.new_version }}"
+          git tag v${{ steps.tag_release.outputs.new_version }} -a -m "Release v${{ steps.tag_release.outputs.new_version }}"
 
       - name: Commit Release ${{ steps.tag_release.outputs.new_version }}
         uses: stefanzweifel/git-auto-commit-action@v4
