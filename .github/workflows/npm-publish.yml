@@ -136,7 +136,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         with:
-          commit_message: "[skip ci] Release ${{ steps.tag_release.outputs.new_version }}"
+          commit_message: "[skip ci] Release v${{ steps.tag_release.outputs.new_version }}"
           commit_user_name: GitHub
           commit_user_email: github-action@bot.com
           commit_author: GitHub <github-action@bot.com>
