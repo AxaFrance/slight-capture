@@ -86,10 +86,19 @@ const texts = {
     'sc-modal__video-message-too-white': "Image trop claire",
 };
 
+const properties = {
+    translations: texts,
+    enableDefaultCss: true,
+    outputImageQuality: 0.7,
+    outputImageMimeType: 'image/jpeg',
+    waitNumberOfSecond: 5,
+    thresholdTooWhite: 1.25,
+    thresholdTooDark: 2.5,
+}
+
 export const loadVideoAsync = (name) => (cv=null) => async (file, 
-                                                            onCaptureCallback = null, 
-                                                            enableDefaultCss = true,
-                                                            translations = texts) => {
+                                                            onCaptureCallback = null,
+                                                            internal_properties = properties) => {
     if(!openCVPromise) {
         openCVPromise = await loadOpenCVAsync();
     }
@@ -104,7 +113,7 @@ export const loadVideoAsync = (name) => (cv=null) => async (file,
     }
     const {featureMatchingDetectAndComputeSerializable, templateMatchingImage} = await initTemplateAsync(cv)(file);
   
-   return await captureAsync(cv)(name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback, enableDefaultCss, translations);
+   return await captureAsync(cv)(name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback, internal_properties);
 }
 
 const displayError = (iDiv, translations, enableDefaultCss, stopStreaming, name, restart, quit) => {
@@ -163,10 +172,11 @@ const removeAllChildren = (node)  => {
 const captureAsync = (cv) => async (name, 
                                     featureMatchingDetectAndComputeSerializable, 
                                     templateMatchingImage, 
-                                    onCaptureCallback = null, 
-                                    enableDefaultCss = true,
-                                    translations= texts) => {
+                                    onCaptureCallback = null,
+                                    internal_properties = properties,
+                                    ) => {
     return new Promise((resolve, error) => {
+        const { enableDefaultCss, translations, outputImageMimeType, outputImageQuality, waitNumberOfSecond, thresholdTooWhite, thresholdTooDark } = internal_properties;
         let mediaDevices = navigator.mediaDevices;
         if (!mediaDevices || !mediaDevices.getUserMedia) {
             console.log("getUserMedia() not supported.");
@@ -184,7 +194,7 @@ const captureAsync = (cv) => async (name,
         const iDivContainerVideo = document.createElement('div');
         iDivContainerVideo.className = `sc-modal__video-container`;
         if (enableDefaultCss) {
-            iDivContainerVideo.style = `position: absolute;z-index: 10000000;padding-top: 0;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`;
+            iDivContainerVideo.style = `position: absolute;z-index: 10000000;padding-top: 0;left: 0;top: 0;width: 100%;max-height: 90vh;overflow: auto;background-color: white;text-align:center;`;
         }
         iDivContainerVideo.id = cuid();
         iDiv.appendChild(iDivContainerVideo);
@@ -319,25 +329,25 @@ const captureAsync = (cv) => async (name,
                 beginMatch = Date.now();
             }
 
-            if(autoAdjustBrightnessRatio > 2.5){
+            if(autoAdjustBrightnessRatio > thresholdTooDark){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
                 const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
                 const thickness = 10;
-                let colorYellow = new cv.Scalar(200, 200, 0, 100);
-                cv.putText(imageSourceClone, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorYellow, thickness, cv.LINE_AA);
+                let colorBlack = new cv.Scalar(255, 255, 255, 255);
+                cv.putText(imageSourceClone, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorBlack, thickness, cv.LINE_AA);
             }
 
-            if(autoAdjustBrightnessRatio < 1.3){
+            if(autoAdjustBrightnessRatio < thresholdTooWhite){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
                 const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
                 const thickness = 10;
-                let colorWhite = new cv.Scalar(0, 0, 0, 0);
+                let colorWhite = new cv.Scalar(0, 0, 0, 255);
                 cv.putText(imageSourceClone, translations['sc-modal__video-message-too-white'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorWhite, thickness, cv.LINE_AA);
             }
 
-            if (counterTime > 5) {
+            if (counterTime > waitNumberOfSecond) {
                 numberFollowingMatchQuality = 0;
                 const finalShot = src.clone();
                 stopStreaming();
@@ -400,7 +410,7 @@ const captureAsync = (cv) => async (name,
                 iButtonYes.className = 'sc-modal__confirm-button sc-modal__confirm-button--ok';
                 iButtonYes.textContent = translations['sc-modal__confirm-button--ok'];
                 iButtonYes.onclick = async () => {
-                    const blob = await toBlobAsync(cv)(zoneResult.finalImage);
+                    const blob = await toBlobAsync(cv)(zoneResult.finalImage, outputImageMimeType, outputImageQuality);
                     zoneResult.finalImage.delete();
                     document.getElementsByTagName('body')[0].removeChild(iDiv);
                     if(onCaptureCallback){

@@ -73,8 +73,8 @@ export const SlightCaptureVideo = () => {
         <form>
             <h1>Slight Capture</h1>
             <div>
-                {state.url &&<>
-                    <p>{formatSizeUnits(state.size)}</p>
+                {state.url && <>
+                    <p  style={{"fontSize":"1.2em", color: "green"}}>{formatSizeUnits(state.size)}</p>
                     <img style={{"maxWidth": "800px"}} src={state.url} alt="image found"/>
                 </>
                 }

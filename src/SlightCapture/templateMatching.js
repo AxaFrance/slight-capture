@@ -1,9 +1,7 @@
 ﻿import {cropImage, imageResize} from "./image.js";
 
-export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.8, minimumRatio = 0, maximumRatio = 100, template=null) => {
+export const autoAdjustBrightness = (cv) => (image, minimumBrightness=0.9, minimumRatio = 0, maximumRatio = 100, template=null) => {
     let brightness = 0;
-    const src = image;
-    
     
     if(template == null){
         template = image;
@@ -50,7 +48,7 @@ export const findMatch = (cv) => (template, image, isDrawRectangle = false) => {
     const point2RectangleToDetect = new cv.Point(Math.round((imageWidth - templateWidth) / 2) + templateWidth, Math.round((imageHeight - templateHeight) / 2) + templateHeight);
     const croppedImage = cropImage(cv)(image.clone(), point1RectangleToDetect.x, point1RectangleToDetect.y, templateWidth, templateHeight);
     
-    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(image, 0.8, 0,100, croppedImage);
+    const autoAdjustBrightnessResult = autoAdjustBrightness(cv)(image, 0.8, 0, 100, croppedImage);
     image = autoAdjustBrightnessResult.image;
     cv.matchTemplate(image, template, destination, cv.TM_CCORR_NORMED, mask);
     let result = cv.minMaxLoc(destination, mask);

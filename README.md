@@ -108,13 +108,31 @@ const translations = {
 
 const onChange = async event => {
     // ...
-    const video = await sligthCapture.loadVideoAsync()(file, onCapture, true, translations);
+    const properties = {
+        translations,
+        enableDefaultCss: false,
+    };
+    const video = await sligthCapture.loadVideoAsync()(file, onCapture, properties);
     // ...
 }
 
 ```
 
-You can customize the css by passing enableDefaultCss: false to take the control of the css.
+All properties with default values
+``` javascript
+const properties = {
+    translations: texts,
+    enableDefaultCss: true,
+    outputImageQuality: 0.7, // 0 to 1 (1 is the best quality)
+    outputImageMimeType: 'image/jpeg', // image/jpeg or image/png
+    waitNumberOfSecond: 5, // number of second to wait before capture
+    thresholdTooWhite: 1.25, // 1.25 is the default value
+    thresholdTooDark: 2.5, // 2.5 is the default value
+}
+``` 
+
+
+You can customize the css by passing properties.enableDefaultCss: false to take the control of the css.
 css use BEM (Block Element Modifier) convention. 
 
 ```css
@@ -161,6 +179,19 @@ css use BEM (Block Element Modifier) convention.
 .sc-modal__video-video {
   display: inline;
   width: 100%;
+}
+
+.sc-modal__video-container{
+    position: absolute;
+    z-index: 10000000;
+    padding-top: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-height: 90vh;
+    overflow: auto;
+    background-color: white;
+    text-align:center;
 }
 
 .sc-modal__confirm-container {
@@ -231,6 +262,7 @@ css use BEM (Block Element Modifier) convention.
     font-size: 2em;
     margin: 1em;
 }
+
 
 
 ```
