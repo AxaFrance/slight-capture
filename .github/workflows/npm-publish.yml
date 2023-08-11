@@ -130,7 +130,7 @@ jobs:
         id: git_tag
         if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         run: |
-          git tag v${{ steps.tag_release.outputs.new_version }} -a -m "Release v${{ steps.tag_release.outputs.new_version }}"
+          git tag -a v${{ steps.tag_release.outputs.new_version }} -m "Release v${{ steps.tag_release.outputs.new_version }}"
 
       - name: Commit Release ${{ steps.tag_release.outputs.new_version }}
         uses: stefanzweifel/git-auto-commit-action@v4
