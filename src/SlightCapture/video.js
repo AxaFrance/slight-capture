@@ -89,11 +89,33 @@ const texts = {
 const properties = {
     translations: texts,
     enableDefaultCss: true,
-    outputImageQuality: 0.7,
+    outputImageQuality: 0.6,
     outputImageMimeType: 'image/jpeg',
     waitNumberOfSecond: 5,
-    thresholdTooWhite: 1.25,
+    thresholdTooWhite: 1.15,
     thresholdTooDark: 2.5,
+}
+
+function validateProperties(internal_properties) {
+    let final_properties = {...properties, ...internal_properties};
+    final_properties.texts = {...texts, ...internal_properties.texts};
+
+    if (final_properties.outputImageMimeType !== 'image/jpeg' && final_properties.outputImageMimeType !== 'image/png') {
+        throw new Error('outputImageMimeType must be image/jpeg or image/png');
+    }
+    if (final_properties.outputImageQuality < 0 || final_properties.outputImageQuality > 1) {
+        throw new Error('outputImageQuality must be between 0 and 1');
+    }
+    if (final_properties.waitNumberOfSecond < 0) {
+        throw new Error('waitNumberOfSecond must be greater than 0');
+    }
+    if (final_properties.thresholdTooWhite < 0) {
+        throw new Error('thresholdTooWhite must be greater than 0');
+    }
+    if (final_properties.thresholdTooDark < 0) {
+        throw new Error('thresholdTooDark must be greater than 0');
+    }
+    return final_properties;
 }
 
 export const loadVideoAsync = (name) => (cv=null) => async (file, 
@@ -111,9 +133,10 @@ export const loadVideoAsync = (name) => (cv=null) => async (file,
         }
         
     }
+    let final_properties = validateProperties(internal_properties);
     const {featureMatchingDetectAndComputeSerializable, templateMatchingImage} = await initTemplateAsync(cv)(file);
   
-   return await captureAsync(cv)(name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback, internal_properties);
+   return await captureAsync(cv)(name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback, final_properties);
 }
 
 const displayError = (iDiv, translations, enableDefaultCss, stopStreaming, name, restart, quit) => {
@@ -172,8 +195,8 @@ const removeAllChildren = (node)  => {
 const captureAsync = (cv) => async (name, 
                                     featureMatchingDetectAndComputeSerializable, 
                                     templateMatchingImage, 
-                                    onCaptureCallback = null,
-                                    internal_properties = properties,
+                                    onCaptureCallback ,
+                                    internal_properties ,
                                     ) => {
     return new Promise((resolve, error) => {
         const { enableDefaultCss, translations, outputImageMimeType, outputImageQuality, waitNumberOfSecond, thresholdTooWhite, thresholdTooDark } = internal_properties;
