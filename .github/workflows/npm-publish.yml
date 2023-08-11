@@ -126,11 +126,11 @@ jobs:
           cp -f ./opencv_build/opencv/build_js/bin/opencv.js ./public/
           rm -rf ./opencv_build
       
-      - name: git tag v${{ steps.tag.outputs.new_version }} -a
-        id: git_tag
-        if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
-        run: |
-          git tag -a v${{ steps.tag_release.outputs.new_version }} -m "Release v${{ steps.tag_release.outputs.new_version }}"
+    #  - name: git tag v${{ steps.tag.outputs.new_version }} -a
+    #    id: git_tag
+    #    if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
+    #    run: |
+    #      git tag -a v${{ steps.tag_release.outputs.new_version }} -m "Release v${{ steps.tag_release.outputs.new_version }}"
 
       - name: Commit Release ${{ steps.tag_release.outputs.new_version }}
         uses: stefanzweifel/git-auto-commit-action@v4
@@ -140,7 +140,8 @@ jobs:
           commit_user_name: GitHub
           commit_user_email: github-action@bot.com
           commit_author: GitHub <github-action@bot.com>
-          push_options: '--force --tags'
+          tagging_message: 'v${{ steps.tag.outputs.new_version }}'
+          push_options: '--force --tags --follow-tags'
 
       - id: publish-slight-capture
         uses: JS-DevTools/npm-publish@v1
