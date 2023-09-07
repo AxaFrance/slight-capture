@@ -54,15 +54,9 @@ export const findMatch = (cv) => (template, image, isDrawRectangle = false) => {
     let result = cv.minMaxLoc(destination, mask);
     
     let point1DetectedRectangle = result.maxLoc;
-    
-   
     let maxPointX = point1DetectedRectangle.x;
     let maxPointY = point1DetectedRectangle.y;
-
     let point2DetectedRectangle = new cv.Point(maxPointX + templateWidth, maxPointY + templateHeight);
-    
-
-
     if(isDrawRectangle) {
         let colorBlue = new cv.Scalar(200, 255, 100, 255);
         cv.rectangle(image, point1RectangleToDetect, point2RectangleToDetect, colorBlue, 1, cv.LINE_8, 0);
@@ -81,26 +75,29 @@ export const findMatch = (cv) => (template, image, isDrawRectangle = false) => {
         }
     }
 
- mask.delete();
- destination.delete();
- return {
-     image, 
-     autoAdjustBrightnessRatio : autoAdjustBrightnessResult.ratio,
-     targetPoints: {
-            x1: point1RectangleToDetect.x / imageWidth,
-            y1: point1RectangleToDetect.y / imageHeight,
-            x2: point2RectangleToDetect.x / imageWidth,
-            y2: point2RectangleToDetect.y / imageHeight
-     },
-     currentPoints
- };
+     mask.delete();
+     destination.delete();
+     return {
+         image, 
+         autoAdjustBrightnessRatio : autoAdjustBrightnessResult.ratio,
+         targetPoints: {
+                x1: point1RectangleToDetect.x / imageWidth,
+                y1: point1RectangleToDetect.y / imageHeight,
+                x2: point2RectangleToDetect.x / imageWidth,
+                y2: point2RectangleToDetect.y / imageHeight
+         },
+         currentPoints
+     };
 }
+
+export const templateMatchingImageSize = 100;
+export const templateMatchingImageRatio = 0.75;
 
 export const applyTemplateMatching = (cv) => async (imageCvTemplate, imgCv) => {
     try {
         if (imgCv === null) return;
-        const imd = imageResize(cv)(imgCv, 100);
-        const imgCvTemplateResized = imd.image;
+        const imageResizeResult = imageResize(cv)(imgCv, templateMatchingImageSize);
+        const imgCvTemplateResized = imageResizeResult.image;
         const {image: imageCv, targetPoints, currentPoints, autoAdjustBrightnessRatio} = findMatch(cv)(imageCvTemplate, imgCvTemplateResized);
         return {imageCv, targetPoints, currentPoints, autoAdjustBrightnessRatio};
     } catch (e) {

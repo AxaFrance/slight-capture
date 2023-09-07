@@ -1,7 +1,7 @@
 ﻿import {cropImage, imageResize, loadImageAsync, rotateImage} from "./image.js";
 import {computeAndComputeHomographyRectangle} from "./featureMatching.js";
 import {cropContours, findContours} from "./contours.js";
-import {autoAdjustBrightness} from "./templateMatching.js";
+import {autoAdjustBrightness, templateMatchingImageRatio} from "./templateMatching.js";
 
 function drawLinesInsideBlackImage(cv, imgCvCopy, lines, ratio) {
     let blackImage = new cv.Mat(imgCvCopy.rows, imgCvCopy.cols, imgCvCopy.type(), new cv.Scalar());
@@ -65,6 +65,8 @@ function extractCroppedContour(cv, imgCvCopy, result, ratio) {
     return {angle, croppedContours, croppedContoursBase64};
 }
 
+export const templateMaximumSize = 800;
+
 export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeThreshold = 6, targetPoints) => {
     let imgCv = null;
     if(sceneUrl instanceof String) {
@@ -73,7 +75,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
         imgCv= sceneUrl;
     }
     let imgCvClone = imgCv.clone();
-    const marge = Math.round((imgDescription.img.rows+ imgDescription.img.cols) /2 * 0.1);
+    const marge = Math.round((imgDescription.img.rows + imgDescription.img.cols) * templateMatchingImageRatio * 0.06);
     const point1 = new cv.Point(Math.max(0, Math.round(targetPoints.x1 * imgCvClone.cols) - marge), Math.max(0, Math.round(targetPoints.y1 * imgCvClone.rows) - marge));
     const point2 = new cv.Point(Math.min(imgCvClone.cols, Math.round(targetPoints.x2 * imgCvClone.cols) + marge), Math.min( imgCvClone.rows, Math.round(targetPoints.y2 * imgCvClone.rows) + marge));
     let imgCvCropped = cropImage(cv)(imgCvClone, point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
@@ -83,7 +85,7 @@ export const zoneAsync = (cv) => async (sceneUrl, imgDescription, goodMatchSizeT
     imgCvCropped = autoAdjustBrightnessResult.image;
     
     let cropRatio = imgCv.cols / imgCvCropped.cols ;
-    const { image: imgResized, ratio} = imageResize(cv)(imgCvCropped, 1600 * cropRatio);
+    const { image: imgResized, ratio} = imageResize(cv)(imgCvCropped, templateMaximumSize + marge);
     const result = computeAndComputeHomographyRectangle(cv)(imgDescription, imgResized, goodMatchSizeThreshold);
     const deleteClean = () => {
         if(sceneUrl instanceof String) {
