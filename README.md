@@ -118,7 +118,7 @@ const onChange = async event => {
 
 ```
 
-All properties with default values
+All properties with default values :
 ``` javascript
 const properties = {
     translations: texts,
@@ -178,7 +178,7 @@ css use BEM (Block Element Modifier) convention.
 
 .sc-modal__video-video {
   display: inline;
-  width: 100%;
+  height: 80vh;
 }
 
 .sc-modal__video-container{

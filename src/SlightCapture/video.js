@@ -1,6 +1,6 @@
 ﻿import {imageResize, loadImageAsync, toImageBase64} from "./image.js";
-import {applyTemplateMatching} from "./templateMatching.js";
-import {zoneAsync} from "./zoning.js";
+import {applyTemplateMatching, templateMatchingImageRatio, templateMatchingImageSize} from "./templateMatching.js";
+import {templateMaximumSize, zoneAsync} from "./zoning.js";
 import {blobToBase64Async, base64ToBlob, toBlobAsync} from "./blob.js";
 import {detectAndComputeSerializable} from "./featureMatching.js";
 import {loadScriptAsync} from "./script.js";
@@ -55,13 +55,13 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
 const initTemplateAsync = (cv) => async (file) => {
     const convertedFile = await blobToBase64Async(file);
     const imgCvTemplate = await loadImageAsync(cv)(convertedFile);
-    let templateMatchingImage = imageResize(cv)(imgCvTemplate, 50).image;
+    let templateMatchingImage = imageResize(cv)(imgCvTemplate, templateMatchingImageSize * templateMatchingImageRatio).image;
     let ksize = new cv.Size(2, 2);
     let anchor = new cv.Point(-1, -1);
     cv.blur(templateMatchingImage, templateMatchingImage, ksize, anchor, cv.BORDER_DEFAULT)
-    let imgCvTemplateResizedMatch = imageResize(cv)(imgCvTemplate, 800).image;
+    let imgCvTemplateResizedMatch = imageResize(cv)(imgCvTemplate, templateMaximumSize).image;
     const featureMatchingDetectAndComputeSerializable = detectAndComputeSerializable(cv)(imgCvTemplateResizedMatch);
-    return {featureMatchingDetectAndComputeSerializable, templateMatchingImage};
+    return { featureMatchingDetectAndComputeSerializable, templateMatchingImage };
 }
 
 let openCVPromise = null;
@@ -91,9 +91,17 @@ const properties = {
     enableDefaultCss: true,
     outputImageQuality: 0.6,
     outputImageMimeType: 'image/jpeg',
-    waitNumberOfSecond: 5,
+    waitNumberOfSecond: 3,
     thresholdTooWhite: 1.15,
     thresholdTooDark: 2.5,
+    video: {
+        width: {ideal: 1600},
+        height: {ideal: 1600},
+        facingMode: {
+            ideal: 'environment' // 'face'
+        },
+    }
+    
 }
 
 function validateProperties(internal_properties) {
@@ -209,7 +217,7 @@ const captureAsync = (cv) => async (name,
         const iDiv = document.createElement('div');
         iDiv.className = `sc-modal sc-modal--${name}`;
         if (enableDefaultCss) {
-            iDiv.style = `position: fixed;z-index: 10000000;padding-top: 0;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto;background-color: white;text-align:center;`;
+            iDiv.style = `margin:0px;position: fixed;z-index: 10000000;padding-top: 0;left: 0;top: 0;width: 100%;height: 100vh;overflow: auto ;background-color: white;text-align:center;`;
         }
         iDiv.id = cuid();
         document.getElementsByTagName('body')[0].appendChild(iDiv);
@@ -217,7 +225,7 @@ const captureAsync = (cv) => async (name,
         const iDivContainerVideo = document.createElement('div');
         iDivContainerVideo.className = `sc-modal__video-container`;
         if (enableDefaultCss) {
-            iDivContainerVideo.style = `position: absolute;z-index: 10000000;padding-top: 0;left: 0;top: 0;width: 100%;max-height: 90vh;overflow: auto;background-color: white;text-align:center;`;
+            iDivContainerVideo.style = `margin:0px;position: absolute;z-index: 10000000;padding-top: 0;left: 0;top: 0;width: 100%;max-height: 100vh;background-color: white;text-align:center;`;
         }
         iDivContainerVideo.id = cuid();
         iDiv.appendChild(iDivContainerVideo);
@@ -240,13 +248,7 @@ const captureAsync = (cv) => async (name,
 
         let constraints = {
             audio: false,
-            video: {
-                width: {ideal: 2600},
-                height: {ideal: 2600},
-                facingMode: {
-                    ideal: 'environment' // 'face'
-                },
-            }
+            video: internal_properties.video
         };
         
         const quit = () => {
@@ -281,7 +283,7 @@ const captureAsync = (cv) => async (name,
 
         const outputCanvas = document.createElement("canvas");
         if (enableDefaultCss) {
-            outputCanvas.style = 'display:inline;width:100%;';
+            outputCanvas.style = 'display:inline;max-width:100vw;max-height:86vh;';
         }
         outputCanvas.className = 'sc-modal__video-video';
         iDivContainerVideo.appendChild(outputCanvas);
@@ -306,27 +308,50 @@ const captureAsync = (cv) => async (name,
 
         const restartAsync = async () => {
             document.getElementsByTagName('body')[0].removeChild(iDiv);
-            const loadVideo = await captureAsync(cv)(name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback, enableDefaultCss);
+            const loadVideo = await captureAsync(cv)(name, featureMatchingDetectAndComputeSerializable, templateMatchingImage, onCaptureCallback, internal_properties);
             if (loadVideo) {
                 loadVideo.start();
             }
         }
 
+        let processVideoCache = {
+            imageCv: null,
+            targetPoints: null,
+            currentPoints: null,
+            autoAdjustBrightnessRatio : null
+        }
+
+        let frameCounter = 0;
+        let imageDestination = null;
         async function processVideo(videoCapture, src) {
-            // start processing.
             videoCapture.read(src);
-            const imageSourceClone = src.clone();
-            const {
-                imageCv,
-                targetPoints,
-                currentPoints,
-                autoAdjustBrightnessRatio
-            } = await applyTemplateMatching(cv)(templateMatchingImage, imageSourceClone);
-            const point1TargetRectangle = new cv.Point(Math.round(targetPoints.x1 * imageSourceClone.cols), Math.round(targetPoints.y1 * imageSourceClone.rows));
-            const point2TargetRectangle = new cv.Point(Math.round(targetPoints.x2 * imageSourceClone.cols), Math.round(targetPoints.y2 * imageSourceClone.rows));
+            if(imageDestination === null && src.cols > 0 && src.rows > 0) {
+                imageDestination = new cv.Mat(src.rows, src.cols, cv.CV_8UC4);
+            }
+            src.copyTo(imageDestination);
+            
+            if(frameCounter%3===0) {
+                const applyTemplateMatchingResult = await applyTemplateMatching(cv)(templateMatchingImage, imageDestination);
+                processVideoCache.imageCv = applyTemplateMatchingResult.imageCv;
+                processVideoCache.targetPoints = applyTemplateMatchingResult.targetPoints;
+                processVideoCache.currentPoints = applyTemplateMatchingResult.currentPoints;
+                processVideoCache.autoAdjustBrightnessRatio = applyTemplateMatchingResult.autoAdjustBrightnessRatio;
+                
+                if (frameCounter > 0) {
+                    frameCounter = 0;
+                }
+                frameCounter++;
+            }
+            else{
+                frameCounter++;
+                processVideoCache.imageCv = null;
+            }
+            const { imageCv, autoAdjustBrightnessRatio, currentPoints, targetPoints } = processVideoCache;
+            const point1TargetRectangle = new cv.Point(Math.round(targetPoints.x1 * imageDestination.cols), Math.round(targetPoints.y1 * imageDestination.rows));
+            const point2TargetRectangle = new cv.Point(Math.round(targetPoints.x2 * imageDestination.cols), Math.round(targetPoints.y2 * imageDestination.rows));
 
             let colorBlue = new cv.Scalar(0, 200, 238, 150);
-            cv.rectangle(imageSourceClone, point1TargetRectangle, point2TargetRectangle, colorBlue, 30, cv.LINE_8, 0);
+            cv.rectangle(imageDestination, point1TargetRectangle, point2TargetRectangle, colorBlue, 30, cv.LINE_8, 0);
 
             let counterTime;
             if (currentPoints != null) {
@@ -334,18 +359,18 @@ const captureAsync = (cv) => async (name,
                 let colorRed = new cv.Scalar(255, 158, 47, 200);
                 counterTime = Math.round((Date.now() - beginMatch) / 1000);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
-                const fontScale = imageSourceClone.cols > 2000 ? 15 : 10;
+                const fontScale = imageDestination.cols > 2000 ? 15 : 10;
                 const thickness = 20;
                 // const baseline=0;
                 // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
                 const size = new cv.Size(300, -280);
-                cv.putText(imageSourceClone, counterTime.toString(), new cv.Point(Math.round(imageSourceClone.cols / 2 - size.width / 2), Math.round(imageSourceClone.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
+                cv.putText(imageDestination, counterTime.toString(), new cv.Point(Math.round(imageDestination.cols / 2 - size.width / 2), Math.round(imageDestination.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
 
-                const point1 = new cv.Point(Math.round(currentPoints.x1 * imageSourceClone.cols), Math.round(currentPoints.y1 * imageSourceClone.rows));
-                const point2 = new cv.Point(Math.round(currentPoints.x2 * imageSourceClone.cols), Math.round(currentPoints.y2 * imageSourceClone.rows));
+                const point1 = new cv.Point(Math.round(currentPoints.x1 * imageDestination.cols), Math.round(currentPoints.y1 * imageDestination.rows));
+                const point2 = new cv.Point(Math.round(currentPoints.x2 * imageDestination.cols), Math.round(currentPoints.y2 * imageDestination.rows));
 
                 let colorGreen = new cv.Scalar(95, 225, 62, 150);
-                cv.rectangle(imageSourceClone, point1, point2, colorGreen, 20, cv.LINE_8, 0);
+                cv.rectangle(imageDestination, point1, point2, colorGreen, 20, cv.LINE_8, 0);
             } else {
                 numberFollowingMatchQuality = 0;
                 counterTime = 0;
@@ -355,19 +380,19 @@ const captureAsync = (cv) => async (name,
             if(autoAdjustBrightnessRatio > thresholdTooDark){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
-                const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
+                const fontScale = imageDestination.cols > 2000 ? 8 : 4;
                 const thickness = 10;
                 let colorBlack = new cv.Scalar(255, 255, 255, 255);
-                cv.putText(imageSourceClone, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorBlack, thickness, cv.LINE_AA);
+                cv.putText(imageDestination, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageDestination.rows *0.12)), font, fontScale, colorBlack, thickness, cv.LINE_AA);
             }
 
             if(autoAdjustBrightnessRatio < thresholdTooWhite){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
-                const fontScale = imageSourceClone.cols > 2000 ? 8 : 4;
+                const fontScale = imageDestination.cols > 2000 ? 8 : 4;
                 const thickness = 10;
                 let colorWhite = new cv.Scalar(0, 0, 0, 255);
-                cv.putText(imageSourceClone, translations['sc-modal__video-message-too-white'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageSourceClone.rows *0.12)), font, fontScale, colorWhite, thickness, cv.LINE_AA);
+                cv.putText(imageDestination, translations['sc-modal__video-message-too-white'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageDestination.rows *0.12)), font, fontScale, colorWhite, thickness, cv.LINE_AA);
             }
 
             if (counterTime > waitNumberOfSecond) {
@@ -385,7 +410,7 @@ const captureAsync = (cv) => async (name,
                 iDiv.appendChild(iDivContainerImage);
 
                 await delay(50);
-                const zoneResult = await zoneAsync(cv)(finalShot, featureMatchingDetectAndComputeSerializable, 30, targetPoints);
+                const zoneResult = await zoneAsync(cv)(finalShot, featureMatchingDetectAndComputeSerializable, 60, targetPoints);
                 iDivContainerImage.removeChild(iHLoading);
                 finalShot.delete();
                 
@@ -447,9 +472,8 @@ const captureAsync = (cv) => async (name,
                 imageCv.delete();
             }
 
-            if (imageSourceClone) {
-                cv.imshow(outputCanvas, imageSourceClone)
-                imageSourceClone.delete();
+            if (imageDestination) {
+                cv.imshow(outputCanvas, imageDestination)
             }
             return src;
         }
@@ -472,6 +496,9 @@ const captureAsync = (cv) => async (name,
                     console.log("Fermeture Camera");
                     if (cameraPromise === null) {
                         stopStreamTracks();
+                        if (imageDestination) {
+                            imageDestination.delete();
+                        }
                     }
                 } 
             }
