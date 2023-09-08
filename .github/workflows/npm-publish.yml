@@ -140,7 +140,7 @@ jobs:
           commit_user_name: GitHub
           commit_user_email: github-action@bot.com
           commit_author: GitHub <github-action@bot.com>
-          tagging_message: 'v${{ steps.tag.outputs.new_version }}'
+          #tagging_message: 'v${{ steps.tag.outputs.new_version }}'
           push_options: '--force --tags --follow-tags'
 
       - id: publish-slight-capture
