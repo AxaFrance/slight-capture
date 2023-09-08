@@ -101,7 +101,6 @@ const properties = {
             ideal: 'environment' // 'face'
         },
     }
-    
 }
 
 function validateProperties(internal_properties) {

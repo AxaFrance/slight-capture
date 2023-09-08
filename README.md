@@ -123,11 +123,19 @@ All properties with default values :
 const properties = {
     translations: texts,
     enableDefaultCss: true,
-    outputImageQuality: 0.7, // 0 to 1 (1 is the best quality)
-    outputImageMimeType: 'image/jpeg', // image/jpeg or image/png
-    waitNumberOfSecond: 5, // number of second to wait before capture
-    thresholdTooWhite: 1.25, // 1.25 is the default value
-    thresholdTooDark: 2.5, // 2.5 is the default value
+    outputImageQuality: 0.6,
+    outputImageMimeType: 'image/jpeg',
+    waitNumberOfSecond: 3,
+    thresholdTooWhite: 1.15,
+    thresholdTooDark: 2.5,
+    video: {
+        // lower resolution are speeder
+        width: {ideal: 1600},
+        height: {ideal: 1600},
+        facingMode: {
+            ideal: 'environment' // 'face'
+        },
+    }
 }
 ``` 
 
