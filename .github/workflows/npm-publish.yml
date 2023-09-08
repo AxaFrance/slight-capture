@@ -133,6 +133,7 @@ jobs:
     #      git tag -a v${{ steps.tag_release.outputs.new_version }} -m "Release v${{ steps.tag_release.outputs.new_version }}"
 
       - name: Git Configuration
+        if: github.ref == 'refs/heads/main' && steps.which_tag.outputs.tag == 'release'
         run: |
           git add .
           git commit -m "[skip ci] Release v${{ steps.tag_release.outputs.new_version }}"
