@@ -133,6 +133,7 @@ const properties = {
         width: {ideal: 1600},
         height: {ideal: 1600},
         facingMode: {
+            // "environment" for back webcam in priority else "face" for front webcam 
             ideal: 'environment' // 'face'
         },
     }
