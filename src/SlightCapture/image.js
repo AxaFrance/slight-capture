@@ -10,7 +10,7 @@ export const imageResize = (cv) => (image, max = null) => {
     // # if both the width and height are None, then return the
     // # original image
     if (!max) {
-        return image, 1;
+        return {image: image, ratio: 1};
     }
 
     let new_width = w;

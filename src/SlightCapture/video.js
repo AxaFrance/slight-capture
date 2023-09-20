@@ -363,7 +363,7 @@ const captureAsync = (cv) => async (name,
                 // const baseline=0;
                 // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
                 const size = new cv.Size(300, -280);
-                cv.putText(imageDestination, counterTime.toString(), new cv.Point(Math.round(imageDestination.cols / 2 - size.width / 2), Math.round(imageDestination.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
+                cv.putText(imageDestination, (waitNumberOfSecond - counterTime).toString(), new cv.Point(Math.round(imageDestination.cols / 2 - size.width / 2), Math.round(imageDestination.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
 
                 const point1 = new cv.Point(Math.round(currentPoints.x1 * imageDestination.cols), Math.round(currentPoints.y1 * imageDestination.rows));
                 const point2 = new cv.Point(Math.round(currentPoints.x2 * imageDestination.cols), Math.round(currentPoints.y2 * imageDestination.rows));
