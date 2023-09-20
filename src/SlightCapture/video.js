@@ -349,8 +349,9 @@ const captureAsync = (cv) => async (name,
             const point1TargetRectangle = new cv.Point(Math.round(targetPoints.x1 * imageDestination.cols), Math.round(targetPoints.y1 * imageDestination.rows));
             const point2TargetRectangle = new cv.Point(Math.round(targetPoints.x2 * imageDestination.cols), Math.round(targetPoints.y2 * imageDestination.rows));
 
-            let colorBlue = new cv.Scalar(0, 200, 238, 150);
-            cv.rectangle(imageDestination, point1TargetRectangle, point2TargetRectangle, colorBlue, 30, cv.LINE_8, 0);
+            let colorRectangle = currentPoints? new cv.Scalar(95, 225, 62, 150) : new cv.Scalar(255, 50, 50, 255);
+            let szeRectangle = currentPoints? 30: 20;
+            cv.rectangle(imageDestination, point1TargetRectangle, point2TargetRectangle, colorRectangle, 30, cv.LINE_8, 0);
 
             let counterTime;
             if (currentPoints != null) {
@@ -369,7 +370,7 @@ const captureAsync = (cv) => async (name,
                 const point2 = new cv.Point(Math.round(currentPoints.x2 * imageDestination.cols), Math.round(currentPoints.y2 * imageDestination.rows));
 
                 let colorGreen = new cv.Scalar(95, 225, 62, 150);
-                cv.rectangle(imageDestination, point1, point2, colorGreen, 20, cv.LINE_8, 0);
+                //cv.rectangle(imageDestination, point1, point2, colorGreen, 20, cv.LINE_8, 0);
             } else {
                 numberFollowingMatchQuality = 0;
                 counterTime = 0;
