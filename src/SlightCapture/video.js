@@ -349,11 +349,10 @@ const captureAsync = (cv) => async (name,
             const point1TargetRectangle = new cv.Point(Math.round(targetPoints.x1 * imageDestination.cols), Math.round(targetPoints.y1 * imageDestination.rows));
             const point2TargetRectangle = new cv.Point(Math.round(targetPoints.x2 * imageDestination.cols), Math.round(targetPoints.y2 * imageDestination.rows));
 
-            let colorRectangle; // = currentPoints? new cv.Scalar(95, 225, 62, 150) : new cv.Scalar(255, 50, 50, 255);
-            let sizeRectangle; // = currentPoints ? 30: 20;
+            let colorRectangle;
+            let sizeRectangle; 
              if(currentPoints){
                  const templateMatchingPercentage = Math.abs(currentPoints.x1 - targetPoints.x1) * 100;
-                 console.log(templateMatchingPercentage);
                  if( templateMatchingPercentage < templateMatchingGreenThresholdPercentage ) {
                      colorRectangle = new cv.Scalar(95, 225, 62, 150); // Green
                      sizeRectangle = 30;
@@ -371,7 +370,6 @@ const captureAsync = (cv) => async (name,
             let counterTime;
             if (currentPoints != null) {
                 numberFollowingMatchQuality++;
-                let colorRed = new cv.Scalar(255, 158, 47, 200);
                 counterTime = Math.round((Date.now() - beginMatch) / 1000);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
                 const fontScale = imageDestination.cols > 2000 ? 15 : 10;
@@ -379,7 +377,16 @@ const captureAsync = (cv) => async (name,
                 // const baseline=0;
                 // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
                 const size = new cv.Size(300, -280);
-                cv.putText(imageDestination, (waitNumberOfSecond - counterTime).toString(), new cv.Point(Math.round(imageDestination.cols / 2 - size.width / 2), Math.round(imageDestination.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
+                const subRatio = Math.max(waitNumberOfSecond - counterTime + 1, 1);
+                const green = 100 + Math.round(155 / subRatio);
+                let colorGreen = new cv.Scalar( 50, green, 255 - Math.round(255 / subRatio), 255);
+                cv.putText(imageDestination, (waitNumberOfSecond - counterTime).toString(), new cv.Point(Math.round(imageDestination.cols / 2 - size.width / 2), Math.round(imageDestination.rows / 2 - size.height / 2)), font, fontScale, colorGreen, thickness, cv.LINE_AA);
+
+                //const point1 = new cv.Point(Math.round(currentPoints.x1 * imageDestination.cols), Math.round(currentPoints.y1 * imageDestination.rows));
+                //const point2 = new cv.Point(Math.round(currentPoints.x2 * imageDestination.cols), Math.round(currentPoints.y2 * imageDestination.rows));
+
+                //let colorGreen = new cv.Scalar(95, 225, 62, 150);
+                //cv.rectangle(imageDestination, point1, point2, colorGreen, 20, cv.LINE_8, 0);
             } else {
                 numberFollowingMatchQuality = 0;
                 counterTime = 0;
