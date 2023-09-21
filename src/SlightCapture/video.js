@@ -1,7 +1,7 @@
 ﻿import {imageResize, loadImageAsync, toImageBase64} from "./image.js";
-import {applyTemplateMatching, templateMatchingImageRatio, templateMatchingImageSize} from "./templateMatching.js";
+import {applyTemplateMatching, templateMatchingImageRatio, templateMatchingImageSize, templateMatchingGreenThresholdPercentage} from "./templateMatching.js";
 import {templateMaximumSize, zoneAsync} from "./zoning.js";
-import {blobToBase64Async, base64ToBlob, toBlobAsync} from "./blob.js";
+import {blobToBase64Async, toBlobAsync} from "./blob.js";
 import {detectAndComputeSerializable} from "./featureMatching.js";
 import {loadScriptAsync} from "./script.js";
 import {cuid} from "./guid.js";
@@ -349,9 +349,24 @@ const captureAsync = (cv) => async (name,
             const point1TargetRectangle = new cv.Point(Math.round(targetPoints.x1 * imageDestination.cols), Math.round(targetPoints.y1 * imageDestination.rows));
             const point2TargetRectangle = new cv.Point(Math.round(targetPoints.x2 * imageDestination.cols), Math.round(targetPoints.y2 * imageDestination.rows));
 
-            let colorRectangle = currentPoints? new cv.Scalar(95, 225, 62, 150) : new cv.Scalar(255, 50, 50, 255);
-            let szeRectangle = currentPoints? 30: 20;
-            cv.rectangle(imageDestination, point1TargetRectangle, point2TargetRectangle, colorRectangle, 30, cv.LINE_8, 0);
+            let colorRectangle; // = currentPoints? new cv.Scalar(95, 225, 62, 150) : new cv.Scalar(255, 50, 50, 255);
+            let sizeRectangle; // = currentPoints ? 30: 20;
+             if(currentPoints){
+                 const templateMatchingPercentage = Math.abs(currentPoints.x1 - targetPoints.x1) * 100;
+                 console.log(templateMatchingPercentage);
+                 if( templateMatchingPercentage < templateMatchingGreenThresholdPercentage ) {
+                     colorRectangle = new cv.Scalar(95, 225, 62, 150); // Green
+                     sizeRectangle = 30;
+                 } else {
+                     colorRectangle = new cv.Scalar(255, 158, 47, 200); // Orange
+                     sizeRectangle = 25;
+                 }
+             } else {
+                 colorRectangle = new cv.Scalar(255, 50, 50, 255); // Red
+                 sizeRectangle = 20;
+             }
+            
+            cv.rectangle(imageDestination, point1TargetRectangle, point2TargetRectangle, colorRectangle, sizeRectangle, cv.LINE_8, 0);
 
             let counterTime;
             if (currentPoints != null) {
@@ -365,12 +380,6 @@ const captureAsync = (cv) => async (name,
                 // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
                 const size = new cv.Size(300, -280);
                 cv.putText(imageDestination, (waitNumberOfSecond - counterTime).toString(), new cv.Point(Math.round(imageDestination.cols / 2 - size.width / 2), Math.round(imageDestination.rows / 2 - size.height / 2)), font, fontScale, colorRed, thickness, cv.LINE_AA);
-
-                const point1 = new cv.Point(Math.round(currentPoints.x1 * imageDestination.cols), Math.round(currentPoints.y1 * imageDestination.rows));
-                const point2 = new cv.Point(Math.round(currentPoints.x2 * imageDestination.cols), Math.round(currentPoints.y2 * imageDestination.rows));
-
-                let colorGreen = new cv.Scalar(95, 225, 62, 150);
-                //cv.rectangle(imageDestination, point1, point2, colorGreen, 20, cv.LINE_8, 0);
             } else {
                 numberFollowingMatchQuality = 0;
                 counterTime = 0;

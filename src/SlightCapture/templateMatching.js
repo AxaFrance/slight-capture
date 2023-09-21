@@ -93,6 +93,8 @@ export const findMatch = (cv) => (template, image, isDrawRectangle = false) => {
 export const templateMatchingImageSize = 200;
 export const templateMatchingImageRatio = 0.75;
 
+export const templateMatchingGreenThresholdPercentage = 3;
+
 export const applyTemplateMatching = (cv) => async (imageCvTemplate, imgCv) => {
     try {
         if (imgCv === null) return;
