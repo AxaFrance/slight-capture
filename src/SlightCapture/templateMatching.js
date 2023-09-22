@@ -90,7 +90,7 @@ export const findMatch = (cv) => (template, image, isDrawRectangle = false) => {
      };
 }
 
-export const templateMatchingImageSize = 200;
+export const templateMatchingImageSize = 300;
 export const templateMatchingImageRatio = 0.75;
 
 export const templateMatchingGreenThresholdPercentage = 3;
