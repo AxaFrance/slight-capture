@@ -206,7 +206,7 @@ const captureAsync = (cv) => async (name,
                                     internal_properties ,
                                     ) => {
     return new Promise((resolve, error) => {
-        const { enableDefaultCss, translations, outputImageMimeType, outputImageQuality, waitNumberOfSecond, thresholdTooWhite, thresholdTooDark } = internal_properties;
+        const { enableDefaultCss, translations, outputImageMimeType, outputImageQuality, waitNumberOfSecond: waitNumber, thresholdTooWhite, thresholdTooDark } = internal_properties;
         let mediaDevices = navigator.mediaDevices;
         if (!mediaDevices || !mediaDevices.getUserMedia) {
             console.log("getUserMedia() not supported.");
@@ -341,13 +341,15 @@ const captureAsync = (cv) => async (name,
                 }
                 frameCounter++;
             }
-            else{
+            else {
                 frameCounter++;
                 processVideoCache.imageCv = null;
             }
             const { imageCv, autoAdjustBrightnessRatio, currentPoints, targetPoints } = processVideoCache;
-            const point1TargetRectangle = new cv.Point(Math.round(targetPoints.x1 * imageDestination.cols), Math.round(targetPoints.y1 * imageDestination.rows));
-            const point2TargetRectangle = new cv.Point(Math.round(targetPoints.x2 * imageDestination.cols), Math.round(targetPoints.y2 * imageDestination.rows));
+            let cols = imageDestination.cols;
+            let rows = imageDestination.rows;
+            const point1TargetRectangle = new cv.Point(Math.round(targetPoints.x1 * cols), Math.round(targetPoints.y1 * rows));
+            const point2TargetRectangle = new cv.Point(Math.round(targetPoints.x2 * cols), Math.round(targetPoints.y2 * rows));
 
             let colorRectangle;
             let sizeRectangle; 
@@ -370,17 +372,17 @@ const captureAsync = (cv) => async (name,
             let counterTime;
             if (currentPoints != null) {
                 numberFollowingMatchQuality++;
-                counterTime = Math.round((Date.now() - beginMatch) / 1000);
+                counterTime = Math.round((Date.now() - beginMatch) / 750);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
-                const fontScale = imageDestination.cols > 2000 ? 15 : 10;
+                const fontScale = cols > 2000 ? 15 : 10;
                 const thickness = 20;
                 // const baseline=0;
                 // const size= cv.getTextSize('Test', font, fontScale, thickness, baseline);
                 const size = new cv.Size(300, -280);
-                const subRatio = Math.max(waitNumberOfSecond - counterTime + 1, 1);
+                const subRatio = Math.max(waitNumber - counterTime + 1, 1);
                 const green = 100 + Math.round(155 / subRatio);
                 let colorGreen = new cv.Scalar( 50, green, 255 - Math.round(255 / subRatio), 255);
-                cv.putText(imageDestination, (waitNumberOfSecond - counterTime).toString(), new cv.Point(Math.round(imageDestination.cols / 2 - size.width / 2), Math.round(imageDestination.rows / 2 - size.height / 2)), font, fontScale, colorGreen, thickness, cv.LINE_AA);
+                cv.putText(imageDestination, (waitNumber - counterTime).toString(), new cv.Point(Math.round(cols / 2 - size.width / 2), Math.round(rows / 2 - size.height / 2)), font, fontScale, colorGreen, thickness, cv.LINE_AA);
 
                 //const point1 = new cv.Point(Math.round(currentPoints.x1 * imageDestination.cols), Math.round(currentPoints.y1 * imageDestination.rows));
                 //const point2 = new cv.Point(Math.round(currentPoints.x2 * imageDestination.cols), Math.round(currentPoints.y2 * imageDestination.rows));
@@ -396,22 +398,22 @@ const captureAsync = (cv) => async (name,
             if(autoAdjustBrightnessRatio > thresholdTooDark){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
-                const fontScale = imageDestination.cols > 2000 ? 8 : 4;
+                const fontScale = cols > 2000 ? 8 : 4;
                 const thickness = 10;
                 let colorBlack = new cv.Scalar(255, 255, 255, 255);
-                cv.putText(imageDestination, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageDestination.rows *0.12)), font, fontScale, colorBlack, thickness, cv.LINE_AA);
+                cv.putText(imageDestination, translations['sc-modal__video-message-too-dark'], new cv.Point(Math.round(size.width * 0.12), Math.round(rows *0.12)), font, fontScale, colorBlack, thickness, cv.LINE_AA);
             }
 
             if(autoAdjustBrightnessRatio < thresholdTooWhite){
                 const size = new cv.Size(300, -280);
                 const font = cv.FONT_HERSHEY_SIMPLEX;
-                const fontScale = imageDestination.cols > 2000 ? 8 : 4;
+                const fontScale = cols > 2000 ? 8 : 4;
                 const thickness = 10;
                 let colorWhite = new cv.Scalar(0, 0, 0, 255);
-                cv.putText(imageDestination, translations['sc-modal__video-message-too-white'], new cv.Point(Math.round(size.width * 0.12), Math.round(imageDestination.rows *0.12)), font, fontScale, colorWhite, thickness, cv.LINE_AA);
+                cv.putText(imageDestination, translations['sc-modal__video-message-too-white'], new cv.Point(Math.round(size.width * 0.12), Math.round(rows *0.12)), font, fontScale, colorWhite, thickness, cv.LINE_AA);
             }
 
-            if (counterTime > waitNumberOfSecond) {
+            if (counterTime > waitNumber) {
                 numberFollowingMatchQuality = 0;
                 const finalShot = src.clone();
                 stopStreaming();
