@@ -7,7 +7,7 @@
 - [How to consume](#how-to-consume)
 - [Contribute](#contribute)
 
-## About
+## About 
 
 Simple vanilla JS library to capture a clean image and light from documents from a webcam. 
 It use Opencv.js under the hood.

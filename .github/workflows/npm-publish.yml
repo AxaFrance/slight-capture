@@ -12,20 +12,15 @@ on:
 env:
   PNPM_VERSION: 8.6.11
   NODE_VERSION: 18
+
+permissions:
+  contents: write
 jobs:
-  skip_ci:
-    runs-on: ubuntu-latest
-    outputs:
-      canSkip: ${{ steps.check.outputs.canSkip }}
-    steps:
-      - id: check
-        uses: Legorooj/skip-ci@main
 
   build:
     runs-on: ubuntu-latest
-    if: needs.skip_ci.outputs.canSkip != 'true' && !github.event.pull_request.head.repo.fork
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GIT_TOKEN }}
 
