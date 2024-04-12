@@ -6,6 +6,10 @@
 - [About](#about)
 - [How to consume](#how-to-consume)
 - [Contribute](#contribute)
+- 
+<p align="center">
+  <img src="slight-capture-logo.jpg" alt="Slight Capture" />
+</p>
 
 ## About 
 
