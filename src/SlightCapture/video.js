@@ -208,7 +208,7 @@ const captureAsync = (cv) => async (name,
     return new Promise((resolve, error) => {
         const { enableDefaultCss, translations, outputImageMimeType, outputImageQuality, waitNumberOfSecond: waitNumber, thresholdTooWhite, thresholdTooDark } = internal_properties;
         let mediaDevices = navigator.mediaDevices;
-        if (!mediaDevices || !mediaDevices.getUserMedia) {
+        if (!mediaDevices?.getUserMedia) {
             console.log("getUserMedia() not supported.");
             return;
         }
