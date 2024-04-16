@@ -1,10 +1,7 @@
 ﻿# Slight Capture
-<p style="float:right">
-  <img src="GreenIT.jpg" alt="Slight Capture" />
-</p>
 
-[![Continuous Integration](https://github.com/AcaFrance/slight-capture/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/slight-capture/actions/workflows/npm-publish.yml)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_slight-capture&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaGuilDEv_slight-capture) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_slight-capture&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_slight-capture&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_slight-capture&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_slight-capture&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaGuilDEv_slight-capture&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaGuilDEv_slight-capture&metric=Coverage) [![Twitter](https://img.shields.io/twitter/follow/GuildDEvOpen?style=social)](https://twitter.com/intent/follow?screen_name=GuildDEvOpen)
+[![Continuous Integration](https://github.com/AxaFrance/slight-capture/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/slight-capture/actions/workflows/npm-publish.yml)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaFrance_slight-capture) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=Coverage) 
 
 - [About](#about)
 - [How to consume](#how-to-consume)
@@ -21,8 +18,14 @@ It use Opencv.js under the hood.
 The usage is easy for user. Your data is lighter and cleaner for future OCR in your backend system.
 
 Advantages of slight capture:
-- Image of quality in your backend system: better OCR results
-- Lighter images (for example 100kb instead of 1Mb): cheaper to store and move evrywhere in you IT system
+- **Better image quality** in your backend system: better OCR results
+- **Less Processing**: No need to run complex and expensive arlgorithms to put the image back in the right direction
+- **Lighter images** (for example 100kb instead of 1Mb): Cheaper to store and move evrywhere in you IT system
+- **Green IT**: Less energy to process, store and move your data
+<p align="center">
+  <img src="GreenIT.jpg" alt="Slight Capture" />
+</p>
+
 
 Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 
