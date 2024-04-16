@@ -4,7 +4,7 @@
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaFrance_slight-capture) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=Coverage) 
 
 - [About](#about)
-- [How to consume](#how-to-consume)
+- [Get Started](#get-started)
 - [Contribute](#contribute)
 
 <p align="center">
@@ -29,7 +29,8 @@ Advantages of slight capture:
 
 Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 
-## Get Started  [![npm version](https://badge.fury.io/js/%40axa-fr%2Fslight-capture.svg)](https://badge.fury.io/js/%40axa-fr%2Fslight-capture)
+## Get Started 
+[![npm version](https://badge.fury.io/js/%40axa-fr%2Fslight-capture.svg)](https://badge.fury.io/js/%40axa-fr%2Fslight-capture)
 
 ```bash
 npm install @axa-fr/slight-capture --save
