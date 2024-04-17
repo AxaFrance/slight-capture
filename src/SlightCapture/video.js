@@ -66,7 +66,7 @@ const initTemplateAsync = (cv) => async (file) => {
 
 let openCVPromise = null;
 
-const loadOpenCVAsync = async (openCVScript = `https://docs.opencv.org/4.8.0/opencv.js` ) => {
+const loadOpenCVAsync = async (openCVScript = `https://docs.opencv.org/4.9.0/opencv.js` ) => {
     openCVPromise = loadScriptAsync(openCVScript);
     return await openCVPromise;
 }
