@@ -12,39 +12,6 @@ const sligthCaptureDatabase = {
 
 };
 
-const _startCaptureStream = (resolve, iVideo ) => (stream) => {
-
-        if ("srcObject" in iVideo) {
-            iVideo.srcObject = stream;
-        } else {
-            iVideo.src = window.URL.createObjectURL(stream);
-        }
-
-        stream.getTracks().forEach(function(track) {
-            track.enabled = true;
-        });
-
-        iVideo.onloadedmetadata = async function (e) {
-            await iVideo.play();
-            let stream_settings = stream.getVideoTracks()[0].getSettings();
-
-            let src = new cv.Mat(stream_settings.height, stream_settings.width, cv.CV_8UC4);
-            iVideo.height = iVideo.videoHeight;
-            iVideo.width = iVideo.videoWidth;
-            let videoCapture = new cv.VideoCapture(iVideo);
-
-            const stopStreamTracks = () => {
-                stream.getTracks().forEach(function(track) {
-                    track.stop();
-                    track.enabled = true;
-                });
-            }
-
-            resolve({ videoCapture, src, stopStreamTracks});
-
-        }
-}
-
 const startCaptureAsync = cv =>(constraints, iVideo) => {
     return new Promise((resolve, error) => {
         navigator.mediaDevices.getUserMedia(constraints)
