@@ -8,14 +8,12 @@ const sligthCapture = sligthCaptureFactory();
 
 
 const loadTemplateAsync = async (url, filename) => {
-    return new Promise(async (resolve, reject) => {
-        const files = await fetch(url);
-        const blob = await files.blob();
-        blob.lastModifiedDate = new Date();
-        blob.name = filename;
-        blob.filename = filename;
-        resolve(blob);
-    });
+    const files = await fetch(url);
+    const blob = await files.blob();
+    blob.lastModifiedDate = new Date();
+    blob.name = filename;
+    blob.filename = filename;
+    return blob;
 };
 
 function formatSizeUnits(bytes){
@@ -75,7 +73,7 @@ export const SlightCaptureVideo = () => {
             <div>
                 {state.url && <>
                     <p  style={{"fontSize":"1.2em", color: "green"}}>{formatSizeUnits(state.size)}</p>
-                    <img style={{"maxWidth": "100%"}} src={state.url} alt="image found"/>
+                    <img style={{"maxWidth": "100%"}} src={state.url} alt="Your document"/>
                 </>
                 }
             </div>
@@ -94,8 +92,8 @@ export const SlightCaptureVideo = () => {
                 <button onClick={(e) => onClick(e, "./template_new_cni_verso.jpg") } style={{"fontSize":"2em", margin: "1em"}}>New french ID card verso</button>
             </div>
             <div>
-                <label style={{"fontSize":"2em", margin: "1em"}}>Your own template :</label>
-                <input type="file" onChange={onChange} multiple={true} style={{"fontSize":"2em", margin: "1em"}}/>
+                <label htmlFor="file_input" style={{"fontSize":"2em", margin: "1em"}}>Your own template :</label>
+                <input id="file_input" type="file" onChange={onChange} multiple={true} style={{"fontSize":"2em", margin: "1em"}}/>
             </div>
 
         </form>
