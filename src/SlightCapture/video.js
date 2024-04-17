@@ -25,16 +25,16 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
                 stream.getTracks().forEach(function(track) {
                     track.enabled = true;
                 });
-      
+
                 iVideo.onloadedmetadata = async function (e) {
                     await iVideo.play();
                     let stream_settings = stream.getVideoTracks()[0].getSettings();
-                    
+
                     let src = new cv.Mat(stream_settings.height, stream_settings.width, cv.CV_8UC4);
                     iVideo.height = iVideo.videoHeight;
                     iVideo.width = iVideo.videoWidth;
                     let videoCapture = new cv.VideoCapture(iVideo);
-                    
+
                     const stopStreamTracks = () => {
                         stream.getTracks().forEach(function(track) {
                             track.stop();
@@ -45,7 +45,7 @@ const startCaptureAsync = cv =>(constraints, iVideo) => {
                     resolve({ videoCapture, src, stopStreamTracks});
 
                 }
-            }) .catch(function(err) {
+            }).catch(function(err) {
             console.error(err.name + ": " + err.message);
             error(err);
         });
@@ -66,7 +66,7 @@ const initTemplateAsync = (cv) => async (file) => {
 
 let openCVPromise = null;
 
-const loadOpenCVAsync = async (openCVScript = `https://docs.opencv.org/4.8.0/opencv.js` ) => {
+const loadOpenCVAsync = async (openCVScript = `https://docs.opencv.org/4.9.0/opencv.js` ) => {
     openCVPromise = loadScriptAsync(openCVScript);
     return await openCVPromise;
 }
