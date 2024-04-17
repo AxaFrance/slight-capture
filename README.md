@@ -1,7 +1,7 @@
 ﻿# Slight Capture
 
 [![Continuous Integration](https://github.com/AxaFrance/slight-capture/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/slight-capture/actions/workflows/npm-publish.yml)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaFrance_slight-capture) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=security_rating) [![Code Coverage](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=coverage)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=Coverage) 
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaFrance_slight-capture) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=security_rating) 
 
 - [About](#about)
 - [Get Started](#get-started)
