@@ -13,7 +13,7 @@
 
 ## About 
 
-Simple vanilla JS library to capture a clean image and light from documents from a webcam. 
+Simple vanilla JS library to capture a clean image and light from documents from a **webcam** directly from you **Web Browser**. 
 It use Opencv.js under the hood.
 The usage is easy for user. Your data is lighter and cleaner for future OCR in your backend system.
 
@@ -27,7 +27,10 @@ Advantages of slight capture:
 </p>
 
 
-Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
+Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/ (test with your phone or tablet)
+<p align="center">
+<img src="demo.png" alt="Slight Capture" />
+</p>
 
 ## Get Started 
 [![npm version](https://badge.fury.io/js/%40axa-fr%2Fslight-capture.svg)](https://badge.fury.io/js/%40axa-fr%2Fslight-capture)
