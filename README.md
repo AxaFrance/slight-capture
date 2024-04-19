@@ -13,14 +13,14 @@
 
 ## About 
 
-Simple vanilla JS library to capture a clean image and light from documents from a webcam. 
-It use Opencv.js under the hood.
+Simple vanilla JS library to capture a clean and small (in weight) image from documents from a webcam. 
+It uses Opencv.js under the hood.
 The usage is easy for user. Your data is lighter and cleaner for future OCR in your backend system.
 
 Advantages of slight capture:
 - **Better image quality** in your backend system: better OCR results.
 - **Less Processing**: No need to run complex and expensive arlgorithms to put the image back in the right direction.
-- **Lighter images** (for example 100kb instead of 1Mb): Cheaper to store and move everywhere in you IT system.
+- **Small images weight** (for example 100kb instead of 1Mb): Cheaper to store and move everywhere in you IT system.
 - **Green IT**: Less energy to process, store and move your data.
 <p align="center">
   <img src="GreenIT.jpg" alt="Slight Capture" />
