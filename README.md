@@ -1,7 +1,7 @@
 ﻿# Slight Capture
 
 [![Continuous Integration](https://github.com/AxaFrance/slight-capture/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/AxaFrance/slight-capture/actions/workflows/npm-publish.yml)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaFrance_slight-capture) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=security_rating) 
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=alert_status)](https://sonarcloud.io/dashboard?id=AxaFrance_slight-capture) [![Reliability](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=reliability_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=reliability_rating) [![Security](https://sonarcloud.io/api/project_badges/measure?project=AxaFrance_slight-capture&metric=security_rating)](https://sonarcloud.io/component_measures?id=AxaFrance_slight-capture&metric=security_rating)
 
 - [About](#about)
 - [Get Started](#get-started)
@@ -11,16 +11,16 @@
   <img src="slight-capture-logo.jpg" alt="Slight Capture" />
 </p>
 
-## About 
+## About
 
-Simple vanilla JS library to capture a clean and light image from documents from a **webcam** directly from you **Web Browser**. 
-It use Opencv.js under the hood.
+Simple vanilla JS library to capture a clean and small (in weight) image from documents from a **webcam** directly from you **Web Browser**.
+It uses Opencv.js under the hood.
 The usage is easy for user. Your data is lighter and cleaner for future OCR in your backend system.
 
 Advantages of slight capture:
 - **Better image quality** in your backend system: better OCR results.
 - **Less Processing**: No need to run complex and expensive arlgorithms to put the image back in the right direction.
-- **Lighter images** (for example 100ko instead of 1Mo or 32 Mo on some phones): Cheaper to store and move everywhere in you IT system.
+- **Small images weight** (for example 100kb instead of 1Mb/32 Mo on some devices): Cheaper to store and move everywhere in your IT system.
 - **Green IT**: Less energy to process, store and move your data.
 <p align="center">
   <img src="GreenIT.jpg" alt="Slight Capture" />
@@ -32,7 +32,7 @@ Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 <img src="demo.png" alt="Slight Capture" />
 </p>
 
-## Get Started 
+## Get Started
 [![npm version](https://badge.fury.io/js/%40axa-fr%2Fslight-capture.svg)](https://badge.fury.io/js/%40axa-fr%2Fslight-capture)
 
 ```bash
@@ -61,7 +61,7 @@ import sligthCaptureFactory, {toBase64Async} from "@axa-fr/slight-capture";
 const sligthCapture = sligthCaptureFactory();
 
 export const SlightCaptureVideo = () => {
-    
+
     const [state, setState] = useState({
         isLoading: false,
         url: null,
@@ -160,7 +160,7 @@ const properties = {
 
 
 You can customize the css by passing properties.enableDefaultCss: false to take the control of the css.
-css use BEM (Block Element Modifier) convention. 
+css use BEM (Block Element Modifier) convention.
 
 ```css
 
@@ -169,43 +169,43 @@ css use BEM (Block Element Modifier) convention.
    disable default inline css by passing enableDefaultCss: false to take the control of the css 
 */
 .sc-modal {
-  position: fixed;
-  z-index: 10000000;
-  padding-top: 0;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100vh;
-  overflow: auto;
-  background-color: white;
-  text-align:center;
+    position: fixed;
+    z-index: 10000000;
+    padding-top: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+    background-color: white;
+    text-align:center;
 }
 
 .sc-modal__video-title {
-  padding-left: 0.5em;
-  padding-right: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
 }
 
 .sc-modal__video-invert-camera {
-  padding: 0.5em;
-  font-size: 1em;
-  margin: 1em;
-  position:absolute;
-  background-color:#a8a8a88f;
+    padding: 0.5em;
+    font-size: 1em;
+    margin: 1em;
+    position:absolute;
+    background-color:#a8a8a88f;
 }
 
 .sc-modal__video-quit {
-  padding: 0.3em;
-  font-size: 1em;
-  margin: 1em;
-  position:absolute; 
-  top: 0; 
-  right: 0;
+    padding: 0.3em;
+    font-size: 1em;
+    margin: 1em;
+    position:absolute;
+    top: 0;
+    right: 0;
 }
 
 .sc-modal__video-video {
-  display: inline;
-  height: 80vh;
+    display: inline;
+    height: 80vh;
 }
 
 .sc-modal__video-container{
@@ -222,41 +222,41 @@ css use BEM (Block Element Modifier) convention.
 }
 
 .sc-modal__confirm-container {
-  position: absolute;
-  z-index: 100000000;
-  padding-top: 0;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100vh;
-  overflow: auto;
-  background-color: white;
-  text-align:center;
+    position: absolute;
+    z-index: 100000000;
+    padding-top: 0;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+    background-color: white;
+    text-align:center;
 }
 
 .sc-modal__confirm-loading {
-  
+
 }
 
 .sc-modal__confirm-title {
-  
+
 }
 
 .sc-modal__confirm-image {
-  max-width: 800px;
-  width: 100%;
+    max-width: 800px;
+    width: 100%;
 }
 
 .sc-modal__confirm-button-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .sc-modal__confirm-button {
-  padding: 0.5em;
-  font-size: 2em;
-  margin: 1em;
+    padding: 0.5em;
+    font-size: 2em;
+    margin: 1em;
 }
 
 
