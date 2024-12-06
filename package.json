@@ -1,7 +1,7 @@
 {
   "name": "@axa-fr/slight-capture",
   "private": false,
-  "version": "0.13.2",
+  "version": "0.13.3",
   "type": "module",
   "module": "./src/SlightCapture/index.js",
   "description": "Pure vanilla javascript library to capture a document image from webcam for web application. Tested on Chrome, Firefox, Safari.",
