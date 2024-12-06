@@ -89,14 +89,14 @@ const texts = {
 const properties = {
     translations: texts,
     enableDefaultCss: true,
-    outputImageQuality: 0.6,
+    outputImageQuality: 0.7,
     outputImageMimeType: 'image/jpeg',
     waitNumberOfSecond: 3,
     thresholdTooWhite: 1.15,
     thresholdTooDark: 2.5,
     video: {
-        width: {ideal: 1600},
-        height: {ideal: 1600},
+        width: {ideal: 2000},
+        height: {ideal: 2000},
         facingMode: {
             ideal: 'environment' // 'face'
         },
