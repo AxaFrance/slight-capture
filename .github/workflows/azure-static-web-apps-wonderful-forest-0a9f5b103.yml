@@ -10,7 +10,7 @@ on:
       - main
 
 env:
-  PNPM_VERSION: 8.5.1
+  PNPM_VERSION: 10.4.1
   NODE_VERSION: 18
 
 jobs:

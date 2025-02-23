@@ -10,7 +10,7 @@ on:
     branches: [ main ]
 
 env:
-  PNPM_VERSION: 8.6.11
+  PNPM_VERSION: 10.4.1
   NODE_VERSION: 18
 
 permissions:

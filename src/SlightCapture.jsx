@@ -35,7 +35,7 @@ export const SlightCaptureVideo = () => {
     });
 
     useEffect(() => {
-        sligthCapture.initAsync("https://docs.opencv.org/4.10.0/opencv.js");
+        sligthCapture.initAsync("https://docs.opencv.org/4.11.0/opencv.js");
     });
 
     const onCapture = async (file) => {
