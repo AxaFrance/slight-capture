@@ -8,7 +8,7 @@ export default {
     argTypes: { },
 };
 
-export const Video = {
+const baseStory = {
     title: 'Component/SlightCapture',
     component: SlightCaptureVideo,
     tags: ['autodocs'],
@@ -20,8 +20,12 @@ export const Video = {
     },
 };
 
+export const Video = {
+    ...baseStory,
+};
+
 export const Mobile = {
-    ...Video,
+    ...baseStory,
     parameters: {
         viewport: {
             defaultViewport: 'mobile1',

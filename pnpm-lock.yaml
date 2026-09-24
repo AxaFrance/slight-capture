@@ -30,8 +30,8 @@ importers:
         specifier: 8.6.15
         version: 8.6.15(storybook@8.6.15(prettier@3.5.2))
       '@storybook/test-runner':
-        specifier: 0.20.0
-        version: 0.20.0(@types/node@22.13.5)(storybook@8.6.15(prettier@3.5.2))
+        specifier: 0.22.0
+        version: 0.22.0(@types/node@22.13.5)(storybook@8.6.15(prettier@3.5.2))
       '@types/react':
         specifier: ^19.3.0
         version: 19.3.0
@@ -1249,12 +1249,12 @@ packages:
       typescript:
         optional: true
 
-  '@storybook/test-runner@0.20.0':
-    resolution: {integrity: sha512-0cSNW61/XYg8jtcRlk8qc5fJa8qKSq7tvSpvikwS7zcXkKgfu6fbGX56ErxnvidmyCyXjMe/j0UHzLACzc2nTg==}
+  '@storybook/test-runner@0.22.0':
+    resolution: {integrity: sha512-fKY6MTE/bcvMaulKXy+z0fPmRXJx1REkYMOMcGn8zn6uffyBigGgaVf/sZ+AZfibwvjzg/StWhJ9HvAM8pc14g==}
     engines: {node: ^16.10.0 || ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
-      storybook: ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0
+      storybook: ^0.0.0-0 || ^8.2.0 || ^8.3.0-0 || ^8.4.0-0 || ^8.5.0-0 || ^8.6.0-0 || ^9.0.0-0
 
   '@storybook/test@8.6.15':
     resolution: {integrity: sha512-EwquDRUDVvWcZds3T2abmB5wSN/Vattal4YtZ6fpBlIUqONV4o/cOBX39cFfQSUCBrIXIjQ6RmapQCHK/PvBYw==}
@@ -5137,7 +5137,7 @@ snapshots:
       '@storybook/test': 8.6.15(storybook@8.6.15(prettier@3.5.2))
       typescript: 5.7.3
 
-  '@storybook/test-runner@0.20.0(@types/node@22.13.5)(storybook@8.6.15(prettier@3.5.2))':
+  '@storybook/test-runner@0.22.0(@types/node@22.13.5)(storybook@8.6.15(prettier@3.5.2))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/generator': 7.29.8
