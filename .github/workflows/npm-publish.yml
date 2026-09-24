@@ -11,7 +11,7 @@ on:
 
 env:
   PNPM_VERSION: 10.4.1
-  NODE_VERSION: 18
+  NODE_VERSION: 22
 
 permissions:
   contents: write
@@ -77,11 +77,11 @@ jobs:
             echo "new_version=$version-beta.${{ github.run_number }}" >> $GITHUB_OUTPUT
           fi
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
           version: ${{ env.PNPM_VERSION }}
@@ -90,6 +90,15 @@ jobs:
       - name: pnpm ci
         run: pnpm i --frozen-lockfile
         working-directory: . 
+
+      - name: pnpm build
+        run: pnpm run build
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: pnpm e2e
+        run: pnpm run test:e2e
         
       - name: Git Configuration
         id: gitconfig
@@ -118,7 +127,7 @@ jobs:
           git clone -b 4.x https://github.com/opencv/opencv.git --depth 1
           cd opencv
           sed -i "s/white_list = makeWhiteList(\[core, imgproc, objdetect, video, dnn, features2d, photo, calib3d\])/white_list = makeWhiteList([core, imgproc, features2d, calib3d])/g" ./platforms/js/opencv_js.config.py
-          docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk:2.0.10 emcmake python3 ./platforms/js/build_js.py build_js
+          docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk:3.1.74 emcmake python3 ./platforms/js/build_js.py build_js
 
       - name: Copy OpenCV
         id: copy_open_cv

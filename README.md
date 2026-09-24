@@ -32,6 +32,14 @@ Online Storybook Demo: https://wonderful-forest-0a9f5b103.3.azurestaticapps.net/
 <img src="demo.png" alt="Slight Capture" />
 </p>
 
+The Storybook demo is now validated with automated end-to-end interaction tests and can be used to validate both desktop and mobile viewports.
+
+Run the local E2E checks with:
+
+```bash
+pnpm run test:e2e
+```
+
 ## Get Started
 [![npm version](https://badge.fury.io/js/%40axa-fr%2Fslight-capture.svg)](https://badge.fury.io/js/%40axa-fr%2Fslight-capture)
 
